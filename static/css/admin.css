@@ -1,0 +1,7 @@
+/* Roles */
+.role{
+    /* box-shadow: 0 1px 3px 0 rgb(0 0 0 / 20%); */
+    border-radius: 5px;
+    padding: 20px;
+    border: thin solid rgba(0,0,0,.125);
+}

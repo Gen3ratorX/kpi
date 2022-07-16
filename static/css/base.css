@@ -1,0 +1,341 @@
+:root{
+    --barberry: #e6eb1e;
+    --salem: #069243;
+    --orange-roughy: #d4431e;
+    --apple: #619939;
+    --dune: #2a2824;
+    --xanadu: #7c7d7c;
+    --jewel: #10562c;
+    --lima: #7ccc1e;
+    --forest-green: #38a424;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 2px;
+}
+
+body{
+    font-family: 'Roboto', sans-serif;
+}
+a{
+    text-decoration: none;
+}
+
+/* Navbar */
+nav{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    background-color: white;
+    z-index: 5;
+}
+#nav-brand{
+    text-decoration: none;
+    max-width: 380px;
+}
+#nav-brand h1, #phone-menu > a > h1, footer > a > h1{
+    font-size: 22px;
+    margin-left: 5px;
+    font-weight: 400;
+    color: var(--jewel);
+    transition: all .2s ease-in-out;
+}
+#nav-brand img{
+    width: 90px;
+    transition: all .2s ease-in-out;
+}
+/* Hamburger menu */
+#hamburger{
+    position: absolute;
+    top: 27.9px;
+    right: 20px;
+    width: 34px;
+    height:22px;
+    cursor: pointer;
+    display: none;
+}
+#hamburger > p{
+    width: 30px;
+    height: 3px;
+    background-color: var(--apple);
+    position: relative;
+    right: -2px;
+    top: 9px;
+}
+#hamburger > p::before, #hamburger > p::after{
+    content: '';
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: var(--apple);
+    position: relative;
+    top: -7px;
+}
+#hamburger > p::after{
+    background-color: var(--apple);
+    top: 5px;
+}
+/* Desktop menu */
+#desktop-menu > ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#desktop-menu > ul > li{
+    display: inline-block;
+}
+#desktop-menu > ul > li > a, #phone-menu > ul > li > a{
+    color: var(--dune);
+    font-size: 15px;
+    font-weight: 500;
+    padding: 8px 20px;
+    transition: all .2s ease-in-out;
+    display: block;
+    text-align: center;
+}
+#desktop-menu > ul > li > a:hover, #phone-menu > ul > li > a:hover{
+    color: var(--forest-green);
+}
+.add-role > a{
+    background-color: var(--forest-green);
+    color: white !important;
+    border-radius: 5px;
+    border: 2px solid var(--forest-green);
+    width: 150px;
+}
+.add-role > a:hover{
+    color: var(--forest-green) !important;
+    background-color: white;
+}
+.logout > a:hover{
+    color: crimson !important;
+}
+
+/* Phone Menu */
+#phone-menu-wrapper{
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: -10000px;
+    z-index: 10;
+}
+#phone-menu{
+    /* width: 250px; */
+    background-color: var(--lima);
+    background-color: white;
+    height: 100vh;
+    padding: 10px;
+    flex-grow: 0;
+}
+#phone-menu > a{
+    text-align: center;
+    display: block;
+}
+#phone-menu > a > h1{
+    color: var(--jewel);
+    font-size: 20px;
+    margin-top: 15px;
+    font-weight: 400;
+}
+#phone-menu > ul{
+    list-style: none;
+    margin: 40px 0px;
+    padding: 0;
+    overflow: auto;
+    height: calc(100vh - 210px);
+}
+#phone-menu > ul > li:first-child > a{
+    border-top: thin solid rgba(0,0,0,.125);
+}
+#phone-menu > ul > li > a{
+    border-bottom: thin solid rgba(0,0,0,.125);
+    font-size: 14px;
+}
+#phone-menu .add-role > a{
+    width: 100%;
+    border-bottom: 2px solid var(--apple);
+    margin: 10px 0;
+}
+#alternate-close{
+    background-color: rgba(0,0,0,.6);
+    flex-grow: 1;
+}
+
+/* Main body */
+#main-body{
+    margin-top: 78px;
+}
+
+/* Header */
+.header{
+    font-weight: 500;
+    font-size: 30px;
+    color: var(--lima);
+    text-align: center;
+    margin: 20px 0px;
+    transition: all .2s ease-in-out;
+}
+.header::after{
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    border-radius: 10px;
+    background-color: var(--orange-roughy);
+    margin: auto;
+    transition: all .2s ease-in-out;
+}
+.header::before{
+    content: '';
+    display: block;
+    width: 30px;
+    height: 3px;
+    border-radius: 10px;
+    background-color: var(--orange-roughy);
+    margin: auto;
+    position: relative;
+    top: 45px;
+    transition: all .2s ease-in-out;
+}
+/* No Item */
+.no-item{
+    text-align: center;
+    font-size: 30px;
+    color: gray;
+    font-weight: 400;
+    text-transform: capitalize;
+    transition: all .2s ease-in-out;
+}
+.no-item div{
+    margin: 10px 0;
+}
+/* Btn */
+.btn{
+    box-shadow: none !important;
+    font-size: 15px !important;
+    font-weight: 400;
+    border-width: 2px;
+}
+.btn-1{
+    background-color: var(--forest-green);
+    color: white;
+    border-color: var(--forest-green);
+}
+.btn-1:hover{
+    background-color: white;
+    color: var(--forest-green);
+}
+.btn-2{
+    background-color: crimson;
+    color: white;
+    border-color: crimson;
+}
+.btn-2:hover{
+    background-color: white;
+    color: crimson;
+}
+.btn-3{
+    background-color: var(--dune);
+    color: white;
+    border-color: var(--dune);
+}
+.btn-3:hover{
+    background-color: var(--dune);
+    color: var(--dune);
+}
+.btn-4{
+    background-color: royalblue;
+    color: white;
+    border-color: royalblue;
+}
+.btn-4:hover{
+    background-color: white;
+    color: royalblue;
+}
+.btn-sm{
+    width: 100px;
+}
+.btn-md{
+    width: 200px;
+}
+.btn-lg{
+    width: 400px;
+}
+/* Footer */
+footer{
+    background-color: #222;
+}
+footer > a{
+    padding: 20px;
+    text-align: center;
+    display: block;
+}
+footer > a > h1{
+    margin-top: 15px;
+}
+#copyright{
+    text-align: center;
+    padding: 10px;
+    font-weight: 400;
+    background-color: #333;
+    font-size: 15px;
+    color: #999;
+}
+
+/* 0px - 900px */
+@media only screen and (max-width:900px){
+    #hamburger{
+        display: block;
+    }
+    #desktop-menu{
+        display: none;
+    }
+}
+
+/* 0px - 500px */
+@media only screen and (max-width:500px){
+    /* Nav */
+    #nav-brand h1{
+        font-size: 20px;
+    }
+    #nav-brand img{
+        width: 80px;
+    }
+    /* Hamburger */
+    #hamburger{
+        top: 25.5px;
+    }
+    #main-body{
+        margin-top: 74px;
+    }
+    /* Header */
+    .header{
+        font-size: 20px;
+    }
+    .header::after{
+        width: 40px;
+        height: 2.5px;
+    }
+    .header::before{
+        width: 30px;
+        height: 2.5px;
+        top: 32px;
+    }
+    /* No item */
+    .no-item{
+        font-size: 20px;
+    }
+    .no-item a{
+        font-size: 16px;
+    }
+}

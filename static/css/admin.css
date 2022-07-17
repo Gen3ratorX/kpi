@@ -5,3 +5,10 @@
     padding: 20px;
     border: thin solid rgba(0,0,0,.125);
 }
+#role-progress{
+    padding: 10px 0;
+    background-color: white;
+    position: sticky;
+    top: 72px;
+    z-index: 4;
+}

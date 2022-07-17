@@ -250,7 +250,7 @@ nav{
     border-color: var(--dune);
 }
 .btn-3:hover{
-    background-color: var(--dune);
+    background-color: white;
     color: var(--dune);
 }
 .btn-4{
@@ -270,6 +270,33 @@ nav{
 }
 .btn-lg{
     width: 400px;
+}
+/* Required input */
+.required{
+    font-size: 18px;
+}
+.required::after{
+    content: '*';
+    display: inline-block;
+    font-size: 20px;
+    color: crimson;
+    position: relative;
+}
+/* Form */
+.form-control{
+    box-shadow: 0 1px 1px 0 rgb(0 0 0 / 14%) !important;
+}
+.form-control:focus{
+    border-color: var(--apple);
+}
+/* Modal */
+.modal{
+    box-shadow: 0px 2px 5px rgba(0,0,0,.9) !important;
+    border-radius: 0px !important;
+}
+/* Accordion */
+.accordion-button{
+    box-shadow: none !important;
 }
 /* Footer */
 footer{

@@ -1,10 +1,15 @@
 class AdminControl{
     constructor(){
+        this.pageInit();
         this.toggleRoleState();
-        this.addFocusAttempt()
-        // this.editFocusAttempt();
-        // this.deleteFocusAttempt()
+        this.addFocusAttempt();
         this.saveFocus();
+        this.deleteItem();
+    }
+
+    pageInit(){
+        // const myModalAlternative = new bootstrap.Modal('#deleteFocusModal', {});
+        // myModalAlternative.show();
     }
 
     toggleRoleState(){
@@ -31,8 +36,13 @@ class AdminControl{
         });
     }
 
+    toggleEventState(ele,action,event='click'){
+        $(ele).off(event);
+        action();
+    }
+
     addFocusAttempt(){
-        $('#add-focus-attempt').click(function(){
+        $('.add-focus-attempt').click(function(){
             $('#save-focus').data('command','add');
 
         });
@@ -51,8 +61,43 @@ class AdminControl{
 
     deleteFocusAttempt(){
         $('.delete-focus-attempt').click(function(){
+            $('#deleteItemModalLabel').text("Delete Focus");
+            $('#deleteItemModal').find('.modal-body > p').text("Do you want to delete this focus?");
             const focusIdentifier = $(this).data('focusIdentifier');
-            console.log(`Delete ${focusIdentifier}`)
+            $('#delete-item').data({'identifier':focusIdentifier,'item':'focus'});
+        });
+    }
+
+    deleteItem(){
+        const inst = this;
+        $('#delete-item').click(function(){
+            const {item,identifier} = $(this).data();
+            if(item == 'focus'){
+                $(`#${identifier}`).hide(function(){
+                    if($('#focuses').children().length === 1){
+                        $('#focuses').hide(function(){
+                            $('#focus-wrapper').prev().after(
+                                `<!-- No Focus -->
+                                    <section class="no-item">
+                                        No Focus Has Been Added
+                                        <div>
+                                            <a href="#" class="btn btn-1 btn-md add-focus-attempt" data-bs-toggle="modal" data-bs-target="#focusModal"> Add Focus </a>
+                                        </div>
+                                    </section>
+                                `
+                            );
+                            // Add events to add focus button
+                            inst.toggleEventState('.add-focus-attempt',inst.addFocusAttempt)
+                            $(this).remove();
+                        });
+                    }
+                    else{
+                        $(this).remove();
+                    }
+                });
+            }
+            // Close modal
+            $('#close-delete-item-modal').click();
         });
     }
 
@@ -63,7 +108,7 @@ class AdminControl{
             if(focus){
                 const command = $(this).data('command');
                 $('#focus-error').text('');
-                $('#close-add-focus-modal').click();
+                $('#close-focus-modal').click();
                 $('#focus-input').val('');
                 // Add focus
                 if(command === 'add'){
@@ -83,7 +128,7 @@ class AdminControl{
                                         <div class="d-flex justify-content-end mb-2">
                                             <button class="btn btn-3 btn-md me-2">Add Objective</button>
                                             <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
-                                            <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}">Delete Focus</button>
+                                            <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#deleteItemModal">Delete Focus</button>
                                         </div>
                                         <div class="objectives">
                                             <!-- No Objective -->
@@ -116,7 +161,7 @@ class AdminControl{
                                             <div class="d-flex justify-content-end mb-2">
                                                 <button class="btn btn-3 btn-md me-2">Add Objective</button>
                                                 <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
-                                                <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}">Delete Focus</button>
+                                                <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#deleteItemModal">Delete Focus</button>
                                             </div>
                                             <div class="objectives">
                                                 <!-- No Objective -->

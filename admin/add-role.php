@@ -3,13 +3,13 @@
     require_once 'admin_navbar.php';
 ?>
     
-    <!-- Focus Modal -->
+    <!-- save Focus Modal -->
     <div class="modal fade" id="focusModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="focusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="focusModalLabel">Add Focus</h5>
-                    <button type="button" class="btn-close" id="close-add-focus-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" id="close-focus-modal" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <label for="focus-input" class="required">Focus:</label>
@@ -23,6 +23,24 @@
         </div>
     </div>
 
+    <!-- Delete Item Modal -->
+    <div class="modal fade" id="deleteItemModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteItemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteItemModalLabel"></h5>
+                    <button type="button" class="btn-close" id="close-delete-item-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="lead"></p>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-4 btn-sm me-3" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-2 btn-sm" id="delete-item">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <main id='main-body'
         <div class="container mb-3">
@@ -41,7 +59,7 @@
                             <button class="btn btn-4 btn-sm" id="save-or-edit" data-command='save'>Save</button>
                         </div>
                         <div class="col-auto">
-                            <button id="add-focus-attempt" class="btn btn-3 btn-sm" data-bs-toggle="modal" data-bs-target="#focusModal">Add Focus</button>
+                            <button class="btn btn-3 btn-sm add-focus-attempt" data-bs-toggle="modal" data-bs-target="#focusModal">Add Focus</button>
                         </div>
                     </div>
                     <p class="text-danger small ml-5 mb-0 error" data-error="false" id="role-error"></p>
@@ -61,70 +79,14 @@
             <section class="mt-4">
                 <h1 class="header">Focuses</h1>
                 <!-- No Focus -->
-                <!-- <section class="no-item">
+                <section class="no-item">
                     No Focus Has Been Added
                     <div>
-                        <a href="#" class="btn btn-1 btn-md" data-bs-toggle="modal" data-bs-target="#addFocusModal"> Add Focus </a>
-                    </div>
-                </section> -->
-                <section id="focus-wrapper">
-                    <div class="accordion" id="accordionPanelsStayOpenExample">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="panelsStayOpen-headingOne">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
-                                    Accordion Item #1
-                                </button>
-                            </h2>
-                            <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-headingOne">
-                                <div class="accordion-body">
-                                    <div class="d-flex justify-content-end mb-2">
-                                        <button class="btn btn-3 btn-md me-2">Add Objective</button>
-                                        <button class="btn btn-4 btn-md me-2 edit-focus-attempt" id="" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
-                                        <button class="btn btn-2 btn-md delete-focus-attempt" id="">Delete Focus</button>
-                                    </div>
-                                    <div class="objectives">
-                                        <!-- No Objective -->
-                                        <section class="no-item">
-                                            No Objective Has Been Added
-                                            <div>
-                                                <a href="#" class="btn btn-1 btn-md" data-bs-toggle="modal" data-bs-target="#addFocusModal"> Add Objective </a>
-                                            </div>
-                                        </section>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
-                                Accordion Item #2
-                            </button>
-                            </h2>
-                            <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
-                            <div class="accordion-body">
-                                    <div class="d-flex justify-content-end mb-2">
-                                        <button class="btn btn-3 btn-md me-2">Add Objective</button>
-                                        <button class="btn btn-4 btn-md me-2 edit-focus-attempt" id="" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
-                                        <button class="btn btn-2 btn-md delete-focus-attempt" id="">Delete Focus</button>
-                                    </div>
-                                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                            </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="panelsStayOpen-headingThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false" aria-controls="panelsStayOpen-collapseThree">
-                                Accordion Item #3
-                            </button>
-                            </h2>
-                            <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingThree">
-                            <div class="accordion-body">
-                                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                            </div>
-                            </div>
-                        </div>
+                        <a href="#" class="btn btn-1 btn-md add-focus-attempt" data-bs-toggle="modal" data-bs-target="#focusModal"> Add Focus </a>
                     </div>
                 </section>
+                <section id="focus-wrapper">
+                    
             </section>
         </div>
     </main>

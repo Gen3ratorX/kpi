@@ -8,25 +8,25 @@
                 <h1 class="header">Roles</h1>
                 <div class="row gy-3 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">
                     <div class="col">
-                        <div class="card shadow role">
+                        <div class="card shadow role h-100">
+                            <h2>Employee Role 1</h2>
+                            <p class="text-muted">Number of employees: <span class="text-dark">2</span></p>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="card shadow role h-100">
                             <h2>Employee Role</h2>
                             <p class="text-muted">Number of employees: <span class="text-dark">2</span></p>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="card shadow role">
+                        <div class="card shadow role h-100">
                             <h2>Employee Role</h2>
                             <p class="text-muted">Number of employees: <span class="text-dark">2</span></p>
                         </div>
                     </div>
                     <div class="col">
-                        <div class="card shadow role">
-                            <h2>Employee Role</h2>
-                            <p class="text-muted">Number of employees: <span class="text-dark">2</span></p>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card shadow role">
+                        <div class="card shadow role h-100">
                             <h2>Employee Role</h2>
                             <p class="text-muted">Number of employees: <span class="text-dark">2</span></p>
                         </div>

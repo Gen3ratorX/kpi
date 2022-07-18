@@ -17,7 +17,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="py-2 px-4 border-bottom">
+    <nav class="py-2 px-3 border-bottom">
         <!-- Hamburger -->
         <div id="hamburger">
             <p></p>

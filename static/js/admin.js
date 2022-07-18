@@ -1,7 +1,10 @@
 class AdminControl{
     constructor(){
         this.toggleRoleState();
-        this.addFocus();
+        this.addFocusAttempt()
+        // this.editFocusAttempt();
+        // this.deleteFocusAttempt()
+        this.saveFocus();
     }
 
     toggleRoleState(){
@@ -28,53 +31,120 @@ class AdminControl{
         });
     }
 
-    addFocus(){
-        $('#add-focus').click(function(){
+    addFocusAttempt(){
+        $('#add-focus-attempt').click(function(){
+            $('#save-focus').data('command','add');
+
+        });
+    }
+
+    editFocusAttempt(){
+        $('.edit-focus-attempt').click(function(){
+            const focusIdentifier = $(this).data('focusIdentifier');
+            // console.log(`Edit ${focusIdentifier}`)
+            $('#save-focus').data({'command':'edit',focusIdentifier});
+            // Get focus and update the focus modal with it
+            const focus = $(this).parents('.accordion-item').find('.accordion-button').text().trim();
+            $('#focus-input').val(focus);
+        });
+    }
+
+    deleteFocusAttempt(){
+        $('.delete-focus-attempt').click(function(){
+            const focusIdentifier = $(this).data('focusIdentifier');
+            console.log(`Delete ${focusIdentifier}`)
+        });
+    }
+
+    saveFocus(){
+        const inst = this;
+        $('#save-focus').click(function(){
             const focus = $('#focus-input').val();
-            const focusCount = $('.focus').length;
-            console.log(focusCount)
             if(focus){
+                const command = $(this).data('command');
                 $('#focus-error').text('');
                 $('#close-add-focus-modal').click();
                 $('#focus-input').val('');
-                if(focusCount > 0){
-                    // Focus already presen
-                    $('#focuses').append(
-                        `<div class="accordion-item focus">
-                            <h2 class="accordion-header" id="panelsStayOpen-heading${focusCount + 1}">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse${focusCount + 1}" aria-expanded="false" aria-controls="panelsStayOpen-collapse${focusCount + 1}">
-                                    ${focus}
-                                </button>
-                            </h2>
-                            <div id="panelsStayOpen-collapse${focusCount + 1}" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-heading${focusCount + 1}">
-                                <div class="accordion-body">
-                                    <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                                </div>
-                            </div>
-                        </div>
-                    `
-                    );
-                }
-                else{
-                    // First focus
-                    $('#focus-wrapper').prev().remove();
-                    $('#focus-wrapper').append(
-                        `<div class="accordion" id='focuses' id="accordionPanelsStayOpenExample">
-                            <div class="accordion-item focus">
-                                <h2 class="accordion-header" id="panelsStayOpen-heading${focusCount + 1}">
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse${focusCount + 1}" aria-expanded="true" aria-controls="panelsStayOpen-collapse${focusCount + 1}">
+                // Add focus
+                if(command === 'add'){
+                    const focusCount = $('.focus').length;
+                    const focusIdentifier = Math.round(Math.random() * 1000000);
+                    if(focusCount > 0){
+                        // Focus already presen
+                        $('#focuses').append(
+                            `<div class="accordion-item focus" id=focus-${focusIdentifier}>
+                                <h2 class="accordion-header" id="panelsStayOpen-heading${focusIdentifier}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse${focusIdentifier}" aria-expanded="false" aria-controls="panelsStayOpen-collapse${focusIdentifier}">
                                         ${focus}
                                     </button>
                                 </h2>
-                                <div id="panelsStayOpen-collapse${focusCount + 1}" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-heading${focusCount + 1}">
+                                <div id="panelsStayOpen-collapse${focusIdentifier}" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-heading${focusIdentifier}">
                                     <div class="accordion-body">
-                                        <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button class="btn btn-3 btn-md me-2">Add Objective</button>
+                                            <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
+                                            <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}">Delete Focus</button>
+                                        </div>
+                                        <div class="objectives">
+                                            <!-- No Objective -->
+                                            <section class="no-item">
+                                                No Objective Has Been Added
+                                                <div>
+                                                    <a href="#" class="btn btn-1 btn-md" data-bs-toggle="modal" data-bs-target="#addFocusModal"> Add Objective </a>
+                                                </div>
+                                            </section>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>`
-                    );
+                        `
+                        );
+                    }
+                    else{
+                        // First focus
+                        $('#focus-wrapper').prev().remove();
+                        $('#focus-wrapper').append(
+                            `<div class="accordion" id="focuses">
+                                <div class="accordion-item focus" id="focus-${focusIdentifier}">
+                                    <h2 class="accordion-header" id="panelsStayOpen-heading${focusIdentifier}">
+                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse${focusIdentifier}" aria-expanded="true" aria-controls="panelsStayOpen-collapse${focusIdentifier}">
+                                            ${focus}
+                                        </button>
+                                    </h2>
+                                    <div id="panelsStayOpen-collapse${focusIdentifier}" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-heading${focusIdentifier}">
+                                        <div class="accordion-body">
+                                            <div class="d-flex justify-content-end mb-2">
+                                                <button class="btn btn-3 btn-md me-2">Add Objective</button>
+                                                <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
+                                                <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}">Delete Focus</button>
+                                            </div>
+                                            <div class="objectives">
+                                                <!-- No Objective -->
+                                                <section class="no-item">
+                                                    No Objective Has Been Added
+                                                    <div>
+                                                        <a href="#" class="btn btn-1 btn-md" data-bs-toggle="modal" data-bs-target="#addFocusModal"> Add Objective </a>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`
+                        );
+                    }
+                    // Add events to buttons
+                    $('.edit-focus-attempt, .delete-focus-attempt').off('click');
+                    inst.editFocusAttempt();
+                    inst.deleteFocusAttempt();
                 }
+                // Update focus
+                else{
+                    // use identifier to update focus name
+                    const focusIdentifier = $(this).data('focusIdentifier');
+                    $(`#${focusIdentifier}`).find('.accordion-button').text(focus);
+                }
+                
             }
             else{
                 $('#focus-error').text('Please add a focus.');

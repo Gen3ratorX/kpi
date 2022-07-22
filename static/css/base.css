@@ -1,5 +1,5 @@
 :root{
-    --barberry: #e6eb1e;
+    --barberry: #e8eb1e5c;
     --salem: #069243;
     --orange-roughy: #d4431e;
     --apple: #619939;
@@ -105,14 +105,14 @@ nav{
 #desktop-menu > ul > li > a:hover, #phone-menu > ul > li > a:hover{
     color: var(--forest-green);
 }
-.add-role > a{
+.create > a{
     background-color: var(--forest-green);
     color: white !important;
     border-radius: 5px;
     border: 2px solid var(--forest-green);
     width: 150px;
 }
-.add-role > a:hover{
+.create > a:hover{
     color: var(--forest-green) !important;
     background-color: white;
 }
@@ -161,7 +161,7 @@ nav{
     border-bottom: thin solid rgba(0,0,0,.125);
     font-size: 14px;
 }
-#phone-menu .add-role > a{
+#phone-menu .create > a{
     width: 100%;
     border-bottom: 2px solid var(--apple);
     margin: 10px 0;

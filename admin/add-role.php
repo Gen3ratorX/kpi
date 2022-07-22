@@ -3,7 +3,7 @@
     require_once 'admin_navbar.php';
 ?>
     
-    <!-- save Focus Modal -->
+    <!-- Save Focus Modal -->
     <div class="modal fade" id="focusModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="focusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -42,8 +42,28 @@
         </div>
     </div>
 
+    <!-- Save Objective Modal -->
+    <div class="modal fade" id="objectiveModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="objectiveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="objectiveModalLabel">Add Objective</h5>
+                    <button type="button" class="btn-close" id="close-objective-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="objective-input" class="required">Objective:</label>
+                    <input type="text" class="form-control" placeholder="Type in key objectives." id="objective-input">
+                    <p class="small text-danger ms-1 mt-1" id="objective-error"></p>
+                    <div class="my-4 text-center">
+                        <button class="btn btn-1 btn-md" id="save-objective">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <main id='main-body'
-        <div class="container mb-3">
+        <div class="container-lg mb-3">
             <h1 class="header">Add Role</h1>
             <section class="border-bottom" id="role-progress">
                 <!-- Add Role -->
@@ -55,9 +75,9 @@
                         <div class="col">
                             <input id="role-input" value="Hello" type="text" class="form-control">
                         </div>
-                        <div class="col-auto">
+                        <!-- <div class="col-auto">
                             <button class="btn btn-4 btn-sm" id="save-or-edit" data-command='save'>Save</button>
-                        </div>
+                        </div> -->
                         <div class="col-auto">
                             <button class="btn btn-3 btn-sm add-focus-attempt" data-bs-toggle="modal" data-bs-target="#focusModal">Add Focus</button>
                         </div>
@@ -71,7 +91,7 @@
                         <span class="text-dark">0%</span>
                     </h5>
                     <div class="progress">
-                        <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 29%">0%</div>
+                        <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 0%">0%</div>
                     </div>
                 </section>
             </section>
@@ -86,6 +106,7 @@
                     </div>
                 </section>
                 <section id="focus-wrapper">
+                </section>
                     
             </section>
         </div>

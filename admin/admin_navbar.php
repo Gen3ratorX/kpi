@@ -26,7 +26,7 @@
             <!-- Nav brand -->
             <a href="index.php" class="d-flex align-items-center" id="nav-brand">
                 <img src="../static/images/nla-logo.png" width="auto" alt="NLA">
-                <h1>National Lottery Authority <br> Key Performance Index</h1>
+                <h1>National Lottery Authority <br> Key Performance Indicator</h1>
             </a>
             <!-- Desktop Menu -->
             <div id="desktop-menu">
@@ -43,8 +43,8 @@
                     <li class="logout">
                         <a href="">Logout</a>
                     </li>
-                    <li class="add-role">
-                        <a href="add-role.php">Add Role</a>
+                    <li class="create">
+                        <a href="add-role.php">Create</a>
                     </li>
                 </ul>
             </div>
@@ -66,8 +66,8 @@
                     <li class="logout">
                         <a href="">Logout</a>
                     </li>
-                    <li class="add-role">
-                        <a href="add-role.php">Add Role</a>
+                    <li class="create">
+                        <a href="add-role.php">Create</a>
                     </li>
                 </ul>
             </div>

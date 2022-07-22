@@ -1,9 +1,11 @@
 class AdminControl{
     constructor(){
         this.pageInit();
-        this.toggleRoleState();
+        // this.toggleRoleState();
         this.addFocusAttempt();
+        // this.addObjectiveAttempt(); // Remove after test
         this.saveFocus();
+        // this.saveObjective(); // Remove after test
         this.deleteItem();
     }
 
@@ -41,33 +43,6 @@ class AdminControl{
         action();
     }
 
-    addFocusAttempt(){
-        $('.add-focus-attempt').click(function(){
-            $('#save-focus').data('command','add');
-
-        });
-    }
-
-    editFocusAttempt(){
-        $('.edit-focus-attempt').click(function(){
-            const focusIdentifier = $(this).data('focusIdentifier');
-            // console.log(`Edit ${focusIdentifier}`)
-            $('#save-focus').data({'command':'edit',focusIdentifier});
-            // Get focus and update the focus modal with it
-            const focus = $(this).parents('.accordion-item').find('.accordion-button').text().trim();
-            $('#focus-input').val(focus);
-        });
-    }
-
-    deleteFocusAttempt(){
-        $('.delete-focus-attempt').click(function(){
-            $('#deleteItemModalLabel').text("Delete Focus");
-            $('#deleteItemModal').find('.modal-body > p').text("Do you want to delete this focus?");
-            const focusIdentifier = $(this).data('focusIdentifier');
-            $('#delete-item').data({'identifier':focusIdentifier,'item':'focus'});
-        });
-    }
-
     deleteItem(){
         const inst = this;
         $('#delete-item').click(function(){
@@ -101,6 +76,36 @@ class AdminControl{
         });
     }
 
+    // Focus
+
+    addFocusAttempt(){
+        $('.add-focus-attempt').click(function(){
+            $('#save-focus').data('command','add');
+
+        });
+    }
+
+    editFocusAttempt(){
+        $('.edit-focus-attempt').click(function(){
+            const focusIdentifier = $(this).data('focusIdentifier');
+            // console.log(`Edit ${focusIdentifier}`)
+            $('#save-focus').data({'command':'edit',focusIdentifier});
+            // Get focus and update the focus modal with it
+            const focus = $(this).parents('.accordion-item').find('.accordion-button').text().trim();
+            $('#focus-input').val(focus);
+        });
+    }
+
+    deleteFocusAttempt(){
+        $('.delete-focus-attempt').click(function(){
+            $('#deleteItemModalLabel').text("Delete Focus");
+            $('#deleteItemModal').find('.modal-body > p').text("Do you want to delete this focus?");
+            const focusIdentifier = $(this).data('focusIdentifier');
+            $('#delete-item').data({'identifier':focusIdentifier,'item':'focus'});
+        });
+    }
+
+
     saveFocus(){
         const inst = this;
         $('#save-focus').click(function(){
@@ -126,7 +131,7 @@ class AdminControl{
                                 <div id="panelsStayOpen-collapse${focusIdentifier}" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-heading${focusIdentifier}">
                                     <div class="accordion-body">
                                         <div class="d-flex justify-content-end mb-2">
-                                            <button class="btn btn-3 btn-md me-2">Add Objective</button>
+                                            <button class="btn btn-3 btn-md me-2 add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-${focusIdentifier}">Add Objective</button>
                                             <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
                                             <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#deleteItemModal">Delete Focus</button>
                                         </div>
@@ -135,7 +140,7 @@ class AdminControl{
                                             <section class="no-item">
                                                 No Objective Has Been Added
                                                 <div>
-                                                    <a href="#" class="btn btn-1 btn-md" data-bs-toggle="modal" data-bs-target="#addFocusModal"> Add Objective </a>
+                                                    <a href="#" class="btn btn-1 btn-md add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-${focusIdentifier}"> Add Objective </a>
                                                 </div>
                                             </section>
                                         </div>
@@ -159,7 +164,7 @@ class AdminControl{
                                     <div id="panelsStayOpen-collapse${focusIdentifier}" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-heading${focusIdentifier}">
                                         <div class="accordion-body">
                                             <div class="d-flex justify-content-end mb-2">
-                                                <button class="btn btn-3 btn-md me-2">Add Objective</button>
+                                                <button class="btn btn-3 btn-md me-2 add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-${focusIdentifier}">Add Objective</button>
                                                 <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
                                                 <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#deleteItemModal">Delete Focus</button>
                                             </div>
@@ -168,7 +173,7 @@ class AdminControl{
                                                 <section class="no-item">
                                                     No Objective Has Been Added
                                                     <div>
-                                                        <a href="#" class="btn btn-1 btn-md" data-bs-toggle="modal" data-bs-target="#addFocusModal"> Add Objective </a>
+                                                        <a href="#" class="btn btn-1 btn-md add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-${focusIdentifier}"> Add Objective </a>
                                                     </div>
                                                 </section>
                                             </div>
@@ -178,10 +183,8 @@ class AdminControl{
                             </div>`
                         );
                     }
-                    // Add events to buttons
-                    $('.edit-focus-attempt, .delete-focus-attempt').off('click');
-                    inst.editFocusAttempt();
-                    inst.deleteFocusAttempt();
+                    inst.toggleEventState('.edit-focus-attempt',inst.editFocusAttempt);
+                    inst.toggleEventState('.delete-focus-attempt',inst.deleteFocusAttempt);
                 }
                 // Update focus
                 else{
@@ -193,6 +196,47 @@ class AdminControl{
             }
             else{
                 $('#focus-error').text('Please add a focus.');
+            }
+        });
+    }
+
+    // Objective
+    addObjectiveAttempt(){
+        $('.add-objective-attempt').click(function(){
+            const focusIdentifier = $(this).data('focusIdentifier');
+            $('#save-objective').data({'command':'add',focusIdentifier});
+
+        });
+    }
+
+    saveObjective(){
+        const inst = this;
+        $('#save-objective').click(function(){
+            const objective = $('#objective-input').val();
+            if(objective){
+                const {command,focusIdentifier} = $(this).data();
+                $('#objective-error').text('');
+                $('#close-objective-modal').click();
+                $('#objective-input').val('');
+                // Add objective
+                if(command === 'add'){
+                    console.log("I am adding")
+                    const objectivesCount = $(`#${focusIdentifier}`).find('.objectives .objective').length;
+                    console.log(objectivesCount);
+                    if(objectivesCount === 0){
+
+                    }
+                    else{
+
+                    }
+                }
+                // Update objective
+                else{
+
+                }
+            }
+            else{
+                $('#objective-error').text('Please add an objective.');
             }
         });
     }

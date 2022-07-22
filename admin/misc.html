@@ -1,0 +1,41 @@
+<div class="accordion" id="focuses">
+    <div class="accordion-item focus" id="focus-12345">
+        <h2 class="accordion-header" id="panelsStayOpen-heading12345">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse12345" aria-expanded="true" aria-controls="panelsStayOpen-collapse12345">
+            God
+            </button>
+        </h2>
+        <div id="panelsStayOpen-collapse12345" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-heading12345">
+            <div class="accordion-body">
+                <div class="d-flex justify-content-end mb-2">
+                    <button class="btn btn-3 btn-md me-2 add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-12345">Add Objective</button>
+                    <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-12345" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
+                    <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-12345" data-bs-toggle="modal" data-bs-target="#deleteItemModal">Delete Focus</button>
+                </div>
+                <div class="objectives mt-4">
+                    <!-- No Objective -->
+                    <!-- <section class="no-item">
+                        No Objective Has Been Added
+                        <div>
+                            <a href="#" class="btn btn-1 btn-md add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-12345"> Add Objective </a>
+                        </div>
+                    </section> -->
+                    <fieldset>
+                        <legend>Objectives</legend>
+                        <section class="objective">
+                            <p class="lead">
+                                I know
+                            </p>
+                            <div class="d-flex justify-content-end">
+                                <button class="btn btn-3 btn-md me-2">Add Measure</button>
+                                <button class="btn btn-4 btn-md me-2">Edit Objective</button>
+                                <button class="btn btn-2 btn-md">Delete Objective</button>
+                            </div>
+                            <div class="measures"></div>
+                        </section>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,6 @@
 class AdminControl{
     constructor(){
+        this.url = './utils.php';
         this.pageInit();
         // this.toggleRoleState();
         this.addFocusAttempt();
@@ -7,6 +8,7 @@ class AdminControl{
         this.saveFocus();
         // this.saveObjective(); // Remove after test
         this.deleteItem();
+        this.projectInit();
     }
 
     pageInit(){
@@ -240,6 +242,61 @@ class AdminControl{
             }
         });
     }
+
+    // Project
+    projectInit(){
+        this.saveProject();
+        this.toggleProjectIsOpen();
+        this.selectEmployee();
+    }
+
+    toggleProjectIsOpen(){
+        $('#isOpen > .btn').click(function(){
+            const value = $(this).text().toLowerCase().trim();
+            $('#isOpen > .btn').attr('class','btn btn-4-outline btn-sm');
+            $(this).attr('class','btn btn-4-solid btn-sm');
+            $('#isOpen').data('value',value)
+        });
+    }
+
+    selectEmployee(){
+        $('.employee').click(function(){
+            const name = $(this).text();
+            $(this).toggleClass('selected-employee');
+        });
+    }
+
+    saveProject(){
+        let inst = this;
+        $('#save-project').click(function(){
+            const selectedEmployees = [];
+            $('.selected-employee').each(function(){
+                // selectedEmployees.push($(this).data('employeeId').trim());
+                selectedEmployees.push($(this).text().trim());
+            });
+            const validate = baseControl.validateFields(['#projectName','#projectDeadline','#projectEmployees']);
+            if(validate){
+                const projectName = $('#projectName').val();
+                const deadline = $('#projectDeadline').val();
+                const isOpen = $('#isOpen').data('value');
+                $.post(
+                    inst.url,
+                    {
+                        projectName,
+                        deadline,
+                        isOpen,
+                        selectedEmployees,
+                        task: 'saveProject'
+                    },
+                    function(res){
+                        console.log(res);
+                    }
+                );
+            }
+        });
+    }
+
+
 }
 
 const adminControl = new AdminControl();

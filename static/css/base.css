@@ -235,6 +235,14 @@ nav{
     background-color: white;
     color: var(--forest-green);
 }
+.btn-1-outline{
+    border-color: var(--forest-green);
+}
+.btn-1-solid{
+    background-color: var(--forest-green);
+    color: white;
+    border-color: var(--forest-green);
+}
 .btn-2{
     background-color: crimson;
     color: white;
@@ -243,6 +251,14 @@ nav{
 .btn-2:hover{
     background-color: white;
     color: crimson;
+}
+.btn-2-outline{
+    border-color: crimson;
+}
+.btn-2-solid{
+    background-color: crimson;
+    color: white;
+    border-color: crimson;
 }
 .btn-3{
     background-color: var(--dune);
@@ -253,6 +269,14 @@ nav{
     background-color: white;
     color: var(--dune);
 }
+.btn-3-outline{
+    border-color: var(--dune);
+}
+.btn-3-solid{
+    background-color: var(--dune);
+    color: white;
+    border-color: var(--dune);
+}
 .btn-4{
     background-color: royalblue;
     color: white;
@@ -261,6 +285,14 @@ nav{
 .btn-4:hover{
     background-color: white;
     color: royalblue;
+}
+.btn-4-outline{
+    border-color: royalblue;
+}
+.btn-4-solid{
+    background-color: royalblue;
+    color: white;
+    border-color: royalblue;
 }
 .btn-sm{
     width: 100px;
@@ -298,6 +330,19 @@ nav{
 .accordion-button{
     box-shadow: none !important;
 }
+
+/* Item */
+.item{
+    transition: all .2s ease-in-out;
+    cursor: pointer;
+}
+.item:hover{
+    background-color: #f8f9fa;
+}
+.item:active{
+    background-color: #e9ecef;
+}
+
 /* Footer */
 footer{
     background-color: #222;

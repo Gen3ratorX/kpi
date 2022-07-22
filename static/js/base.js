@@ -35,6 +35,48 @@ class BaseControl{
             $('body').css('overflow','hidden');
         });
     }
+
+    startLoading(ele){
+        $(ele).html(
+            `<div class="spinner-border spinner-border-sm" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>    
+        `).attr('disabled',true)
+    }
+
+    endLoading(ele,text){
+        $(ele).html(text).removeAttr('disabled');
+    }
+
+    validateFields(elements){
+        let allFieldsValid = true;
+        for(let ele of elements){
+            let value = $(ele).val();
+            if(value){
+                $(ele).removeClass('is-invalid');
+                $(ele).addClass('is-valid');
+            }
+            else{
+                $(ele).addClass('is-invalid');
+                allFieldsValid = false;
+            }
+        }
+        return allFieldsValid;
+    }
+
+    async postData(url,options={}){
+        await fetch(url,{
+            mathod: 'POST',
+            ...options
+        })
+    }
+
+    async getData(url,options={}){
+        await fetch(url,{
+            method: 'GET',
+            ...options 
+        });
+    }
 }
 
 const baseControl = new BaseControl();

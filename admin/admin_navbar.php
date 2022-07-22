@@ -44,7 +44,7 @@
                         <a href="">Logout</a>
                     </li>
                     <li class="create">
-                        <a href="add-role.php">Create</a>
+                        <a href="create.php">Create</a>
                     </li>
                 </ul>
             </div>
@@ -67,7 +67,7 @@
                         <a href="">Logout</a>
                     </li>
                     <li class="create">
-                        <a href="add-role.php">Create</a>
+                        <a href="create.php">Create</a>
                     </li>
                 </ul>
             </div>

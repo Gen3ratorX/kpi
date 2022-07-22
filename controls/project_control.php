@@ -26,7 +26,7 @@
                 foreach($projects as $project){
                     $projectHtml .= "
                         <div class='col'>
-                            <a href='#' class='card shadow-sm role h-100 project text-dark'>
+                            <a href='#' class='card shadow-sm role h-100 project text-dark item'>
                                 <h2>{$project['name']}</h2>
                                 <p class='text-muted m-0'>Date Created: <span class='text-dark'>2nd May, 2022</span></p>
                                 <p class='text-muted m-0'>Deadline: <span class='text-dark'>21st October, 2022</span></p>

@@ -47,7 +47,7 @@
                     <section class='no-item'>
                         No Project Has Been added.
                         <div>
-                            <a href='add_project.php' class='btn btn-1 btn-md'> Add Project </a>
+                            <a href='create_project.php' class='btn btn-1 btn-md'> Add Project </a>
                         </div>
                     </section>
                 ";

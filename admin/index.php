@@ -16,6 +16,7 @@
             <section class="mb-3">
                 <h1 class="header">Projects</h1>
                 <?php echo $projectsHtml; ?>
+            </section>
         </div>
     </main>
 <?php

@@ -9,6 +9,7 @@ class AdminControl{
         // this.saveObjective(); // Remove after test
         this.deleteItem();
         this.projectInit();
+        this.roleInit();
     }
 
     pageInit(){
@@ -274,8 +275,8 @@ class AdminControl{
                 // selectedEmployees.push($(this).data('employeeId').trim());
                 selectedEmployees.push($(this).text().trim());
             });
-            const validate = baseControl.validateFields(['#projectName','#projectDeadline','#projectEmployees']);
-            if(validate){
+            const isValidated = baseControl.validateFields(['#projectName','#projectDeadline','#projectEmployees']);
+            if(isValidated){
                 const projectName = $('#projectName').val();
                 const deadline = $('#projectDeadline').val();
                 const isOpen = $('#isOpen').data('value');
@@ -292,6 +293,31 @@ class AdminControl{
                         console.log(res);
                     }
                 );
+            }
+        });
+    }
+
+
+    // Role
+    roleInit(){
+        this.saveRole();
+    }
+
+    saveRole(){
+        const inst = this;
+        $('#save-role').click(function(){
+            const isValidated = baseControl.validateFields(['#role']);
+            if(isValidated){
+                const role = $('#role').val();
+                const data = {
+                    role,
+                    task: 'saveRole',
+                }
+                const success = (res,statusCode,status) => {
+                    console.log(res);
+                    window.location.assign('./roles.php');
+                }
+                baseControl.fetchData(false,inst.url,data,'Save Role','#save-role',success);
             }
         });
     }

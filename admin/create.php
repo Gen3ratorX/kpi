@@ -16,14 +16,14 @@
                         </a>
                     </div>
                     <div class="col">
-                        <a href="" class="card shadow-sm item">
+                        <a href="./create_employee.php" class="card shadow-sm item">
                             <div class="card-body p-5 text-center">
                                 <h2 class="text-secondary">Employee</h2>
                             </div>
                         </a>
                     </div>
                     <div class="col">
-                        <a href="" class="card shadow-sm item">
+                        <a href="create_role.php" class="card shadow-sm item">
                             <div class="card-body p-5 text-center">
                                 <h2 class="text-secondary">Role</h2>
                             </div>

@@ -64,17 +64,51 @@ class BaseControl{
         return allFieldsValid;
     }
 
-    async postData(url,options={}){
-        await fetch(url,{
-            mathod: 'POST',
-            ...options
-        })
+    showToast(message){
+        $('#toastBody').text(message);
+        const informationToast = new bootstrap.Toast('#toast',{});
+        informationToast.show();
     }
 
-    async getData(url,options={}){
-        await fetch(url,{
-            method: 'GET',
-            ...options 
+    fetchData(
+        get=true,
+        url,
+        data,
+        bntText,
+        btnId,
+        success = () => {} 
+        ,error = () => {}
+    )
+    {
+        const inst = this;
+        inst.startLoading(btnId);
+        // $.post(
+        //     url,
+        //     data,
+        //     function(res,statusCode,{status}){
+        //         baseControl.endLoading(btnId,bntText);
+        //         success(res,statusCode,status)
+        //     }
+        // )
+        // .fail(() => {
+        //     baseControl.endLoading(btnId,bntText);
+        //     baseControl.showToast("The server has encounted an error.")
+        //     error();
+        // })
+        $.ajax({
+            url: url,
+            method : get ? "GET" : "POST",
+            data: data,
+            success: function(res,statusCode,{status}){
+                inst.endLoading(btnId,bntText);
+                success(res,statusCode,status)
+            },
+            error: function(){
+                inst.endLoading(btnId,bntText);
+                inst.showToast("The server has encounted an error.")
+                error();
+            },
+            dataType: 'json',
         });
     }
 }

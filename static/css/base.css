@@ -93,7 +93,7 @@ nav{
 #desktop-menu > ul > li{
     display: inline-block;
 }
-#desktop-menu > ul > li > a, #phone-menu > ul > li > a{
+#desktop-menu > ul > li > a, #phone-menu > ul > li > a, #desktop-menu .submenu ul > li > a{
     color: var(--dune);
     font-size: 15px;
     font-weight: 500;
@@ -102,8 +102,39 @@ nav{
     display: block;
     text-align: center;
 }
-#desktop-menu > ul > li > a:hover, #phone-menu > ul > li > a:hover{
+#desktop-menu > ul > li > a:hover, #phone-menu > ul > li > a:hover, #desktop-menu .submenu ul > li > a:hover{
     color: var(--forest-green);
+}
+/* Desktop submenu */
+#desktop-menu .submenu{
+    position: relative;
+}
+#desktop-menu .submenu ul{
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    position: absolute;
+    top: 58px;
+    right: -50px;
+    opacity: 0;
+    visibility: hidden;
+    background: white;
+    width: 200px;
+    background-color: white;
+    border: thin solid rgba(0,0,0,.125);
+    box-shadow: 0px 2px 5px rgba(0,0,0,.2);
+    transition: all .2s ease-in-out;
+}
+#desktop-menu .submenu ul > li > a{
+    display: block;
+    border-top: thin solid rgba(0,0,0,.125);
+}
+#desktop-menu .submenu ul > li:first-child > a{
+    border: none;
+}
+#desktop-menu .submenu:hover > ul{
+    visibility: visible;
+    opacity: 1;
 }
 .create > a{
     background-color: var(--forest-green);
@@ -335,11 +366,13 @@ nav{
 .item{
     transition: all .2s ease-in-out;
     cursor: pointer;
+    text-align: center;
+    border: thin solid rgba(0,0,0,.125);
 }
-.item:hover{
+/* .item:hover{
     background-color: #f8f9fa;
-}
-.item:active{
+} */
+.item:hover{
     background-color: #e9ecef;
 }
 

@@ -16,6 +16,19 @@
     </style>
 </head>
 <body>
+    <!-- Information Toast -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div class="toast" id="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-info text-white">
+                <strong class="me-auto">Information</strong>
+                <small>Now</small>
+            <button type="button" class="btn-close bg-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastBody">
+                Hello, world! This is a toast message.
+            </div>
+        </div>
+    </div>
     <!-- Navbar -->
     <nav class="py-2 px-3 border-bottom">
         <!-- Hamburger -->
@@ -34,11 +47,24 @@
                     <li>
                         <a href="">Home</a>
                     </li>
-                    <li>
-                        <a href="">Home</a>
-                    </li>
-                    <li>
-                        <a href="">Home</a>
+                    <li class="submenu">
+                        <a href="#">
+                            Extras
+                        </a>
+                        <ul>
+                            <li>
+                                <a href="">Employees</a>
+                            </li>
+                            <li>
+                                <a href="./roles.php">Roles</a>
+                            </li>
+                            <li>
+                                <a href="">Departments</a>
+                            </li>
+                            <li>
+                                <a href="">Units</a>
+                            </li>
+                        </ul>
                     </li>
                     <li class="logout">
                         <a href="">Logout</a>
@@ -61,7 +87,16 @@
                         <a href="">Home</a>
                     </li>
                     <li>
-                        <a href="">Home</a>
+                        <a href="">Employees</a>
+                    </li>
+                    <li>
+                        <a href="">Roles</a>
+                    </li>
+                    <li>
+                        <a href="">Departments</a>
+                    </li>
+                    <li>
+                        <a href="">Units</a>
                     </li>
                     <li class="logout">
                         <a href="">Logout</a>

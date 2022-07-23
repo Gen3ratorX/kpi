@@ -313,10 +313,7 @@ class AdminControl{
                     role,
                     task: 'saveRole',
                 }
-                const success = (res,statusCode,status) => {
-                    console.log(res);
-                    window.location.assign('./roles.php');
-                }
+                const success = (res,statusCode,status) => window.location.assign('./roles.php');
                 baseControl.fetchData(false,inst.url,data,'Save Role','#save-role',success);
             }
         });

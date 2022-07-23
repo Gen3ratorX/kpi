@@ -103,13 +103,17 @@ class BaseControl{
                 inst.endLoading(btnId,bntText);
                 success(res,statusCode,status)
             },
-            error: function(){
+            error: function({status}){
                 inst.endLoading(btnId,bntText);
                 inst.showToast("The server has encounted an error.")
-                error();
+                error(status);
             },
             dataType: 'json',
-        });
+        })
+        // .always(()=> {
+        //     inst.endLoading(btnId,bntText);
+        //     inst.showToast( "Check your internet connection and try again.");
+        // })
     }
 }
 

@@ -7,8 +7,33 @@
             $this->con = $con;    
         }
 
-        function saveRole(){
+        function filterInput($field,$post=true){
+            // if($post){
+            // }
+            // else{
+                
+            // }
+            $sanitizedField = $post 
+            ? trim(htmlspecialchars($_POST[$field])) 
+            : trim(htmlspecialchars($_GET[$field]));
+            return $sanitizedField;
+        }
 
+        function saveRole(){
+            $name = $this->filterInput('role');
+            $sql1 = "INSERT IGNORE INTO employee_role(name) VALUE('$name')";
+            if($this->con->query($sql1)){
+                http_response_code(201);
+                echo json_encode([
+                    'status'=> "SUCCESS"
+                ]);
+            }
+            else{
+                http_response_code(500);
+                echo json_encode([
+                    'status'=> "ERROR"
+                ]);
+            }
         }
 
         function getRolesList(){

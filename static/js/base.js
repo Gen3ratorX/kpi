@@ -106,6 +106,7 @@ class BaseControl{
             error: function({status}){
                 inst.endLoading(btnId,bntText);
                 inst.showToast("The server has encounted an error.")
+                console.log(status);
                 error(status);
             },
             dataType: 'json',

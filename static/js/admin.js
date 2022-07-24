@@ -307,12 +307,15 @@ class AdminControl{
     saveRole(){
         const inst = this;
         $('#save-role').click(function(){
+            const roleEdit = $(this).data('roleEdit');
+            const roleId = $(this).data('roleId');
             const isValidated = baseControl.validateFields(['#role']);
             if(isValidated){
                 const role = $('#role').val();
                 const data = {
                     role,
-                    task: 'saveRole',
+                    task: roleEdit ? 'editRole' : 'saveRole',
+                    roleId,
                 }
                 const success = (res,statusCode,status) => window.location.assign('./roles.php');
                 baseControl.fetchData(inst.url,data,'Save Role','#save-role',false,success);
@@ -320,12 +323,6 @@ class AdminControl{
         });
     }
 
-    deleteRoleAttempt(){
-        $('.delete-role-attempt').click(function(){
-            $('#deleteItemLabel').text("Delete Role");
-            $('#deleteItemBody').text("Are you sure you want to delete this modal");
-        });
-    }
 
     deleteRole(){
         const inst = this;
@@ -337,7 +334,6 @@ class AdminControl{
         $('#delete-item').click(function(){
             const roleId = $(this).data('id');
             const success = (res,statusCode,status) => {
-                console.log(res);
                 if($('#roles').children().length - 1 == 0){
                     $('#roles').hide('slow',function(){
                         $(this).before(
@@ -345,7 +341,7 @@ class AdminControl{
                                 <section class='no-item'>
                                     No Role Has Been added.
                                     <div>
-                                        <a href='create_role.php' class='btn btn-1 btn-md'> Add Role </a>
+                                        <a href='role_form.php' class='btn btn-1 btn-md'> Add Role </a>
                                     </div>
                                 </section>`
                         );

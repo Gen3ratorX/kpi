@@ -15,10 +15,12 @@
 
     // Role
     elseif (isset($_POST) and $_POST['task'] == 'saveRole') {
-        // http_response_code(400);
         $roleControl->saveRole();
     }
+    elseif (isset($_POST) and $_POST['task'] == 'editRole') {
+        $roleControl->editRole();
+    }
     elseif (isset($_POST) and $_POST['task'] == 'deleteRole') {
-        echo json_encode("Thank God i have deleted it.");
+        $roleControl->deleteRole();
     }
 ?>

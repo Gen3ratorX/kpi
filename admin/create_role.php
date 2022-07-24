@@ -5,6 +5,7 @@
     // $projectControl = new ProjectControl($con);
     // $projects = $projectControl->getProjectsList();
     // $projectsHtml = $projectControl->projectAdminListTemplate($projects);
+    $url = $_SERVER['REQUEST_URI'];
 ?>
 
 <?php
@@ -24,6 +25,7 @@
                         </div>
                     </div>
                 </section>
+                <?php echo $url ?>
                 <div class="text-center my-5">
                     <button type="button" id="save-role" class="btn btn-1 btn-lg">Save Role</button>
                 </div>

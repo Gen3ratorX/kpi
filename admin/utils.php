@@ -12,8 +12,13 @@
     elseif (isset($_POST) and $_POST['task'] == 'saveEmployee') {
         echo json_encode("God is very good");
     }
+
+    // Role
     elseif (isset($_POST) and $_POST['task'] == 'saveRole') {
         // http_response_code(400);
         $roleControl->saveRole();
+    }
+    elseif (isset($_POST) and $_POST['task'] == 'deleteRole') {
+        echo json_encode("Thank God i have deleted it.");
     }
 ?>

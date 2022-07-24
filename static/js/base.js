@@ -71,13 +71,13 @@ class BaseControl{
     }
 
     fetchData(
-        get=true,
         url,
         data,
         bntText,
         btnId,
+        get=true,
         success = () => {} 
-        ,error = () => {}
+        ,error = () => {},
     )
     {
         const inst = this;
@@ -114,6 +114,10 @@ class BaseControl{
         //     inst.endLoading(btnId,bntText);
         //     inst.showToast( "Check your internet connection and try again.");
         // })
+    }
+
+    deleteItem(url,){
+
     }
 }
 

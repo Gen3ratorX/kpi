@@ -29,6 +29,27 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Item Modal -->
+    <!-- <div class="modal fade" id="deleteItem" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteItemLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteItemLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h4 id="deleteItemBody" class="text-secondary">
+                    </h4>
+                    <div class="text-end mt-4">
+                        <button class="btn btn-2 btn-sm" id="delete-item">Yes</button>
+                        <button class="btn btn-3 btn-sm" data-bs-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
     <!-- Navbar -->
     <nav class="py-2 px-3 border-bottom">
         <!-- Hamburger -->

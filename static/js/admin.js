@@ -301,6 +301,7 @@ class AdminControl{
     // Role
     roleInit(){
         this.saveRole();
+        this.deleteRole();
     }
 
     saveRole(){
@@ -314,8 +315,54 @@ class AdminControl{
                     task: 'saveRole',
                 }
                 const success = (res,statusCode,status) => window.location.assign('./roles.php');
-                baseControl.fetchData(false,inst.url,data,'Save Role','#save-role',success);
+                baseControl.fetchData(inst.url,data,'Save Role','#save-role',false,success);
             }
+        });
+    }
+
+    deleteRoleAttempt(){
+        $('.delete-role-attempt').click(function(){
+            $('#deleteItemLabel').text("Delete Role");
+            $('#deleteItemBody').text("Are you sure you want to delete this modal");
+        });
+    }
+
+    deleteRole(){
+        const inst = this;
+        $('.delete-role-attempt').click(function(){
+            const roleId = $(this).attr('id').split('-')[1];
+            $('#delete-item').data('id',roleId);
+        });
+
+        $('#delete-item').click(function(){
+            const roleId = $(this).data('id');
+            const success = (res,statusCode,status) => {
+                console.log(res);
+                if($('#roles').children().length - 1 == 0){
+                    $('#roles').hide('slow',function(){
+                        $(this).before(
+                            `<!-- No Item -->
+                                <section class='no-item'>
+                                    No Role Has Been added.
+                                    <div>
+                                        <a href='create_role.php' class='btn btn-1 btn-md'> Add Role </a>
+                                    </div>
+                                </section>`
+                        );
+                        $(this).remove();
+
+                    });
+                }
+                else{
+                    $(`#role-${roleId}`).parents('.col').hide('slow');
+                }
+
+                // Close modal
+                $('#close-delete-item').click();
+                
+            }
+            const data = {task: 'deleteRole',roleId}
+            baseControl.fetchData(inst.url,data,'Yes','#delete-item',false,success);
         });
     }
 

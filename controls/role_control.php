@@ -56,15 +56,21 @@
                 foreach($roles as $role){
                     $roleHtml .= "
                         <div class='col'>
-                            <a href='#' class='card shadow-sm role h-100 text-dark item'>
+                            <section href='#' class='card shadow-sm role h-100 text-dark item'>
                                 <h2>{$role['name']}</h2>
-                            </a>
+                                <div class='card-footer'>
+                                    <div>
+                                        <button class='btn btn-3 delete-role-attempt' data-bs-toggle='modal' data-bs-target='#deleteItem' id='role-{$role['id']}'>Delete</button>
+                                        <button class='btn btn-3'>Edit</button>
+                                    <div>
+                                </div>
+                            </section>
                         </div>
                     ";
                 }
 
                 $rolesHtml = "
-                    <div class='row gy-3 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4'>
+                    <div class='row gy-3 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4' id='roles'>
                         $roleHtml
                     </div>
                 ";

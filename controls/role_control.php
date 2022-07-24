@@ -57,12 +57,16 @@
                 foreach($roles as $role){
                     $roleHtml .= "
                         <div class='col'>
-                            <section href='#' class='card shadow-sm role h-100 text-dark item'>
+                            <section class='card h-100 shadow-sm role h-100 text-dark p-5'>
                                 <h2>{$role['name']}</h2>
-                                <div class='card-footer'>
-                                    <div>
-                                        <button class='btn btn-3 delete-role-attempt' data-bs-toggle='modal' data-bs-target='#deleteItem' id='role-{$role['id']}'>Delete</button>
-                                        <a class='btn btn-3' href='./role_form.php?id={$role['id']}'>Edit</a>
+                                <div class='options d-flex align-items-center justify-content-center'>
+                                    <div class='text-center'>
+                                        <button title='Delete Role' class='mb-2 btn btn-2 delete-role-attempt btn-md' data-bs-toggle='modal' data-bs-target='#deleteItem' id='role-{$role['id']}'>
+                                            Delete
+                                        </button> <br/>
+                                        <a title='Edit Role' class='btn btn-4 btn-md' href='./role_form.php?id={$role['id']}'>
+                                            Edit
+                                        </a>
                                     <div>
                                 </div>
                             </section>

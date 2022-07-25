@@ -9,14 +9,14 @@
                 <h1 class="header">Create Item</h1>
                 <div class="row row-cols-md-2 row-cols-xl-3 g-3">
                     <div class="col">
-                        <a href="create_project.php" class="card shadow-sm item">
+                        <a href="project_form.php" class="card shadow-sm item">
                             <div class="card-body p-5 text-center">
                                 <h2 class="text-secondary">Project</h2>
                             </div>
                         </a>
                     </div>
                     <div class="col">
-                        <a href="./create_employee.php" class="card shadow-sm item">
+                        <a href="./employee_form.php" class="card shadow-sm item">
                             <div class="card-body p-5 text-center">
                                 <h2 class="text-secondary">Employee</h2>
                             </div>

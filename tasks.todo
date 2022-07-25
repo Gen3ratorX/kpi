@@ -2,6 +2,7 @@ Navbar:
     - Make it a little transparent.
     - Find a background color for the phone menu
 Main:
+    -Make sure you set up foreign key constraints for employee table 
     -The links in various places 
     -Check if a user is signed in before redirecting
 Create_Role:

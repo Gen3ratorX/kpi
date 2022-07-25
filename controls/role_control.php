@@ -57,7 +57,7 @@
                 foreach($roles as $role){
                     $roleHtml .= "
                         <div class='col'>
-                            <section class='card h-100 shadow-sm role h-100 text-dark p-5'>
+                            <section class='card h-100 shadow role h-100 text-dark p-5 action-item'>
                                 <h2>{$role['name']}</h2>
                                 <div class='options d-flex align-items-center justify-content-center'>
                                     <div class='text-center'>
@@ -75,9 +75,9 @@
                 }
 
                 $rolesHtml = "
-                    <div class='row gy-3 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4' id='roles'>
+                    <section class='row gy-3 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4' id='roles'>
                         $roleHtml
-                    </div>
+                    </section>
                 ";
             }
             else{

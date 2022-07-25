@@ -335,9 +335,6 @@ nav{
     width: 250px;
 }
 /* Required input */
-.required{
-    font-size: 18px;
-}
 .required::after{
     content: '*';
     display: inline-block;
@@ -443,5 +440,8 @@ footer > a > h1{
     }
     .no-item a{
         font-size: 16px;
+    }
+    label, .form-control{
+        font-size: 16px !important;
     }
 }

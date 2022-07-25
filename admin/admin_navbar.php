@@ -74,7 +74,7 @@
                         </a>
                         <ul>
                             <li>
-                                <a href="">Employees</a>
+                                <a href="./employees.php">Employees</a>
                             </li>
                             <li>
                                 <a href="./roles.php">Roles</a>
@@ -101,17 +101,17 @@
             <div id="phone-menu">
                 <a href="index.php">
                     <img src="../static/images/nla-logo.png" alt="NLA Logo">
-                    <h1>National Lottery Authority <br> Key Performance Index</h1>
+                    <h1>National Lottery Authority <br> Key Performance Indicator</h1>
                 </a>
                 <ul>
                     <li>
-                        <a href="">Home</a>
+                        <a href="./index.php">Home</a>
                     </li>
                     <li>
-                        <a href="">Employees</a>
+                        <a href="./employees.php">Employees</a>
                     </li>
                     <li>
-                        <a href="">Roles</a>
+                        <a href="./roles.php">Roles</a>
                     </li>
                     <li>
                         <a href="">Departments</a>

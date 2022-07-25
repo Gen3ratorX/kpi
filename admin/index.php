@@ -3,8 +3,7 @@
     require_once '../misc/database_auth.php';
     require_once '../controls/project_control.php';
     $projectControl = new ProjectControl($con);
-    $projects = $projectControl->getProjectsList();
-    $projectsHtml = $projectControl->projectAdminListTemplate($projects);
+    $projectsHtml = $projectControl->projectAdminListTemplate();
 ?>
 
 <?php

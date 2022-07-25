@@ -10,6 +10,7 @@ class AdminControl{
         this.deleteItem();
         this.projectInit();
         this.roleInit();
+        this.employeeInit();
     }
 
     pageInit(){
@@ -261,7 +262,7 @@ class AdminControl{
     }
 
     selectEmployee(){
-        $('.employee').click(function(){
+        $('.employee-item').click(function(){
             const name = $(this).text();
             $(this).toggleClass('selected-employee');
         });
@@ -359,6 +360,37 @@ class AdminControl{
             }
             const data = {task: 'deleteRole',roleId}
             baseControl.fetchData(inst.url,data,'Yes','#delete-item',false,success);
+        });
+    }
+
+    
+    // Employee
+    employeeInit(){
+        this.saveEmployee();
+    }
+
+    saveEmployee(){
+        const inst = this;
+        $('#save-employee').click(function(){
+            const isValidated = baseControl.validateFields(['#surname','#otherNames','#phone','#location']);
+            const email = $('#email').val();
+            if(isValidated & (email ? baseControl.validateEmail('#email') : true)){
+                const surname = $('#surname').val();
+                const otherNames = $('#otherNames').val();
+                const phone = $('#phone').val();
+                const location = $('#location').val();
+                const role = $('#role').val();
+                const unit = $('#unit').val();
+                const department = $('#department').val();
+                const data = {
+                    surname,otherNames,phone,location,role,unit,department,
+                    task: 'saveEmployee',
+                }
+                const success = (res,statusCode,status) => {
+                    console.log(res,'sucess');
+                }
+                baseControl.fetchData(inst.url,data,'Save Employee','#save-employee',false,success)
+            }
         });
     }
 

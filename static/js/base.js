@@ -64,6 +64,21 @@ class BaseControl{
         return allFieldsValid;
     }
 
+    validateEmail(ele){
+        let isValid = true;
+        const emailRegex = /^[a-zA-Z][a-zA-Z0-9]+@[a-z]+\.[a-z]{2,}(\.[a-z]{2,})?$/;
+        const value = $(ele).val();
+        if(emailRegex.test(value)){
+            $(ele).removeClass('is-invalid');
+            $(ele).addClass('is-valid');
+        }
+        else{
+            $(ele).addClass('is-invalid');
+            isValid = false;
+        }
+        return isValid;
+    }
+
     showToast(message){
         $('#toastBody').text(message);
         const informationToast = new bootstrap.Toast('#toast',{});
@@ -104,9 +119,9 @@ class BaseControl{
                 success(res,statusCode,status)
             },
             error: function({status}){
+                console.log(status);
                 inst.endLoading(btnId,bntText);
                 inst.showToast("The server has encounted an error.")
-                console.log(status);
                 error(status);
             },
             dataType: 'json',

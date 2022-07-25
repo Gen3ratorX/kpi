@@ -19,14 +19,15 @@
             return $projects;
         }
 
-        function projectAdminListTemplate($projects){
+        function projectAdminListTemplate(){
+            $projects = $this->getProjectsList();
             $projectsHtml = "";
             if($projects){
                 $projectHtml = "";
                 foreach($projects as $project){
                     $projectHtml .= "
                         <div class='col'>
-                            <a href='#' class='card shadow-sm role h-100 project text-dark item'>
+                            <a href='#' class='card shadow role h-100 project text-dark item'>
                                 <h2>{$project['name']}</h2>
                                 <p class='text-muted m-0'>Date Created: <span class='text-dark'>2nd May, 2022</span></p>
                                 <p class='text-muted m-0'>Deadline: <span class='text-dark'>21st October, 2022</span></p>
@@ -36,9 +37,9 @@
                 }
 
                 $projectsHtml = "
-                    <div class='row gy-3 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4' id='projects'>
+                    <section class='row gy-3 row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4' id='projects'>
                         $projectHtml
-                    </div>
+                    </section>
                 ";
             }
             else{
@@ -47,7 +48,7 @@
                     <section class='no-item'>
                         No Project Has Been added.
                         <div>
-                            <a href='create_project.php' class='btn btn-1 btn-md'> Add Project </a>
+                            <a href='project_form.php' class='btn btn-1 btn-md'> Add Project </a>
                         </div>
                     </section>
                 ";

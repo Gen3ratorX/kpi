@@ -53,13 +53,13 @@
                         </h2>
                         <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
-                                <div class="employee">
+                                <div class="employee-item">
                                     God The Father
                                 </div>
-                                <div class="employee selected-employee">
+                                <div class="employee-item selected-employee">
                                     God The Son
                                 </div>
-                                <div class="employee selected-employee">
+                                <div class="employee-item selected-employee">
                                     God The Holy Spirit
                                 </div>
                             </div>
@@ -73,13 +73,13 @@
                         </h2>
                         <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
-                                <div class="employee">
+                                <div class="employee-item">
                                     Peter
                                 </div>
-                                <div class="employee selected-employee">
+                                <div class="employee-item selected-employee">
                                     Paul
                                 </div>
-                                <div class="employee selected-employee">
+                                <div class="employee-item-item selected-employee">
                                     John
                                 </div>
                             </div>

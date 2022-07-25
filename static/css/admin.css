@@ -1,5 +1,5 @@
 /* Project */
-.employee{
+.employee-item{
     border: thin solid var(--xanadu);
     display: inline-block;
     padding: 5px 20px;
@@ -18,25 +18,37 @@
 
 
 
-/* Roles */
-.role{
+/* Action */
+.action-item{
     border-radius: 5px;
     border: thin solid rgba(0,0,0,.125);
     position: relative;
     background-color: #f8f9fa;
 }
-.role:hover > .options{
+.action-item:hover > .options{
     visibility: visible;
     opacity: 1;
 }
-.role .options{
+.action-item .options{
     position: absolute;
     width: 100%;
     height: 100%;
     opacity: 0;
     visibility: hidden;
     transition: all .2s ease-in-out;
-    background-color: rgba(0, 0, 0, 0.396);
+    background-color: rgba(0, 0, 0, 0.400);
     top: 0;
     left: 0;
+}
+
+/* Employee */
+.employee h4{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.employee p > span{
+    font-size: 17px;
+    display: block;
+    font-weight: 400;
 }

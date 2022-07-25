@@ -1,10 +1,14 @@
 
 <?php
-    // require_once '../misc/database_auth.php';
-    // require_once '../controls/project_control.php';
-    // $projectControl = new ProjectControl($con);
-    // $projects = $projectControl->getProjectsList();
-    // $projectsHtml = $projectControl->projectAdminListTemplate($projects);
+    require_once '../misc/database_auth.php';
+    require_once '../controls/role_control.php';
+    require_once '../controls/employee_control.php';
+    $roleControl = new RoleControl($con);
+    $employeeControl = new EmployeeControl($con);
+    $roles = $roleControl->getRolesList();
+    $rolesValues = $employeeControl->generateRolesValues($roles);
+    // $departmentsValues = $employeeControl->generateDepartmentsValues($departments);
+    // $unitsValues = $employeeControl->generateUnitsValues($units);
 ?>
 
 <?php
@@ -41,20 +45,20 @@
                         <label for="email">Email:</label>
                         <input type="email" id="email" class="form-control">
                         <div class="invalid-feedback">
-                            Please provide an email.
+                            Enter a full email or leave it blank.
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <label for="location" class="required">Location:</label>
                         <input type="text" id="location" class="form-control">
                         <div class="invalid-feedback">
-                            Please provide an email.
+                            Please provide a location.
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <label for="role" class="required">Role:</label>
                         <select id="role" class='form-control'>
-                            <option value="">Hello</option>
+                            <?php echo $rolesValues ?>
                         </select>
                         <div class="invalid-feedback">
                             Please provide a role.
@@ -66,9 +70,6 @@
                             <option value=""></option>
                             <option value="">Hello</option>
                         </select>
-                        <div class="invalid-feedback">
-                            Please provide an department.
-                        </div>
                     </div>
                     <div class="col-12 col-md-6">
                         <label for="unit">Unit:</label>
@@ -76,13 +77,10 @@
                             <option value=""></option>
                             <option value="">Hello</option>
                         </select>
-                        <div class="invalid-feedback">
-                            Please provide an depa.
-                        </div>
                     </div>
                 </section>
                 <div class="text-center my-5">
-                    <button type="button" class="btn btn-1 btn-lg">Save Employee</button>
+                    <button type="button" class="btn btn-1 btn-lg" id="save-employee">Save Employee</button>
                 </div>
             </section>
         </div>

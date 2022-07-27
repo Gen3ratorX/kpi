@@ -80,7 +80,7 @@
                                 <a href="./roles.php">Roles</a>
                             </li>
                             <li>
-                                <a href="">Departments</a>
+                                <a href="./departments.php">Departments</a>
                             </li>
                             <li>
                                 <a href="">Units</a>
@@ -114,7 +114,7 @@
                         <a href="./roles.php">Roles</a>
                     </li>
                     <li>
-                        <a href="">Departments</a>
+                        <a href="./departments.php">Departments</a>
                     </li>
                     <li>
                         <a href="">Units</a>

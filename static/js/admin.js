@@ -6,6 +6,7 @@ class AdminControl{
         this.projectInit();
         this.roleInit();
         this.employeeInit();
+        this.departmentInit();
     }
 
     pageInit(){
@@ -148,7 +149,9 @@ class AdminControl{
                     });
                 }
                 else{
-                    $(`#role-${roleId}`).parents('.col').hide('slow');
+                    $(`#role-${roleId}`).parents('.col').hide('slow',function(){
+                        $(this).remove();
+                    });
                 }
 
                 // Close modal
@@ -175,7 +178,7 @@ class AdminControl{
             const isValidated = baseControl.validateFields(['#surname','#otherNames','#phone','#location']);
             const email = $('#email').val();
             const emailIsValid = baseControl.validateEmail('#email');
-            if(isValidated & (email ? emailIsValid : true)){
+            if(isValidated && (email ? emailIsValid : true)){
                 const surname = baseControl.capitalize($('#surname').val());
                 const otherNames = baseControl.capitalize($('#otherNames').val());
                 const phone = $('#phone').val();
@@ -223,7 +226,9 @@ class AdminControl{
                     });
                 }
                 else{
-                    $(`#employee-${roleId}`).parents('.col').hide('slow');
+                    $(`#employee-${roleId}`).parents('.col').hide('slow',function(){
+                        $(this).remove();
+                    });
                 }
 
                 // Close modal
@@ -235,6 +240,131 @@ class AdminControl{
         });
     }
 
+    // Department
+    departmentInit(){
+        this.saveDepartment();
+        this.searchDepartmentHead();
+        this.deleteDepartment();
+    }
+
+    selectDepartmentHead(){
+        $('.department-head-options').click(function(){
+            $('.department-head-options').each(function(){
+                $(this).removeAttr('id');
+            });
+            $(this).attr('id','selected-department-head');
+        });
+    }
+
+    searchDepartmentHead(){
+        const inst = this;
+        $('#search-department-head').click(function(){
+            const q = $('#search-input').val();
+            if(q){
+                baseControl.startLoading('#search-department-head');
+                const success = (res,statusCode,status) => {
+                    // Display search results
+                    $('#search-results').empty();
+                    if(res?.employees?.length === 0){
+                        $('#search-results').html(
+                            `<div class="col-12">
+                                <p class="text-center text-muted lead">No Employee Has Been Selected.</p>
+                            </div>`
+                        );
+                    }
+                    else{
+                        for(let employee of res?.employees){
+                            $('#search-results').append(
+                                `<div class="col-auto">
+                                    <div data-department-head-id='${employee?.id}' class="department-head-options">${employee?.name}</div>
+                                </div>`
+                            );
+                        }
+                        // Add event
+                        inst.toggleEventState('.department-head-options',inst.selectDepartmentHead)
+                    }
+                }
+                const data = {
+                    q,
+                    task: 'searchDepartmentHead'
+                }
+
+                baseControl.fetchData(inst.url,data,'Search','#search-department-head',true,success)
+            }
+            else{
+                $('#search-results').html(
+                    `<div class="col-12">
+                        <p class="text-center text-muted lead">No Employee Has Been Selected.</p>
+                    </div>`
+                );
+            }
+        });        
+    }
+
+    saveDepartment(){
+        const inst = this;
+        $('#save-department').click(function(){
+            const departmentEdit =  $(this).data('departmentEdit');
+            const departmentId = $(this).data('departmentId');
+            const isValid = baseControl.validateFields(['#department']);
+            const departmentHeadId = $('#selected-department-head').data('departmentHeadId');
+            if(isValid && departmentHeadId){
+                const department = baseControl.capitalize($('#department').val());
+                const data = {
+                    department,departmentHeadId,departmentId,
+                    task: departmentEdit ? 'editDepartment' : 'saveDepartment'
+                }
+                const success = (res,statusCodes,status) => {
+                    window.location.assign('./departments.php');
+                    // console.log(res);
+                }
+                baseControl.fetchData(inst.url,data,'Save Department','#save-department',false,success);
+            }
+            else if(isValid && !departmentHeadId){
+                baseControl.showToast("You must search and select a department head");
+            }
+        });
+    }
+
+    deleteDepartment(){
+        const inst = this;
+        $('.delete-department-attempt').click(function(){
+            const departmentId = $(this).attr('id').split('-')[1];
+            $('#delete-department').data('id',departmentId);
+        });
+
+        $('#delete-department').click(function(){
+            const departmentId = $(this).data('id');
+            const success = (res,statusCode,status) => {
+                if($('#departments').children().length - 1 == 0){
+                    $('#departments').hide('slow',function(){
+                        $(this).before(
+                            `   <!-- No Item -->
+                                <section class='no-item'>
+                                    No Department Has Been added.
+                                    <div>
+                                        <a href='department_form.php' class='btn btn-1 btn-md'> Add Department </a>
+                                    </div>
+                                </section>
+                            `
+                        );
+                        $(this).remove();
+                    });
+                }
+                else{
+                    $(`#department-${departmentId}`).parents('.col').hide('slow',function(){
+                        $(this).remove();
+                    });
+                }
+
+                // Close modal
+                $('#close-delete-department').click();
+                
+            }
+            const data = {task: 'deleteDepartment',departmentId}
+            baseControl.fetchData(inst.url,data,'Yes','#delete-department',false,success);
+        });
+    }
 
 }
 

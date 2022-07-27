@@ -30,7 +30,7 @@
                         </a>
                     </div>
                     <div class="col">
-                        <a href="" class="card shadow-sm item">
+                        <a href="./department_form.php" class="card shadow-sm item">
                             <div class="card-body p-5 text-center">
                                 <h2 class="text-secondary">Department</h2>
                             </div>

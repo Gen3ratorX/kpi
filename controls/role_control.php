@@ -58,8 +58,8 @@
                 foreach($roles as $role){
                     $roleHtml .= "
                         <div class='col'>
-                            <section class='card h-100 shadow role h-100 text-dark p-5 action-item'>
-                                <h2>{$role['name']}</h2>
+                            <section class='card h-100 shadow role h-100 text-dark py-5 px-2 action-item'>
+                                <h2 class='text-truncate'>{$role['name']}</h2>
                                 <div class='options d-flex align-items-center justify-content-center'>
                                     <div class='text-center'>
                                         <button title='Delete Role' class='mb-2 btn btn-2 delete-role-attempt btn-md' data-bs-toggle='modal' data-bs-target='#deleteItem' id='role-{$role['id']}'>

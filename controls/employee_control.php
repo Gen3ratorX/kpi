@@ -7,11 +7,20 @@
         function __construct($con)
         {
             $this->con = $con;
+            $this->tableName = 'employee';
         }
 
-        function getEmployeesList(){
+        function getEmployeesList($q=null, $columns=null){
             $employees = [];
-            $sql1 = "SELECT * FROM employee";
+            // $sql1 = "SELECT * FROM $this->tableName";
+            if($q){
+                $spreadColumns = spreadSearchColumns($columns,$q);
+                $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+            }
+            else{
+                $sql1 = "SELECT * FROM $this->tableName";
+            }
+
             $results = $this->con->query($sql1);
             while($row1 = $results->fetch_assoc()){
                 $employees[] = $row1;
@@ -37,7 +46,7 @@
                                     </div>
                                 </div>
                                 <div class='card-body'>
-                                    <h4>$name</h4>
+                                    <h4 class'text-truncate text-secondary'>$name</h4>
                                     <p class='m-0 text-secondary'>Username: <span class='text-dark'>{$employee['username']}</span></p>
                                     <p class='m-0 text-secondary'>Phone: <span class='text-dark'>{$employee['phone']}</span></p>
                                 </div>
@@ -99,7 +108,7 @@
             $username .= strtolower($surname);
 
             // Check if it exists in the database
-            $sql1 = "SELECT * FROM employee WHERE username='$username'";
+            $sql1 = "SELECT * FROM $this->tableName WHERE username='$username'";
             $results1 = $this->con->query($sql1);
             $numRows = $results1->num_rows + 1;
             $username .= "$numRows";
@@ -108,7 +117,7 @@
 
         
         function getEmployee($employeeId){
-            $sql1 = "SELECT * FROM employee WHERE id=$employeeId";
+            $sql1 = "SELECT * FROM $this->tableName WHERE id=$employeeId";
             $result1 = $this->con->query($sql1);
             return $result1->fetch_assoc();
         }
@@ -126,16 +135,16 @@
             $password = password_hash($username,PASSWORD_BCRYPT);
 
             $sql1 = "INSERT INTO 
-            employee(surname,other_names,phone,email,employee_role_id,location,username,password)
+            $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password)
             VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password')";
             if($department and $unit){
                 $sql1 = "INSERT INTO 
-                employee(surname,other_names,phone,email,employee_role_id,location,username,password,department_id,unit_id)
+                $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,department_id,unit_id)
                 VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department,$unit)";
             }
             elseif($department and !$unit){
                 $sql1 = "INSERT INTO 
-                employee(surname,other_names,phone,email,employee_role_id,location,username,password,department_id)
+                $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,department_id)
                 VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department)";
             }
 
@@ -159,15 +168,15 @@
             $unit = filterInput('unit');
             $department = filterInput('department');
 
-            $sql1 = "UPDATE employee 
+            $sql1 = "UPDATE $this->tableName 
             SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role WHERE id=$employeeId";
             if($department and $unit){
-                $sql1 = "UPDATE employee 
+                $sql1 = "UPDATE $this->tableName 
                 SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
                 department_id=$department, unit_id=$unit WHERE id=$employeeId";
             }
             elseif($department and !$unit){
-                $sql1 = "UPDATE employee 
+                $sql1 = "UPDATE $this->tableName 
                 SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
                 department_id=$department WHERE id=$employeeId";
             }
@@ -184,7 +193,7 @@
 
         function deleteEmployee(){
             $employeeId = filterInput('employeeId');
-            $sql1 = "DELETE FROM employee WHERE id='$employeeId'";
+            $sql1 = "DELETE FROM $this->tableName WHERE id='$employeeId'";
             if($this->con->query($sql1)){
                 http_response_code(204);
                 echo json_encode([

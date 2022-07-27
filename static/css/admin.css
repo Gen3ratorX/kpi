@@ -1,5 +1,5 @@
 /* Project */
-.employee-item{
+.employee-item, .department-head-options{
     border: thin solid var(--xanadu);
     display: inline-block;
     padding: 5px 20px;
@@ -8,6 +8,7 @@
     margin: 0 4px 4px 0;
     cursor: pointer;
     transition: all .2s ease-in-out;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.100);
 }
 .selected-employee{
     background-color: var(--xanadu);
@@ -51,4 +52,10 @@
     font-size: 17px;
     display: block;
     font-weight: 400;
+}
+
+/* Department */
+#selected-department-head{
+    background-color: var(--xanadu);
+    color: white;
 }

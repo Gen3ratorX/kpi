@@ -16,4 +16,17 @@
         return $sanitizedField;
     }
 
+    function spreadSearchColumns($columns,$q){
+        $returnValue = "";
+        for($i = 0; $i < count($columns); $i++){  
+            $i + 1 < count($columns)
+            ? $returnValue .= "$columns[$i] LIKE '%$q%' OR "
+            : $returnValue .= "$columns[$i] LIKE '%$q%'";
+        }
+
+        return $returnValue;
+    }
+    
+    // echo spreadSeachColumns(['name','other_names'],'hrllo');
+
 ?>

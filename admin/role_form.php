@@ -1,15 +1,17 @@
 <?php
     require_once '../misc/database_auth.php';
     require_once '../controls/role_control.php';
+    $roleControl = new RoleControl($con);
 ?>
 
 <?php
     $roleId = $_GET['id'] ?? '';
     $roleName = "";
     // Check if we are editing
-    $roleControl = new RoleControl($con);
-    $role = $roleControl->getRole($roleId);
-    $roleName = $role ? $role['name'] : '';
+    if($roleId){
+        $role = $roleControl->getRole($roleId);
+        $roleName = $role ? $role['name'] : '';
+    }
 ?>
 
 <?php

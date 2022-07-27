@@ -7,8 +7,14 @@
         {
             $this->con = $con;
         }
+
         function testDatabaseConnection(){
             echo $this->con->connect_error ? "Error Connecting to Database" : "Database Connected Successfully";
+        }
+
+        function generateUsername($surname,$otherNames){
+            $username = '';
+            // $otherNamesLst = explode()
         }
     }
 

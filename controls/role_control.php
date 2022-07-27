@@ -1,4 +1,5 @@
 <?php
+    require_once '../misc/utils.php';
     class RoleControl{
         private $con;
 
@@ -21,7 +22,7 @@
         }
 
         function saveRole(){
-            $name = $this->filterInput('role');
+            $name = filterInput('role');
             $sql1 = "INSERT IGNORE INTO $this->tableName(name) VALUE('$name')";
             if($this->con->query($sql1)){
                 http_response_code(201);
@@ -103,8 +104,8 @@
         }
 
         function editRole(){
-            $roleId = $this->filterInput('roleId');
-            $name = $this->filterInput('role');
+            $roleId = filterInput('roleId');
+            $name = filterInput('role');
             $sql1 = "UPDATE $this->tableName SET name='$name' WHERE id=$roleId";
             if($this->con->query($sql1)){
                 echo json_encode([
@@ -121,7 +122,7 @@
         }
 
         function deleteRole(){
-            $roleId = $this->filterInput('roleId');
+            $roleId = filterInput('roleId');
             $sql1 = "DELETE FROM $this->tableName WHERE id=$roleId";
             if($this->con->query($sql1)){
                 http_response_code(204);

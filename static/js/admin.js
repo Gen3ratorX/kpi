@@ -3,11 +3,6 @@ class AdminControl{
         this.url = './utils.php';
         this.pageInit();
         // this.toggleRoleState();
-        this.addFocusAttempt();
-        // this.addObjectiveAttempt(); // Remove after test
-        this.saveFocus();
-        // this.saveObjective(); // Remove after test
-        this.deleteItem();
         this.projectInit();
         this.roleInit();
         this.employeeInit();
@@ -47,204 +42,6 @@ class AdminControl{
         action();
     }
 
-    deleteItem(){
-        const inst = this;
-        $('#delete-item').click(function(){
-            const {item,identifier} = $(this).data();
-            if(item == 'focus'){
-                $(`#${identifier}`).hide(function(){
-                    if($('#focuses').children().length === 1){
-                        $('#focuses').hide(function(){
-                            $('#focus-wrapper').prev().after(
-                                `<!-- No Focus -->
-                                    <section class="no-item">
-                                        No Focus Has Been Added
-                                        <div>
-                                            <a href="#" class="btn btn-1 btn-md add-focus-attempt" data-bs-toggle="modal" data-bs-target="#focusModal"> Add Focus </a>
-                                        </div>
-                                    </section>
-                                `
-                            );
-                            // Add events to add focus button
-                            inst.toggleEventState('.add-focus-attempt',inst.addFocusAttempt)
-                            $(this).remove();
-                        });
-                    }
-                    else{
-                        $(this).remove();
-                    }
-                });
-            }
-            // Close modal
-            $('#close-delete-item-modal').click();
-        });
-    }
-
-    // Focus
-
-    addFocusAttempt(){
-        $('.add-focus-attempt').click(function(){
-            $('#save-focus').data('command','add');
-
-        });
-    }
-
-    editFocusAttempt(){
-        $('.edit-focus-attempt').click(function(){
-            const focusIdentifier = $(this).data('focusIdentifier');
-            // console.log(`Edit ${focusIdentifier}`)
-            $('#save-focus').data({'command':'edit',focusIdentifier});
-            // Get focus and update the focus modal with it
-            const focus = $(this).parents('.accordion-item').find('.accordion-button').text().trim();
-            $('#focus-input').val(focus);
-        });
-    }
-
-    deleteFocusAttempt(){
-        $('.delete-focus-attempt').click(function(){
-            $('#deleteItemModalLabel').text("Delete Focus");
-            $('#deleteItemModal').find('.modal-body > p').text("Do you want to delete this focus?");
-            const focusIdentifier = $(this).data('focusIdentifier');
-            $('#delete-item').data({'identifier':focusIdentifier,'item':'focus'});
-        });
-    }
-
-
-    saveFocus(){
-        const inst = this;
-        $('#save-focus').click(function(){
-            const focus = $('#focus-input').val();
-            if(focus){
-                const command = $(this).data('command');
-                $('#focus-error').text('');
-                $('#close-focus-modal').click();
-                $('#focus-input').val('');
-                // Add focus
-                if(command === 'add'){
-                    const focusCount = $('.focus').length;
-                    const focusIdentifier = Math.round(Math.random() * 1000000);
-                    if(focusCount > 0){
-                        // Focus already presen
-                        $('#focuses').append(
-                            `<div class="accordion-item focus" id=focus-${focusIdentifier}>
-                                <h2 class="accordion-header" id="panelsStayOpen-heading${focusIdentifier}">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse${focusIdentifier}" aria-expanded="false" aria-controls="panelsStayOpen-collapse${focusIdentifier}">
-                                        ${focus}
-                                    </button>
-                                </h2>
-                                <div id="panelsStayOpen-collapse${focusIdentifier}" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-heading${focusIdentifier}">
-                                    <div class="accordion-body">
-                                        <div class="d-flex justify-content-end mb-2">
-                                            <button class="btn btn-3 btn-md me-2 add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-${focusIdentifier}">Add Objective</button>
-                                            <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
-                                            <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#deleteItemModal">Delete Focus</button>
-                                        </div>
-                                        <div class="objectives">
-                                            <!-- No Objective -->
-                                            <section class="no-item">
-                                                No Objective Has Been Added
-                                                <div>
-                                                    <a href="#" class="btn btn-1 btn-md add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-${focusIdentifier}"> Add Objective </a>
-                                                </div>
-                                            </section>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `
-                        );
-                    }
-                    else{
-                        // First focus
-                        $('#focus-wrapper').prev().remove();
-                        $('#focus-wrapper').append(
-                            `<div class="accordion" id="focuses">
-                                <div class="accordion-item focus" id="focus-${focusIdentifier}">
-                                    <h2 class="accordion-header" id="panelsStayOpen-heading${focusIdentifier}">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse${focusIdentifier}" aria-expanded="true" aria-controls="panelsStayOpen-collapse${focusIdentifier}">
-                                            ${focus}
-                                        </button>
-                                    </h2>
-                                    <div id="panelsStayOpen-collapse${focusIdentifier}" class="accordion-collapse collapse show" aria-labelledby="panelsStayOpen-heading${focusIdentifier}">
-                                        <div class="accordion-body">
-                                            <div class="d-flex justify-content-end mb-2">
-                                                <button class="btn btn-3 btn-md me-2 add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-${focusIdentifier}">Add Objective</button>
-                                                <button class="btn btn-4 btn-md me-2 edit-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#focusModal">Edit Focus</button>
-                                                <button class="btn btn-2 btn-md delete-focus-attempt" data-focus-identifier="focus-${focusIdentifier}" data-bs-toggle="modal" data-bs-target="#deleteItemModal">Delete Focus</button>
-                                            </div>
-                                            <div class="objectives">
-                                                <!-- No Objective -->
-                                                <section class="no-item">
-                                                    No Objective Has Been Added
-                                                    <div>
-                                                        <a href="#" class="btn btn-1 btn-md add-objective-attempt" data-bs-toggle="modal" data-bs-target="#objectiveModal" data-focus-identifier="focus-${focusIdentifier}"> Add Objective </a>
-                                                    </div>
-                                                </section>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`
-                        );
-                    }
-                    inst.toggleEventState('.edit-focus-attempt',inst.editFocusAttempt);
-                    inst.toggleEventState('.delete-focus-attempt',inst.deleteFocusAttempt);
-                }
-                // Update focus
-                else{
-                    // use identifier to update focus name
-                    const focusIdentifier = $(this).data('focusIdentifier');
-                    $(`#${focusIdentifier}`).find('.accordion-button').text(focus);
-                }
-                
-            }
-            else{
-                $('#focus-error').text('Please add a focus.');
-            }
-        });
-    }
-
-    // Objective
-    addObjectiveAttempt(){
-        $('.add-objective-attempt').click(function(){
-            const focusIdentifier = $(this).data('focusIdentifier');
-            $('#save-objective').data({'command':'add',focusIdentifier});
-
-        });
-    }
-
-    saveObjective(){
-        const inst = this;
-        $('#save-objective').click(function(){
-            const objective = $('#objective-input').val();
-            if(objective){
-                const {command,focusIdentifier} = $(this).data();
-                $('#objective-error').text('');
-                $('#close-objective-modal').click();
-                $('#objective-input').val('');
-                // Add objective
-                if(command === 'add'){
-                    console.log("I am adding")
-                    const objectivesCount = $(`#${focusIdentifier}`).find('.objectives .objective').length;
-                    console.log(objectivesCount);
-                    if(objectivesCount === 0){
-
-                    }
-                    else{
-
-                    }
-                }
-                // Update objective
-                else{
-
-                }
-            }
-            else{
-                $('#objective-error').text('Please add an objective.');
-            }
-        });
-    }
-
     // Project
     projectInit(){
         this.saveProject();
@@ -278,7 +75,7 @@ class AdminControl{
             });
             const isValidated = baseControl.validateFields(['#projectName','#projectDeadline','#projectEmployees']);
             if(isValidated){
-                const projectName = $('#projectName').val();
+                const projectName = baseControl.capitalize($('#projectName').val());
                 const deadline = $('#projectDeadline').val();
                 const isOpen = $('#isOpen').data('value');
                 $.post(
@@ -312,7 +109,7 @@ class AdminControl{
             const roleId = $(this).data('roleId');
             const isValidated = baseControl.validateFields(['#role']);
             if(isValidated){
-                const role = $('#role').val();
+                const role = baseControl.capitalize($('#role').val());
                 const data = {
                     role,
                     task: roleEdit ? 'editRole' : 'saveRole',
@@ -329,10 +126,10 @@ class AdminControl{
         const inst = this;
         $('.delete-role-attempt').click(function(){
             const roleId = $(this).attr('id').split('-')[1];
-            $('#delete-item').data('id',roleId);
+            $('#delete-role').data('id',roleId);
         });
 
-        $('#delete-item').click(function(){
+        $('#delete-role').click(function(){
             const roleId = $(this).data('id');
             const success = (res,statusCode,status) => {
                 if($('#roles').children().length - 1 == 0){
@@ -355,11 +152,11 @@ class AdminControl{
                 }
 
                 // Close modal
-                $('#close-delete-item').click();
+                $('#close-delete-role').click();
                 
             }
             const data = {task: 'deleteRole',roleId}
-            baseControl.fetchData(inst.url,data,'Yes','#delete-item',false,success);
+            baseControl.fetchData(inst.url,data,'Yes','#delete-role',false,success);
         });
     }
 
@@ -367,30 +164,74 @@ class AdminControl{
     // Employee
     employeeInit(){
         this.saveEmployee();
+        this.deleteEmployee();
     }
 
     saveEmployee(){
         const inst = this;
         $('#save-employee').click(function(){
+            const employeeEdit = $(this).data('employeeEdit');
+            const employeeId = $(this).data('employeeId');
             const isValidated = baseControl.validateFields(['#surname','#otherNames','#phone','#location']);
             const email = $('#email').val();
-            if(isValidated & (email ? baseControl.validateEmail('#email') : true)){
-                const surname = $('#surname').val();
-                const otherNames = $('#otherNames').val();
+            const emailIsValid = baseControl.validateEmail('#email');
+            if(isValidated & (email ? emailIsValid : true)){
+                const surname = baseControl.capitalize($('#surname').val());
+                const otherNames = baseControl.capitalize($('#otherNames').val());
                 const phone = $('#phone').val();
-                const location = $('#location').val();
+                const location = baseControl.capitalize($('#location').val());
                 const role = $('#role').val();
                 const unit = $('#unit').val();
                 const department = $('#department').val();
                 const data = {
-                    surname,otherNames,phone,location,role,unit,department,
-                    task: 'saveEmployee',
+                    surname,otherNames,phone,location,role,unit,department,email,employeeId,
+                    task: employeeEdit ? 'editEmployee' :'saveEmployee',
                 }
+                console.log(data);
                 const success = (res,statusCode,status) => {
-                    console.log(res,'sucess');
-                }
+                    console.log(res);
+                    window.location.assign('./employees.php')
+                };
                 baseControl.fetchData(inst.url,data,'Save Employee','#save-employee',false,success)
             }
+        });
+    }
+
+    deleteEmployee(){
+        const inst = this;
+        $('.delete-employee-attempt').click(function(){
+            const employeeId = $(this).attr('id').split('-')[1];
+            $('#delete-employee').data('id',employeeId);
+        });
+
+        $('#delete-employee').click(function(){
+            const employeeId = $(this).data('id');
+            const success = (res,statusCode,status) => {
+                if($('#employees').children().length - 1 == 0){
+                    $('#employees').hide('slow',function(){
+                        $(this).before(
+                            `<!-- No Item -->
+                                <section class='no-item'>
+                                    No Employee Has Been added.
+                                    <div>
+                                        <a href='./employee_form.php' class='btn btn-1 btn-md'> Add Employee </a>
+                                    </div>
+                                </section>`
+                        );
+                        $(this).remove();
+
+                    });
+                }
+                else{
+                    $(`#employee-${roleId}`).parents('.col').hide('slow');
+                }
+
+                // Close modal
+                $('#close-delete-employee').click();
+                
+            }
+            const data = {task: 'deleteEmployee',employeeId}
+            baseControl.fetchData(inst.url,data,'Yes','#delete-employee',false,success);
         });
     }
 

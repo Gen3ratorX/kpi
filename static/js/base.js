@@ -68,13 +68,20 @@ class BaseControl{
         let isValid = true;
         const emailRegex = /^[a-zA-Z][a-zA-Z0-9]+@[a-z]+\.[a-z]{2,}(\.[a-z]{2,})?$/;
         const value = $(ele).val();
-        if(emailRegex.test(value)){
-            $(ele).removeClass('is-invalid');
-            $(ele).addClass('is-valid');
+        // console.log(value);
+        if(value){
+            if(emailRegex.test(value)){
+                $(ele).removeClass('is-invalid');
+                $(ele).addClass('is-valid');
+            }
+            else{
+                $(ele).addClass('is-invalid');
+                isValid = false;
+            }
         }
         else{
-            $(ele).addClass('is-invalid');
-            isValid = false;
+            $(ele).removeClass('is-valid');
+            $(ele).removeClass('is-invalid');
         }
         return isValid;
     }
@@ -118,8 +125,9 @@ class BaseControl{
                 inst.endLoading(btnId,bntText);
                 success(res,statusCode,status)
             },
-            error: function({status}){
-                console.log(status);
+            error: function(xhr){
+                const {status} = xhr;
+                console.log(xhr);
                 inst.endLoading(btnId,bntText);
                 inst.showToast("The server has encounted an error.")
                 error(status);
@@ -132,8 +140,13 @@ class BaseControl{
         // })
     }
 
-    deleteItem(url,){
-
+    capitalize(word){
+        const wordLst = word.trim().split(' ');
+        let capitalizedWordLst = [];
+        for(let i of wordLst){
+            capitalizedWordLst.push(`${i[0].toUpperCase()}${i.substring(1,)}`);
+        }
+        return capitalizedWordLst.join(' ');
     }
 }
 

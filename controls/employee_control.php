@@ -31,9 +31,9 @@
                             <div class='card shadow employee action-item'>
                                 <div class='options d-flex align-items-center justify-content-center'>
                                     <div>
-                                        <button class='btn btn-md btn-4 mb-2'>Delete</button>
+                                        <button class='btn btn-md btn-2 mb-2 delete-employee-attempt' id='employee-{$employee['id']}' data-bs-toggle='modal' data-bs-target='#deleteItem'>Delete</button>
                                         <br>
-                                        <button class='btn btn-md btn-2'>Edit</button>
+                                        <a href='./employee_form.php?id={$employee['id']}' class='btn btn-md btn-4'>Edit</a>
                                     </div>
                                 </div>
                                 <div class='card-body'>
@@ -66,12 +66,16 @@
             return $employeesHtml;
         }
 
-        function generateRolesValues($roles){
+        function generateRolesValues($roles,$select = 0){
             $options = "";
             foreach($roles as $role){
-                $options .= "
-                    <option value='{$role['id']}'>{$role['name']}</option>
-                ";
+                $select == $role['id']
+                    ? $options .= "
+                        <option selected value='{$role['id']}'>{$role['name']}</option>
+                    "
+                    : $options .= "
+                        <option value='{$role['id']}'>{$role['name']}</option>
+                    ";
             }
             return $options;
         }
@@ -86,16 +90,113 @@
             return $options;
         }
 
+        function generateUsername($surname,$otherNames){
+            $username = '';
+            $otherNamesLst = explode(' ',$otherNames);
+            foreach($otherNamesLst as $otherName){
+                $username .= strtolower($otherName[0]);
+            }
+            $username .= strtolower($surname);
+
+            // Check if it exists in the database
+            $sql1 = "SELECT * FROM employee WHERE username='$username'";
+            $results1 = $this->con->query($sql1);
+            $numRows = $results1->num_rows + 1;
+            $username .= "$numRows";
+            return $username;
+        }
+
+        
+        function getEmployee($employeeId){
+            $sql1 = "SELECT * FROM employee WHERE id=$employeeId";
+            $result1 = $this->con->query($sql1);
+            return $result1->fetch_assoc();
+        }
+        
         function saveEmployee(){
             $surname = filterInput('surname');
             $otherNames = filterInput('otherNames');
             $phone = filterInput('phone');
-            $email = filterInput('email') ?: null;
+            $email = filterInput('email');
             $location = filterInput('location');
             $role = filterInput('role');
-            $unit = filterInput('unit') ?: null;
-            $department = filterInput('department') ?: null;
-            echo json_encode([$email,$unit,$department]);
+            $unit = filterInput('unit');
+            $department = filterInput('department');
+            $username = $this->generateUsername($surname,$otherNames);
+            $password = password_hash($username,PASSWORD_BCRYPT);
+
+            $sql1 = "INSERT INTO 
+            employee(surname,other_names,phone,email,employee_role_id,location,username,password)
+            VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password')";
+            if($department and $unit){
+                $sql1 = "INSERT INTO 
+                employee(surname,other_names,phone,email,employee_role_id,location,username,password,department_id,unit_id)
+                VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department,$unit)";
+            }
+            elseif($department and !$unit){
+                $sql1 = "INSERT INTO 
+                employee(surname,other_names,phone,email,employee_role_id,location,username,password,department_id)
+                VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department)";
+            }
+
+            if($this->con->query($sql1)){
+                http_response_code(201);
+                echo json_encode(['status'=>'SUCCESS']);
+            }else{
+                http_response_code(500);
+                echo json_encode(['status'=>'ERROR','sql'=>$sql1]);
+            }
+        }
+
+        function editEmployee(){
+            $employeeId = filterInput('employeeId');
+            $surname = filterInput('surname');
+            $otherNames = filterInput('otherNames');
+            $phone = filterInput('phone');
+            $email = filterInput('email');
+            $location = filterInput('location');
+            $role = filterInput('role');
+            $unit = filterInput('unit');
+            $department = filterInput('department');
+
+            $sql1 = "UPDATE employee 
+            SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role WHERE id=$employeeId";
+            if($department and $unit){
+                $sql1 = "UPDATE employee 
+                SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
+                department_id=$department, unit_id=$unit WHERE id=$employeeId";
+            }
+            elseif($department and !$unit){
+                $sql1 = "UPDATE employee 
+                SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
+                department_id=$department WHERE id=$employeeId";
+            }
+
+            if($this->con->query($sql1)){
+                http_response_code(201);
+                echo json_encode(['status'=>'SUCCESS']);
+            }else{
+                http_response_code(500);
+                echo json_encode(['status'=>'ERROR','sql'=>$sql1]);
+            }
+
+        }
+
+        function deleteEmployee(){
+            $employeeId = filterInput('employeeId');
+            $sql1 = "DELETE FROM employee WHERE id='$employeeId'";
+            if($this->con->query($sql1)){
+                http_response_code(204);
+                echo json_encode([
+                    'status'=> "SUCCESS"
+                ]);
+            }
+            else{
+                http_response_code(500);
+                echo json_encode([
+                    'status'=>'SUCCESS'
+                ]);
+            }
         }
     }
 ?>

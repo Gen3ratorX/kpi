@@ -16,6 +16,12 @@
     elseif (isset($_POST) and $_POST['task'] == 'saveEmployee') {
         $employeeControl->saveEmployee();
     }
+    elseif (isset($_POST) and $_POST['task'] == 'editEmployee') {
+        $employeeControl->editEmployee();
+    }
+    elseif (isset($_POST) and $_POST['task'] == 'deleteEmployee') {
+        $employeeControl->deleteEmployee();
+    }
 
     // Role
     elseif (isset($_POST) and $_POST['task'] == 'saveRole') {

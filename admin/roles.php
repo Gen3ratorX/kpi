@@ -24,8 +24,8 @@
                         Are you sure you want to delete this role?
                     </h4>
                     <div class="text-end mt-4">
-                        <button class="btn btn-2 btn-sm" id="delete-item">Yes</button>
-                        <button class="btn btn-3 btn-sm" data-bs-dismiss="modal" id="close-delete-item">No</button>
+                        <button class="btn btn-2 btn-sm" id="delete-role">Yes</button>
+                        <button class="btn btn-3 btn-sm" data-bs-dismiss="modal" id="close-delete-role">No</button>
                     </div>
                 </div>
             </div>

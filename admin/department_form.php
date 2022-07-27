@@ -12,7 +12,7 @@
         $department = $departmentControl->getDepartment($departmentId);
         if($department){
             $departmentName = $department['name'];
-            $departmentHeadName = $department['departmentHeadName'];
+            $departmentHeadName = $department['departmentHeadName'] ?? '';
             $departmentHeadId = $department['employee_id'];
         }
             
@@ -47,7 +47,7 @@
                         </div>
                         <div id="search-results" class="row my-3 g-2">
                             <?php 
-                                $departmentId and $department
+                                $departmentId and isset($department['departmentHeadName'])
                                 ? $departmentControl->generateDefaultDepartmentHeadContent(
                                     $departmentId,$department
                                 )

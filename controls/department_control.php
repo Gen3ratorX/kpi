@@ -97,7 +97,13 @@
             INNER JOIN employee
             ON department.id = $departmentId AND employee.id = department.employee_id;";
             $result1 = $this->con->query($sql1);
-            return $result1->fetch_assoc();
+            $row1 = $result1->fetch_assoc();
+            if($row1['employee_id'] == null){
+                $sql2 = "SELECT * FROM department WHERE id=$departmentId";
+                $result2 = $this->con->query($sql2);
+                $row1 = $result2->fetch_assoc();
+            }
+            return $row1;
 
         }
 

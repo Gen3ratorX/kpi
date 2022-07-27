@@ -226,7 +226,7 @@ class AdminControl{
                     });
                 }
                 else{
-                    $(`#employee-${roleId}`).parents('.col').hide('slow',function(){
+                    $(`#employee-${employeeId}`).parents('.col').hide('slow',function(){
                         $(this).remove();
                     });
                 }

@@ -48,10 +48,13 @@
     overflow: hidden;
     white-space: nowrap;
 }
+.employee p{
+    font-size: 14px;
+}
 .employee p > span{
     font-size: 17px;
     display: block;
-    font-weight: 400;
+    font-weight: 500;
 }
 
 /* Department */

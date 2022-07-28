@@ -13,7 +13,7 @@
                 <h1 class="header">Create Project</h1>
                 <section class="row g-3">
                     <div class="col-12">
-                        <label for="project-name" class="required">Project Name</label>
+                        <label for="project-name" class="required">Project Name:</label>
                         <input type="text" id="projectName" value="" class="form-control">
                         <div class="invalid-feedback">
                             Please provide a project name.

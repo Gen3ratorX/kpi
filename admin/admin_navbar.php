@@ -58,7 +58,7 @@
         </div>
         <div class="d-flex align-items-center justify-content-between">
             <!-- Nav brand -->
-            <a href="index.php" class="d-flex align-items-center" id="nav-brand">
+            <a href="./index.php" class="d-flex align-items-center" id="nav-brand">
                 <img src="../static/images/nla-logo.png" width="auto" alt="NLA">
                 <h1>National Lottery Authority <br> Key Performance Indicator</h1>
             </a>
@@ -66,7 +66,7 @@
             <div id="desktop-menu">
                 <ul>
                     <li>
-                        <a href="">Home</a>
+                        <a href="./index.php">Home</a>
                     </li>
                     <li class="submenu">
                         <a href="#">
@@ -83,7 +83,7 @@
                                 <a href="./departments.php">Departments</a>
                             </li>
                             <li>
-                                <a href="">Units</a>
+                                <a href="./units.php">Units</a>
                             </li>
                         </ul>
                     </li>
@@ -117,7 +117,7 @@
                         <a href="./departments.php">Departments</a>
                     </li>
                     <li>
-                        <a href="">Units</a>
+                        <a href="./units.php">Units</a>
                     </li>
                     <li class="logout">
                         <a href="">Logout</a>

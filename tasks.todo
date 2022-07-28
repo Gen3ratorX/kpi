@@ -2,6 +2,7 @@ Navbar:
     - Make it a little transparent.
     - Find a background color for the phone menu
 Main:
+    -Cross check every foem label 
     -Make sure you set up foreign key constraints for employee table 
     -The links in various places 
     -Check if a user is signed in before redirecting

@@ -29,7 +29,7 @@
                 <h1 class="header">Create Department</h1>
                 <section>
                     <div>
-                        <label for="role" class="required">Department</label>
+                        <label for="role" class="required">Department:</label>
                         <input type="text" value="<?php echo $departmentName; ?>" class="form-control" id="department">
                         <div class="invalid-feedback">
                             Please provide a department.

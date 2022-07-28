@@ -7,6 +7,7 @@ class AdminControl{
         this.roleInit();
         this.employeeInit();
         this.departmentInit();
+        this.unitInit();
     }
 
     pageInit(){
@@ -190,9 +191,7 @@ class AdminControl{
                     surname,otherNames,phone,location,role,unit,department,email,employeeId,
                     task: employeeEdit ? 'editEmployee' :'saveEmployee',
                 }
-                console.log(data);
                 const success = (res,statusCode,status) => {
-                    console.log(res);
                     window.location.assign('./employees.php')
                 };
                 baseControl.fetchData(inst.url,data,'Save Employee','#save-employee',false,success)
@@ -363,6 +362,75 @@ class AdminControl{
             }
             const data = {task: 'deleteDepartment',departmentId}
             baseControl.fetchData(inst.url,data,'Yes','#delete-department',false,success);
+        });
+    }
+
+    // Unit
+    unitInit(){
+        this.saveUnit();
+        this.deleteUnit();
+    }
+
+    saveUnit(){
+        const inst = this;
+        $('#save-unit').click(function(){
+            const unitEdit = $(this).data('unitEdit');
+            const unitId = $(this).data('unitId');
+            const isValid = baseControl.validateFields(['#unit']);
+            if(isValid){
+                const unit = baseControl.capitalize($('#unit').val());
+                const department = $('#department').val();
+                const data = {
+                    department,unit,unitId,
+                    task: unitEdit ? 'editUnit' : 'saveUnit',
+                }
+                const success = (res,statusCode,status) => {
+                    // console.log(res);
+                    window.location.assign('./units.php');
+                }
+
+                baseControl.fetchData(inst.url,data,'Save Unit','#save-unit',false,success);
+            }
+        });
+    }
+
+    deleteUnit(){
+        const inst = this;
+        $('.delete-unit-attempt').click(function(){
+            const unitId = $(this).attr('id').split('-')[1];
+            $('#delete-unit').data('id',unitId);
+        });
+
+        $('#delete-unit').click(function(){
+            const unitId = $(this).data('id');
+            const success = (res,statusCode,status) => {
+                if($('#units').children().length - 1 == 0){
+                    $('#units').hide('slow',function(){
+                        $(this).before(
+                            `   <!-- No Item -->
+                                <section class='no-item'>
+                                    No Unit Has Been added.
+                                    <div>
+                                        <a href='unit_form.php' class='btn btn-1 btn-md'> Add Unit </a>
+                                    </div>
+                                </section>
+                            `
+                        );
+                        $(this).remove();
+                    });
+                }
+                else{
+                    $(`#unit-${unitId}`).parents('.col').hide('slow',function(){
+                        $(this).remove();
+                    });
+                }
+
+                // Close modal
+                $('#close-delete-unit').click();
+                
+            }
+            const data = {task: 'deleteUnit',unitId}
+            baseControl.fetchData(inst.url,data,'Yes','#delete-unit',false,success);
         });
     }
 

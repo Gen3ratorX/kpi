@@ -58,7 +58,7 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
-                        <label for="phone" class="required">Phone</label>
+                        <label for="phone" class="required">Phone:</label>
                         <input type="text" value="<?php echo $phone; ?>" id="phone" class="form-control">
                         <div class="invalid-feedback">
                             Please provide a phone number.

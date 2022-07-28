@@ -24,7 +24,7 @@
                 <h1 class="header">Create Role</h1>
                 <section>
                     <div>
-                        <label for="role" class="required">Role</label>
+                        <label for="role" class="required">Role:</label>
                         <input type="text" value="<?php echo $roleName; ?>" class="form-control" id="role">
                         <div class="invalid-feedback">
                             Please provide a role.

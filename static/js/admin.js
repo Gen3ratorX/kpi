@@ -169,6 +169,7 @@ class AdminControl{
     employeeInit(){
         this.saveEmployee();
         this.deleteEmployee();
+        this.getUnitsForDepartment();
     }
 
     saveEmployee(){
@@ -192,7 +193,7 @@ class AdminControl{
                     task: employeeEdit ? 'editEmployee' :'saveEmployee',
                 }
                 const success = (res,statusCode,status) => {
-                    window.location.assign('./employees.php')
+                    window.location.assign('./employees.php');
                 };
                 baseControl.fetchData(inst.url,data,'Save Employee','#save-employee',false,success)
             }
@@ -236,6 +237,30 @@ class AdminControl{
             }
             const data = {task: 'deleteEmployee',employeeId}
             baseControl.fetchData(inst.url,data,'Yes','#delete-employee',false,success);
+        });
+    }
+
+    getUnitsForDepartment(){
+        const inst = this;
+        $('#department').change(function(){
+            const departmentId = $(this).val();
+            $('#unit').empty(); // Clear units options
+            // Default option
+            $('#unit').html(
+                `<option value=''>__</option>`
+            );
+            if(departmentId){
+                const success = (res,statusCode,status) => {
+                    for(let unit of res.units){
+                        $('#unit').append(
+                            `<option value='${unit.id}'>${unit.name}</option>`
+                        );
+                    }
+                }
+
+                const data = {task: 'getUnitsForDepartment',departmentId};
+                baseControl.fetchData(inst.url,data,'','',true,success);
+            }
         });
     }
 

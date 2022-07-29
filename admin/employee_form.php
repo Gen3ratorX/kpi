@@ -3,12 +3,17 @@
     require_once '../misc/database_auth.php';
     require_once '../controls/role_control.php';
     require_once '../controls/employee_control.php';
+    require_once '../controls/department_control.php';
+    require_once '../controls/unit_control.php';
     $roleControl = new RoleControl($con);
-    $employeeControl = new EmployeeControl($con);
     $roles = $roleControl->getRolesList();
+    $departmentControl = new DepartmentControl($con);
+    $departments = $departmentControl->getDepartmentsList();
+    $unitControl = new UnitControl($con);
+    $employeeControl = new EmployeeControl($con);
     $rolesValues = $employeeControl->generateRolesValues($roles);
-    // $departmentsValues = $employeeControl->generateDepartmentsValues($departments);
-    // $unitsValues = $employeeControl->generateUnitsValues($units);
+    $departmentsValues = $employeeControl->generateDepartmentsValues($departments);
+    $unitsValues = '';
 ?>
 
 <?php
@@ -27,9 +32,11 @@
             $email = $employee['email'];
             $location = $employee['location'];
             $roleId = $employee['employee_role_id'];
-            $departmentId = $employee['department_id'];
-            $unitId = $employee['unit_id'];
+            $departmentId = $employee['department_id'] ?: null;
+            $unitId = $employee['unit_id'] ?: null;
             $rolesValues = $employeeControl->generateRolesValues($roles,$roleId);
+            $departmentsValues = $employeeControl->generateDepartmentsValues($departments,$departmentId);
+            $unitsValues = $departmentId ? $employeeControl->generateUnitsValues($departmentId,$unitId) : '';
         }
     }
 ?>
@@ -90,15 +97,15 @@
                     <div class="col-12 col-md-6">
                         <label for="department">Department:</label>
                         <select id="department" class='form-control'>
-                            <option value=""></option>
-                            <option value="">Hello</option>
+                            <option value="">__</option>
+                            <?php echo $departmentsValues ?>
                         </select>
                     </div>
                     <div class="col-12 col-md-6">
                         <label for="unit">Unit:</label>
                         <select id="unit" class='form-control'>
-                            <option value=""></option>
-                            <option value="">Hello</option>
+                            <option value="">__</option>
+                            <?php echo $unitsValues ?>
                         </select>
                     </div>
                 </section>

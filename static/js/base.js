@@ -95,8 +95,8 @@ class BaseControl{
     fetchData(
         url,
         data,
-        bntText,
-        btnId,
+        bntText='',
+        btnId='#' ,
         get=true,
         success = () => {} 
         ,error = () => {},

@@ -56,7 +56,8 @@
             if($roles){
                 $roleHtml = "";
                 foreach($roles as $role){
-                    $roleHtml .= "
+                    $role['can_delete'] 
+                    ? $roleHtml .= "
                         <div class='col'>
                             <section class='card h-100 shadow role h-100 text-dark py-5 px-2 action-item'>
                                 <h4 class='text-center text-secondary'>{$role['name']}</h4>
@@ -70,6 +71,13 @@
                                         </a>
                                     <div>
                                 </div>
+                            </section>
+                        </div>
+                    "
+                    : $roleHtml .= "
+                        <div class='col'>
+                            <section class='card h-100 shadow role h-100 text-dark py-5 px-2 action-item'>
+                                <h4 class='text-center text-secondary'>{$role['name']}</h4>
                             </section>
                         </div>
                     ";

@@ -89,13 +89,53 @@
             return $options;
         }
 
-        function generateUnitsValues($units){
+        
+
+        function generateDepartmentsValues($departments,$select = 0){
             $options = "";
+            foreach($departments as $department){
+                $select == $department['id']
+                    ? $options .= "
+                        <option selected value='{$department['id']}'>{$department['name']}</option>
+                    "
+                    : $options .= "
+                        <option value='{$department['id']}'>{$department['name']}</option>
+                    ";
+            }
             return $options;
         }
 
-        function generateDepartmentsValues($departments){
+        function getUnitsForDepartment($departmentId=null,$returnData = false){
+            if(!$departmentId){
+                $departmentId = filterInput('departmentId',false);
+            }
+
+            $units = [];
+            $sql1 = "SELECT * FROM unit WHERE department_id=$departmentId";
+            $results1 = $this->con->query($sql1);
+            while($row1 = $results1->fetch_assoc()){
+                $units[] = $row1;
+            }
+            if($returnData){
+                return $units;
+            }
+            else{
+                echo json_encode(['units'=>$units]);
+            }
+        }
+
+        function generateUnitsValues($departmentId,$select){
+            $units = $this->getUnitsForDepartment($departmentId,true);
             $options = "";
+            foreach($units as $unit){
+                $select == $unit['id']
+                    ? $options .= "
+                        <option selected value='{$unit['id']}'>{$unit['name']}</option>
+                    "
+                    : $options .= "
+                        <option value='{$unit['id']}'>{$unit['name']}</option>
+                    ";
+            }
             return $options;
         }
 
@@ -121,6 +161,9 @@
             $result1 = $this->con->query($sql1);
             return $result1->fetch_assoc();
         }
+
+        
+
         
         function saveEmployee(){
             $surname = filterInput('surname');
@@ -169,7 +212,7 @@
             $department = filterInput('department');
 
             $sql1 = "UPDATE $this->tableName 
-            SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role WHERE id=$employeeId";
+            SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, department_id=null, unit_id=null WHERE id=$employeeId";
             if($department and $unit){
                 $sql1 = "UPDATE $this->tableName 
                 SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
@@ -178,7 +221,7 @@
             elseif($department and !$unit){
                 $sql1 = "UPDATE $this->tableName 
                 SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
-                department_id=$department WHERE id=$employeeId";
+                department_id=$department, unit_id=null WHERE id=$employeeId";
             }
 
             if($this->con->query($sql1)){
@@ -188,6 +231,7 @@
                 http_response_code(500);
                 echo json_encode(['status'=>'ERROR','sql'=>$sql1]);
             }
+
 
         }
 

@@ -26,6 +26,9 @@
     elseif (isset($_POST['task']) and $_POST['task'] == 'deleteEmployee') {
         $employeeControl->deleteEmployee();
     }
+    elseif (isset($_GET['task']) and $_GET['task'] == 'getUnitsForDepartment') {
+        $employeeControl->getUnitsForDepartment();
+    }
 
     // Role
     elseif (isset($_POST['task']) and $_POST['task'] == 'saveRole') {

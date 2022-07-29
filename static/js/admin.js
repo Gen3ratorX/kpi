@@ -15,29 +15,6 @@ class AdminControl{
         // myModalAlternative.show();
     }
 
-    toggleRoleState(){
-        $('#save-or-edit').click(function(){
-            const command = $(this).data('command');
-            const value = $('#role-input').val();
-            if(value){
-                if(command === 'save'){
-                    $(this).data('command','edit');
-                    $('#role-input').attr('disabled',true);
-                    $(this).text("Edit");
-                }else{
-                    $(this).data('command','save');
-                    $('#role-input').attr('disabled',false);
-                    $(this).text("Save");
-                }
-                $('#role-error').data('error',false);
-                $('#role-error').text("");
-            }
-            else{
-                $('#role-error').text("You need to put in a role.");
-                $('#role-error').data('error',true);
-            }
-        });
-    }
 
     toggleEventState(ele,action,event='click'){
         $(ele).off(event);
@@ -46,9 +23,12 @@ class AdminControl{
 
     // Project
     projectInit(){
+        this.assignedEmployees = new Set();
         this.saveProject();
         this.toggleProjectIsOpen();
-        this.selectEmployee();
+        this.assignEmployee();
+        this.searchProjectEmployees();
+        this.deleteProject();
     }
 
     toggleProjectIsOpen(){
@@ -56,44 +36,147 @@ class AdminControl{
             const value = $(this).text().toLowerCase().trim();
             $('#isOpen > .btn').attr('class','btn btn-4-outline btn-sm');
             $(this).attr('class','btn btn-4-solid btn-sm');
-            $('#isOpen').data('value',value)
+            $('#isOpen').data('value',value.toLowerCase()  == 'yes' ? 1 : 0)
         });
     }
 
-    selectEmployee(){
-        $('.employee-item').click(function(){
-            const name = $(this).text();
-            $(this).toggleClass('selected-employee');
+    assignEmployee(){
+        const inst = this;
+        $('.employee-item').click(function(){ 
+            const employeeId = $(this).data('employeeId');
+            const name = $(this).text().trim();
+            
+            const countAssignedEmployees = $('.assigned-employee').length;
+            if(countAssignedEmployees == 0){
+                $('#assigned-employees').empty();
+            }
+            if(!inst.assignedEmployees.has(`${employeeId}`)){
+                // Update a set of employees
+                inst.assignedEmployees.add(`${employeeId}`);
+                $('#assigned-employees').append(
+                    `<div class="assigned-employee">
+                        <p>${name}</p>
+                        <span data-employee-id='${employeeId}'>x</span>
+                    </div>`
+                );
+            }
+            inst?.toggleEventState('.assigned-employee > span',() => inst.removeAssignedEmployee());
+        });
+    }
+
+    removeAssignedEmployee(){
+        const inst = this;
+        $('.assigned-employee > span').click(function(){
+            const employeeId  = $(this).data('employeeId');
+            inst.assignedEmployees.delete(`${employeeId}`);
+            $(this).parents('.assigned-employee').hide(function(){
+                const countAssignedEmployees = $('.assigned-employee').length;
+                if(countAssignedEmployees - 1 == 0){
+                    $('#assigned-employees').append(
+                        `<p class='text-center text-muted lead'>No Employee Has Been Assigned.</p>`
+                    );
+                }
+                $(this).remove();
+            });
+        });
+    }
+
+    searchProjectEmployees(){
+        const inst = this;
+        $('.search-project-employee').click(function(){
+            const employeeRole = $(this).data('employeeRole');
+            const q = $(this).parents('.search').find('.search-project-employee-input').val();
+            const data = {
+                employeeRole,q,
+                task: 'searchProjectEmployees'
+            };
+            const success = (res,statusCode,status) => {
+                // console.log(res);
+                const employees = res.employees;
+                if(employees.length == 0){
+                    $(this).parents('.search').parent().next().html(
+                        `<p class='text-center text-muted lead'>No Employee Found</p>`
+                    );
+                }
+                else{
+                    $(this).parents('.search').parent().next().empty();
+                    for(let employee of employees){
+                        $(this).parents('.search').parent().next().append(
+                            `<p class='employee-item' data-employee-id='${employee.id}'>${employee.name}</p>`
+                        );
+                    }
+                    // Add event
+                    inst.toggleEventState('.employee-item',() => inst.assignEmployee())
+                }
+                
+            }
+            baseControl.fetchData(inst.url,data,'Search','.search-project-employee',true,success);
         });
     }
 
     saveProject(){
         let inst = this;
         $('#save-project').click(function(){
-            const selectedEmployees = [];
-            $('.selected-employee').each(function(){
-                // selectedEmployees.push($(this).data('employeeId').trim());
-                selectedEmployees.push($(this).text().trim());
-            });
-            const isValidated = baseControl.validateFields(['#projectName','#projectDeadline','#projectEmployees']);
-            if(isValidated){
+            const isValidated = baseControl.validateFields(['#projectName','#projectDeadline']);
+            if(isValidated && inst.assignedEmployees.size > 0){
                 const projectName = baseControl.capitalize($('#projectName').val());
                 const deadline = $('#projectDeadline').val();
                 const isOpen = $('#isOpen').data('value');
-                $.post(
-                    inst.url,
-                    {
-                        projectName,
-                        deadline,
-                        isOpen,
-                        selectedEmployees,
-                        task: 'saveProject'
-                    },
-                    function(res){
-                        console.log(res);
-                    }
-                );
+                const data = {
+                    projectName,deadline,isOpen,
+                    assignedEmployees: Array(...inst.assignedEmployees).join(','),
+                    task: 'saveProject'
+                }
+                const success = (res,statusCode,status) => {
+                    // console.log(res);
+                    window.location.assign('./index.php')
+                }
+                baseControl.fetchData(inst.url,data,'Save Project','#save-project',false,success);
             }
+            else if(inst.assignedEmployees.size == 0){
+                baseControl.showToast("You haven't assigned any employee to the project.");
+            }
+        });
+    }
+
+    deleteProject(){
+        const inst = this;
+        $('.delete-project-attempt').click(function(){
+            const projectId = $(this).attr('id').split('-')[1];
+            $('#delete-project').data('id',projectId);
+        });
+
+        $('#delete-project').click(function(){
+            const projectId = $(this).data('id');
+            const success = (res,statusCode,status) => {
+                console.log(res);
+                if($('#projects').children().length - 1 == 0){
+                    $('#projects').hide('slow',function(){
+                        $(this).before(
+                            `   <!-- No Item -->
+                                <section class='no-item'>
+                                    No Project Has Been added.
+                                    <div>
+                                        <a href='project_form.php' class='btn btn-1 btn-md'> Add Project </a>
+                                    </div>
+                                </section>`
+                        );
+                        $(this).remove();
+
+                    });
+                }
+                else{
+                    $(`#project-${projectId}`).parents('.card').hide('slow',function(){
+                        $(this).remove();
+                    });
+                }
+
+                // Close modal
+                $('#close-delete-project').click();
+                
+            }
+            const data = {task: 'deleteProject',projectId}
+            baseControl.fetchData(inst.url,data,'Yes','#delete-project',false,success);
         });
     }
 

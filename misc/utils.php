@@ -1,4 +1,5 @@
 <?php
+    date_default_timezone_set("GMT");
     function filterInput($field,$post=true){
         // if($post){
         // }
@@ -24,7 +25,12 @@
             : $returnValue .= "$columns[$i] LIKE '%$q%'";
         }
 
-        return $returnValue;
+        return "($returnValue)";
+    }
+
+    function convertToKhebabCase($word,$delimiter){
+        $wordLst = explode($delimiter,strtolower($word));
+        return implode('-',$wordLst);
     }
     
     // echo spreadSeachColumns(['name','other_names'],'hrllo');

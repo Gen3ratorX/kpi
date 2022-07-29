@@ -1,6 +1,18 @@
+<?php
+    require_once '../misc/database_auth.php';
+    require_once '../controls/employee_control.php';
+    require_once '../controls/project_control.php';
+
+    $employeeControl = new EmployeeControl($con);
+    $employees = $employeeControl->getEmployeesList();
+    $projectControl = new ProjectControl($con);
+    $assignEmployeesHtml = $projectControl->generateAssignEmployeesHtml();
+
+
+?>
 
 <?php
-    $todaysDate = date('Y-m-d');
+    $tomorrowsDate = date('Y-m-d',strtotime('tomorrow'));
 ?>
 
 <?php
@@ -21,12 +33,12 @@
                     </div>
                     <div class="col-12 col-sm-6">
                         <label for="project-deadline" class="required">Deadline:</label>
-                        <input type="date" min="<?php echo $todaysDate;?>" id="projectDeadline" value="" class="form-control">
+                        <input type="date" min="<?php echo $tomorrowsDate;?>" id="projectDeadline" value="" class="form-control">
                         <div class="invalid-feedback">
                             Please provide a deadline.
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 align-self-center" id="isOpen" data-value="no">
+                    <div class="col-12 col-sm-6 align-self-center" id="isOpen" data-value="0">
                         <label>
                             Is Open:
                         </label> <br>
@@ -35,58 +47,15 @@
                     </div>
                     <div class="col-12">
                         <label for="projectEmployees">Employees Assigned:</label>
-                        <textarea name="" id="projectEmployees" disabled class="form-control"></textarea>
-                        <div class="invalid-feedback">
-                            Please assign at least one employee to the project;
-                        </div>
+                        <section class="my-2" id="assigned-employees">
+                            <p class='text-center text-muted lead'>No Employee Has Been Assigned.</p>
+                        </section>
                     </div>
                 </section>
 
-                <!-- Add Employees -->
+                <!-- Assign Employees -->
                 <h1 class="header">Assign Employees</h1>
-                <div class="accordion" id="accordionExample">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                God Class
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <div class="employee-item">
-                                    God The Father
-                                </div>
-                                <div class="employee-item selected-employee">
-                                    God The Son
-                                </div>
-                                <div class="employee-item selected-employee">
-                                    God The Holy Spirit
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                Human Class
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <div class="employee-item">
-                                    Peter
-                                </div>
-                                <div class="employee-item selected-employee">
-                                    Paul
-                                </div>
-                                <div class="employee-item-item selected-employee">
-                                    John
-                                </div>
-                            </div>
-                        </div>
-                    </div>    
-                </div>
-            </section>
+                <?php echo $assignEmployeesHtml; ?>
             <!-- Save -->
             <div class="text-center my-5">
                 <button type="button" id="save-project" class="btn btn-1 btn-lg">Save Project</button>

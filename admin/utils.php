@@ -12,8 +12,15 @@
     $departmentControl = new DepartmentControl($con);
     $unitControl = new UnitControl($con);
 
+    // Project
     if(isset($_POST['task']) and $_POST['task'] == 'saveProject'){
-        echo json_encode("God is good");
+        $projectControl->saveProject();
+    }
+    elseif (isset($_GET['task']) and $_GET['task'] == 'searchProjectEmployees') {
+        $projectControl->searchProjectEmployees();
+    }
+    elseif (isset($_POST['task']) and $_POST['task'] == 'deleteProject') {
+        $projectControl->deleteProject();
     }
 
     // Employee

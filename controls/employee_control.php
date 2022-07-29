@@ -37,7 +37,7 @@
                     $name = "{$employee['surname']} {$employee['other_names']}";
                     $employeeHtml .= "
                         <div class='col'>
-                            <div class='card shadow employee action-item'>
+                            <div class='card shadow-sm employee action-item'>
                                 <div class='options d-flex align-items-center justify-content-center'>
                                     <div>
                                         <button class='btn btn-md btn-2 mb-2 delete-employee-attempt' id='employee-{$employee['id']}' data-bs-toggle='modal' data-bs-target='#deleteItem'>Delete</button>

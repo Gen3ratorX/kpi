@@ -21,6 +21,186 @@
             return $projects;
         }
 
+        function getProject($projectId){
+            $sql1 = "SELECT *,COUNT(`assign`.`project_id`) AS employeesAssigned 
+            FROM project,assign WHERE id=$projectId";
+            $result1 = $this->con->query($sql1);
+            if($result1->num_rows == 1){
+                return $result1->fetch_assoc();
+            }
+        }
+
+        function generalDashboardItems($projectId){
+            $generalItems = [];
+            // Get project details
+            $project = $this->getProject($projectId);
+            $generalItems['projectName'] = $project['name'];
+            $dateCreated = new DateTime($project['date_created']);
+            $deadline = new DateTime($project['deadline']);
+            $generalItems['daysLeft'] = $deadline->diff($dateCreated)->format('%a');
+
+            // Get task and employee details
+            $sql2 = "SELECT COUNT(project_id) AS employeesAssigned FROM assign WHERE project_id=$projectId";
+            $result2 = $this->con->query($sql2);
+            $generalItems['employeesAssigned'] = $result2->fetch_assoc()['employeesAssigned'];
+
+            $sql3 = "SELECT COUNT(project_id) AS tasks FROM task WHERE project_id=$projectId";
+            $result3 = $this->con->query($sql3);
+            $generalItems['tasks'] = $result3->fetch_assoc()['tasks'];
+
+            // Get total progress
+            $totalEmployeeProgress = [];
+            $sql4 = "SELECT employee_id FROM assign WHERE project_id=$projectId";
+            $results4 = $this->con->query($sql4);
+
+            // Get employee progress
+            while($row4 = $results4->fetch_assoc()){
+                $employeeId = $row4['employee_id'];
+                $employeeProgress = $this->employeeProgress($employeeId,$projectId);
+                $totalEmployeeProgress[] = $employeeProgress;
+            }
+            $generalItems['totalProgress'] = array_sum($totalEmployeeProgress) / count($totalEmployeeProgress);
+
+            return $generalItems;
+        }
+
+        function colorCodesForProgress($progress){
+
+        }
+
+        function generateEmployeeProgressItems($projectId){
+            $employeeProgressHtml = "";
+            // Get all employees in the project
+            $sql1 = "SELECT employee_id FROM assign WHERE project_id=$projectId";
+            $results1 = $this->con->query($sql1);
+            while($row1 = $results1->fetch_assoc()){
+                $employeeId = $row1['employee_id'];
+                $employeeProgress = $this->employeeProgress($employeeId,$projectId);
+                // Get employee details
+                $sql2 = "SELECT CONCAT_WS(' ',`employee`.`surname`,`employee`.`other_names`) as name,
+                `department`.`name` AS department
+                FROM employee
+                INNER JOIN department
+                ON `employee`.`department_id`=`department`.`id` AND `employee`.`id`=$employeeId";
+                $results2 = $this->con->query($sql2);
+                $row2 = $results2->fetch_assoc();
+                $employeeName = $row2['name'];
+                $department = $row2['department'];
+
+                // Get number of tasks
+                $sql3 = "SELECT COUNT(*) AS tasks FROM task
+                WHERE project_id=$projectId and employee_id=$employeeId";
+                $results3 = $this->con->query($sql3);
+                $tasks = $results3->fetch_assoc()['tasks'];
+
+                // Generate html code
+                $employeeProgressHtml .= "
+                    <div class='card item shadow-sm department-progress-item mb-3'>
+                        <div class='card-body d-flex justify-content-between align-items-center'>
+                            <section class='details text-start'>
+                                $employeeName
+                                <div class='d-flex flex-sm-row flex-column'>
+                                    <p class='m-0 text-start small text-secondary'>Tasks: $tasks</p>
+                                    <p class='m-0 text-start small text-secondary ms-sm-3'>Department: $department</p>
+                                </div>
+                            </section>
+                            <section class='percentage text-danger'>
+                                $employeeProgress%
+                            </section>
+                        </div>
+                    </div>
+                ";
+            }
+
+            return $employeeProgressHtml;
+        }
+
+        function generateDepartmentProgressItems($projectId){
+            $departmentsData = [];
+            $departmentProgressHtml = "";
+            // Get all employees 
+            $sql1 = "SELECT employee_id FROM assign WHERE project_id=$projectId";
+            $results1 = $this->con->query($sql1);
+            while($row1 = $results1->fetch_assoc()){
+                $employeeId = $row1['employee_id'];
+                $employeeProgress = $this->employeeProgress($employeeId,$projectId);
+                $employeeTasks = $this->employeeTasks($employeeId,$projectId);
+                // Get department details
+                $sql2 = "SELECT `department`.`name` AS department, `department`.`id` AS id FROM employee 
+                INNER JOIN department
+                ON `employee`.`department_id`=`department`.`id`
+                WHERE  `employee`.`id`=$employeeId";
+                $results2 = $this->con->query($sql2);
+                $row2 = $results2->fetch_assoc();
+                $departmentId = $row2['id'];
+                $department = $row2['department'];
+                // Department has been added
+                if(array_key_exists($departmentId,$departmentsData)){
+                    $departmentsData[$departmentId]['progress'][] = $employeeProgress;
+                    $departmentsData[$departmentId]['tasks'][] = $employeeTasks;
+                    $departmentsData[$departmentId]['employeesAssigned']++;
+
+                }
+                // Department is not added
+                else{
+                    $departmentsData[$departmentId] = [
+                        'tasks'=>[$employeeTasks],
+                        'progress'=>[$employeeProgress],
+                        'name'=>$department,
+                        'employeesAssigned'=>1,
+                    ];
+                }
+            }
+            // Go through department data
+            foreach($departmentsData as $departmentData){
+                $tasks = array_sum($departmentData['tasks']);
+                $progress = array_sum($departmentData['progress']) /count($departmentData['progress']);
+                $employeesAssigned = $departmentData['employeesAssigned'];
+                $departmentName = $departmentData['name'];
+
+                $departmentProgressHtml .= "
+                    <div class='card item shadow-sm department-progress-item mb-3'>
+                        <div class='card-body d-flex justify-content-between align-items-center'>
+                            <section class='details text-start'>
+                                $departmentName
+                                <div class='d-flex flex-sm-row flex-column'>
+                                    <p class='m-0 text-start small text-secondary'>Tasks: $tasks</p>
+                                    <p class='m-0 text-start small text-secondary ms-sm-3'>Employees Assigned: $employeesAssigned</p>
+                                </div>
+                            </section>
+                            <section class='percentage text-danger'>
+                                $progress%
+                            </section>
+                        </div>
+                    </div>
+                ";
+            }
+
+            return $departmentProgressHtml;
+        }
+
+        function employeeProgress($employeeId,$projectId){
+            $ratings = 0;
+            // Get all tasks and their ratings
+            $sql1 = "SELECT IFNULL(AVG(`performance`.`rating`),0) as rating FROM performance
+            INNER JOIN task
+            ON `task`.`id`=`performance`.`task_id`
+            WHERE `task`.`project_id`=$projectId AND `task`.`employee_id` = $employeeId";
+            $results1 = $this->con->query($sql1);
+            while($row1 = $results1->fetch_assoc()){
+                $ratings += $row1['rating'];
+            }
+            $employeeProgress = $ratings / $results1->num_rows;
+            return $employeeProgress;
+        }
+
+        function employeeTasks($employeeId,$projectId){
+            $sql1 = "SELECT COUNT(*) as tasks FROM task WHERE employee_id=$employeeId AND project_id=$projectId";
+            $results1 = $this->con->query($sql1);
+            return $results1->fetch_assoc()['tasks'];
+
+        }
+
         function projectAdminListTemplate(){
             $projects = $this->getProjectsList();
             $projectsHtml = "";
@@ -38,8 +218,8 @@
                             <div class='options d-flex align-items-center justify-content-center'>
                                 <div>
                                     <button class='btn btn-md btn-2 me-2 delete-project-attempt' id='project-{$project['id']}' data-bs-toggle='modal' data-bs-target='#deleteItem'>Delete</button>
-                                    <a href='' class='btn btn-md btn-4 me-2'>Edit</a>
-                                    <a href='' class='btn btn-md btn-3'>View</a>
+                                    <!-- <a href='' class='btn btn-md btn-4 me-2'>Edit</a> -->
+                                    <a href='./project_detail.php?id={$project['id']}' class='btn btn-md btn-3'>View</a>
                                 </div>
                             </div>
                             <div class='card-body d-flex justify-content-between align-items-center'>

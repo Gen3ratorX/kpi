@@ -53,33 +53,27 @@
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.100);
 }
 
-
-
-
-
-
-/* Action */
-.action-item{
-    border-radius: 5px;
-    border: thin solid rgba(0,0,0,.125);
-    position: relative;
-    background-color: #f8f9fa;
+.project-detail-general-dashboard-item  h4{
+    font-size: 20px;
+    text-align: left;
+    font-weight: 400;
+    color: gray;
+    color: white;
+    margin: auto;
 }
-.action-item:hover > .options{
-    visibility: visible;
-    opacity: 1;
+.project-detail-general-dashboard-item  p{
+    font-size: 30px;
+    margin: auto;
+    font-weight: 500;
+    color: white;
 }
-.action-item .options{
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    visibility: hidden;
-    transition: all .2s ease-in-out;
-    background-color: rgba(0, 0, 0, 0.400);
-    top: 0;
-    left: 0;
+
+.department-progress-item .percentage{
+    font-size: 25px;
+    font-weight: 500;
 }
+
+
 
 /* Employee */
 .employee h4{

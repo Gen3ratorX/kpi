@@ -124,8 +124,16 @@
             }
         }
 
-        function generateUnitsValues($departmentId,$select){
-            $units = $this->getUnitsForDepartment($departmentId,true);
+        function generateUnitsValues($departmentId=null,$select=null){
+            if($departmentId){
+                $units = $this->getUnitsForDepartment($departmentId,true);
+            }
+            else{
+                $sql1 = "SELECT id FROM department ORDER BY id LIMIT 1";
+                $result1 = $this->con->query($sql1);
+                $departmentId = $result1->fetch_assoc()['id'];
+                $units = $this->getUnitsForDepartment($departmentId,true);
+            }
             $options = "";
             foreach($units as $unit){
                 $select == $unit['id']
@@ -178,17 +186,12 @@
             $password = password_hash($username,PASSWORD_BCRYPT);
 
             $sql1 = "INSERT INTO 
-            $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password)
-            VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password')";
-            if($department and $unit){
+            $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,$department)
+            VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department)";
+            if($unit){
                 $sql1 = "INSERT INTO 
                 $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,department_id,unit_id)
                 VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department,$unit)";
-            }
-            elseif($department and !$unit){
-                $sql1 = "INSERT INTO 
-                $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,department_id)
-                VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department)";
             }
 
             if($this->con->query($sql1)){
@@ -212,16 +215,11 @@
             $department = filterInput('department');
 
             $sql1 = "UPDATE $this->tableName 
-            SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, department_id=null, unit_id=null WHERE id=$employeeId";
-            if($department and $unit){
+            SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, department_id=$department, unit_id=null WHERE id=$employeeId";
+            if($unit){
                 $sql1 = "UPDATE $this->tableName 
                 SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
                 department_id=$department, unit_id=$unit WHERE id=$employeeId";
-            }
-            elseif($department and !$unit){
-                $sql1 = "UPDATE $this->tableName 
-                SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
-                department_id=$department, unit_id=null WHERE id=$employeeId";
             }
 
             if($this->con->query($sql1)){

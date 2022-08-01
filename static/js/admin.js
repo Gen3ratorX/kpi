@@ -332,18 +332,16 @@ class AdminControl{
             $('#unit').html(
                 `<option value=''>__</option>`
             );
-            if(departmentId){
-                const success = (res,statusCode,status) => {
-                    for(let unit of res.units){
-                        $('#unit').append(
-                            `<option value='${unit.id}'>${unit.name}</option>`
-                        );
-                    }
+            const success = (res,statusCode,status) => {
+                for(let unit of res.units){
+                    $('#unit').append(
+                        `<option value='${unit.id}'>${unit.name}</option>`
+                    );
                 }
-
-                const data = {task: 'getUnitsForDepartment',departmentId};
-                baseControl.fetchData(inst.url,data,'','',true,success);
             }
+
+            const data = {task: 'getUnitsForDepartment',departmentId};
+            baseControl.fetchData(inst.url,data,'','',true,success);
         });
     }
 

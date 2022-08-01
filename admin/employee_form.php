@@ -13,7 +13,7 @@
     $employeeControl = new EmployeeControl($con);
     $rolesValues = $employeeControl->generateRolesValues($roles);
     $departmentsValues = $employeeControl->generateDepartmentsValues($departments);
-    $unitsValues = '';
+    $unitsValues = $employeeControl->generateUnitsValues()
 ?>
 
 <?php
@@ -95,9 +95,8 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
-                        <label for="department">Department:</label>
+                        <label for="department" class="required">Department:</label>
                         <select id="department" class='form-control'>
-                            <option value="">__</option>
                             <?php echo $departmentsValues ?>
                         </select>
                     </div>

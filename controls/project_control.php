@@ -208,11 +208,8 @@
                 $projectHtml = "";
                 foreach($projects as $project){
                     $projectId = $project['id'];
-                    // Get number of employees
-                    $sql1 = "SELECT COUNT(*) as employeesAssigned FROM assign WHERE project_id=$projectId";
-                    $result1 = $this->con->query($sql1);
-                    $employeesAssigned = $result1->fetch_assoc()['employeesAssigned'];
-
+                    $generalItems = $this->generalDashboardItems($projectId);
+                    
                     $projectHtml .= "
                         <div class='card shadow-sm action-item mb-3'>
                             <div class='options d-flex align-items-center justify-content-center'>
@@ -226,11 +223,11 @@
                                 <div class='flex-grow-1'>
                                     <h4 class='project-name'>{$project['name']}</h4>
                                     <div class='row g-2 row-cols-1 row-cols-sm-2 mt-3'>
-                                        <p class='project-item col'>Tasks: <span>30</span></p>
-                                        <p class='project-item col'>Employees Assigned: <span>$employeesAssigned</span></p>
+                                        <p class='project-item col'>Tasks: <span>{$generalItems['tasks']}</span></p>
+                                        <p class='project-item col'>Employees Assigned: <span>{$generalItems['employeesAssigned']}</span></p>
                                     </div>
                                 </div>
-                                <h1 class='text-success display-4'>100%</h1>
+                                <h1 class='text-success display-4'>{$generalItems['totalProgress']}%</h1>
                             </div>
                         </div>
                     ";

@@ -6,7 +6,7 @@
     overflow: hidden;
 }
 .project-item{
-    margin: auto;
+    margin: 0px 20px 0px 0px;
     color: gray;
 }
 .project-item span{

@@ -100,8 +100,12 @@
                             <section class='details text-start'>
                                 $employeeName
                                 <div class='d-flex flex-sm-row flex-column'>
-                                    <p class='m-0 text-start small text-secondary'>Tasks: $tasks</p>
-                                    <p class='m-0 text-start small text-secondary ms-sm-3'>Department: $department</p>
+                                    <p class='project-item small'>
+                                        Tasks: <span>$tasks</span>
+                                    </p>
+                                    <p class='project-item small'>
+                                        Department: <span>$department</span>
+                                    </p>
                                 </div>
                             </section>
                             <section class='percentage text-danger'>
@@ -164,8 +168,12 @@
                             <section class='details text-start'>
                                 $departmentName
                                 <div class='d-flex flex-sm-row flex-column'>
-                                    <p class='m-0 text-start small text-secondary'>Tasks: $tasks</p>
-                                    <p class='m-0 text-start small text-secondary ms-sm-3'>Employees Assigned: $employeesAssigned</p>
+                                    <p class='project-item small'>
+                                        Tasks: <span>$tasks</span>
+                                    </p>
+                                    <p class='project-item small'>
+                                        Employees Assigned: <span>$employeesAssigned</span>
+                                    </p>
                                 </div>
                             </section>
                             <section class='percentage text-danger'>
@@ -222,9 +230,10 @@
                             <div class='card-body d-flex justify-content-between align-items-center'>
                                 <div class='flex-grow-1'>
                                     <h4 class='project-name'>{$project['name']}</h4>
-                                    <div class='row g-2 row-cols-1 row-cols-sm-2 mt-3'>
-                                        <p class='project-item col'>Tasks: <span>{$generalItems['tasks']}</span></p>
-                                        <p class='project-item col'>Employees Assigned: <span>{$generalItems['employeesAssigned']}</span></p>
+                                    <div class='d-flex flex-column flex-md-row'>
+                                        <p class='project-item'>Tasks: <span>{$generalItems['tasks']}</span></p>
+                                        <p class='project-item'>Employees Assigned: <span>{$generalItems['employeesAssigned']}</span></p>
+                                        <p class='project-item'>Days Left: <span>{$generalItems['daysLeft']}</span></p>
                                     </div>
                                 </div>
                                 <h1 class='text-success display-4'>{$generalItems['totalProgress']}%</h1>

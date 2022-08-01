@@ -1,7 +1,7 @@
 <footer>
         <a href="index.php">
             <img src="../static/images//nla-logo.png" alt="NLA Logo">
-            <h1>National Lottery Authority Key Performance Indicator</h1>
+            <h1>National Lottery Authority Target Performance Appraisal</h1>
         </a>
         <div id="copyright">
         </div>

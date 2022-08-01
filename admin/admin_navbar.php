@@ -60,7 +60,7 @@
             <!-- Nav brand -->
             <a href="./index.php" class="d-flex align-items-center" id="nav-brand">
                 <img src="../static/images/nla-logo.png" width="auto" alt="NLA">
-                <h1>National Lottery Authority <br> Key Performance Indicator</h1>
+                <h1>National Lottery Authority <br> Target Performance Appraisal</h1>
             </a>
             <!-- Desktop Menu -->
             <div id="desktop-menu">
@@ -101,7 +101,7 @@
             <div id="phone-menu">
                 <a href="index.php">
                     <img src="../static/images/nla-logo.png" alt="NLA Logo">
-                    <h1>National Lottery Authority <br> Key Performance Indicator</h1>
+                    <h1>National Lottery Authority <br> Target Performance Appraisal</h1>
                 </a>
                 <ul>
                     <li>

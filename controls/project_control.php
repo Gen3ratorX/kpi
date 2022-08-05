@@ -29,8 +29,9 @@
         }
 
         function getProject($projectId){
-            $sql1 = "SELECT *,COUNT(`assign`.`project_id`) AS employeesAssigned 
-            FROM project,assign WHERE id=$projectId";
+            // $sql1 = "SELECT *,COUNT(`assign`.`project_id`) AS employeesAssigned 
+            // FROM project,assign WHERE id=$projectId";
+            $sql1 = "SELECT * FROM project WHERE id=$projectId";
             $result1 = $this->con->query($sql1);
             if($result1->num_rows == 1){
                 return $result1->fetch_assoc();
@@ -42,9 +43,9 @@
             // Get project details
             $project = $this->getProject($projectId);
             $generalItems['projectName'] = $project['name'];
-            $dateCreated = new DateTime();
+            $currentDate = new DateTime();
             $deadline = new DateTime($project['deadline']);
-            $generalItems['daysLeft'] = $deadline->diff($dateCreated)->format('%a');
+            $generalItems['daysLeft'] = $deadline->diff($currentDate)->format('%a');
 
             // Get task and employee details
             $sql2 = "SELECT COUNT(project_id) AS employeesAssigned FROM assign WHERE project_id=$projectId";
@@ -95,10 +96,7 @@
                 $department = $row2['department'];
 
                 // Get number of tasks
-                $sql3 = "SELECT COUNT(*) AS tasks FROM task
-                WHERE project_id=$projectId and employee_id=$employeeId";
-                $results3 = $this->con->query($sql3);
-                $tasks = $results3->fetch_assoc()['tasks'];
+                $tasks = $this->employeeTasks($employeeId,$projectId);
 
                 // Generate html code
                 $employeeProgressHtml .= "
@@ -209,12 +207,14 @@
             return $employeeProgress;
         }
 
+
         function employeeTasks($employeeId,$projectId){
             $sql1 = "SELECT COUNT(*) as tasks FROM task WHERE employee_id=$employeeId AND project_id=$projectId";
             $results1 = $this->con->query($sql1);
             return $results1->fetch_assoc()['tasks'];
 
         }
+
 
         function projectAdminListTemplate(){
             $projects = $this->getProjectsList();
@@ -472,19 +472,32 @@
                     $projectId = $row1['id'];
                     $projectName = $row1['name'];
                     $generalItems = $this->generalDashboardItems($projectId);
+                    // Auditor
+                    if($auditor){
+                        $tasks = $generalItems['tasks'];
+                        $daysLeft = $generalItems['daysLeft'];
+                        $progress = $generalItems['totalProgress'];
+                    }
+                    else{
+                        $tasks = $this->employeeTasks($employeeId,$projectId);
+                        $progress = $this->employeeProgress($employeeId,$projectId);
+                        $currentDate = new DateTime();
+                        $deadline = new DateTime($row1['deadline']);
+                        $daysLeft = $deadline->diff($currentDate)->format('%a');
+                    }
                     $projects[] = $row1;
                     $employeeProjectsHtml .= "
-                        <a href='#'>
+                        <a href='./project_detail.php?id=$projectId'>
                             <div class='card shadow-sm item mb-3'>
                                 <div class='card-body d-flex justify-content-between align-items-center'>
                                     <div class='flex-grow-1'>
                                         <h4 class='project-name'>$projectName</h4>
                                         <div class='d-flex flex-column flex-md-row'>
-                                            <p class='project-item'>Tasks: <span>{$generalItems['tasks']}</span></p>
-                                            <p class='project-item'>Days Left: <span>{$generalItems['daysLeft']}</span></p>
+                                            <p class='project-item'>Tasks: <span>$tasks</span></p>
+                                            <p class='project-item'>Days Left: <span>$daysLeft</span></p>
                                         </div>
                                     </div>
-                                    <h1 class='text-success display-4'>{$generalItems['totalProgress']}%</h1>
+                                    <h1 class='text-success display-4'>$progress%</h1>
                                 </div>
                             </div>
                         </a>

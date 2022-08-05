@@ -15,9 +15,12 @@
             $employeeProgressHtml = $projectControl->generateEmployeeProgressItems($projectId);
             $departmentProgressHtml = $projectControl->generateDepartmentProgressItems($projectId);
         }
+        else{
+            header("Location:./");
+        }
     }
     else{
-        header("Location: ../");
+        header("Location: ./");
     }
 ?>
 

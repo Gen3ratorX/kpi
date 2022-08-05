@@ -12,15 +12,21 @@
         $project = $projectControl->getProject($projectId);
         if($project){
             $employeeId = 1;
+            $employeeRole = 2;
             $projectName = $project['name'];
             // Days left
             $currentDate = new DateTime();
             $deadline = new DateTime($project['deadline']);
             $daysLeft = $deadline->diff($currentDate)->format('%a');
-            // Tasks
-            $tasks = $projectControl->employeeTasks($employeeId,$projectId);
-            // Progress
-            $progress = $projectControl->employeeProgress($employeeId,$projectId);
+            if($employeeRole == 1){
+                $generalItems = $projectControl->generalDashboardItems($projectId);
+                $tasks = $generalItems['tasks'];
+                $progress = $generalItems['totalProgress'];
+            }
+            else{
+                $tasks = $projectControl->employeeTasks($employeeId,$projectId);
+                $progress = $projectControl->employeeProgress($employeeId,$projectId);
+            }
         }
         else{
             header("Location: ./");
@@ -35,6 +41,33 @@
     $pageTitle = "NLA KPI | Project -  $projectName";
     require_once 'employee_navbar.php';
 ?>
+    <!-- Add item -->
+    <section id="add-item">
+        <p data-bs-toggle="modal" data-bs-target="#addItem">+</p>
+    </section>
+
+    <!-- Add Item Modal -->
+    <div class="modal fade" id="addItem" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addItemLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addItemLabel">Delete Employee</h5>
+                    <button type="button" class="btn-close" id="close-add-item" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="task" class="required">Task</label>
+                    <textarea id="task" class="form-control resizable"></textarea>
+                    <div class="invalid-feedback">
+                        Please provide a task.
+                    </div>
+                    <div class="text-center my-5">
+                        <button class="btn btn-1 btn-md" id="add-task">Add Task</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <main id='main-body'
         <div class="container">
             <section class="mb-3">
@@ -89,6 +122,18 @@
                             </div>
                         </div>
                     </div>
+                </section>
+                <section>
+                    <!-- Tasks -->
+                    <h3 class="text-secondary">Tasks</h3>
+                    <section>
+                        <div class="no-item">
+                            No task has been added...
+                            <div class="text-center">
+                                <button data-bs-toggle="modal" data-bs-target="#addItem" type="button" href="" class="btn btn-md btn-1">Add Task</button>
+                            </div>
+                        </div>
+                    </section>
                 </section>
             </section>
         </div>

@@ -10,6 +10,10 @@
     $pageTitle = "NLA KPI Admin | Departments";
     require_once './admin_navbar.php';
 ?>
+    <!-- Add item -->
+    <section id="add-item">
+        <a href="./department_form.php">+</a>
+    </section>
     <!-- Delete Item Modal -->
     <div class="modal fade" id="deleteItem" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteItemLabel" aria-hidden="true">
         <div class="modal-dialog">

@@ -11,9 +11,10 @@
     if($departmentId){
         $department = $departmentControl->getDepartment($departmentId);
         if($department){
+            echo print_r($department);
             $departmentName = $department['name'];
             $departmentHeadName = $department['departmentHeadName'] ?? '';
-            $departmentHeadId = $department['employee_id'];
+            $departmentHeadId = $department['departmentHeadId'] ?? '';
         }
             
     }
@@ -49,9 +50,9 @@
                             <?php 
                                 $departmentId and isset($department['departmentHeadName'])
                                 ? $departmentControl->generateDefaultDepartmentHeadContent(
-                                    $departmentId,$department
+                                    true,$department
                                 )
-                                : $departmentControl->generateDefaultDepartmentHeadContent(); 
+                                : $departmentControl->generateDefaultDepartmentHeadContent();
                             ?>
                         </div>
                     </div>

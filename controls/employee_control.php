@@ -12,7 +12,6 @@
 
         function getEmployeesList($q=null, $columns=null){
             $employees = [];
-            // $sql1 = "SELECT * FROM $this->tableName";
             if($q){
                 $spreadColumns = spreadSearchColumns($columns,$q);
                 $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
@@ -171,8 +170,6 @@
         }
 
         
-
-        
         function saveEmployee(){
             $surname = filterInput('surname');
             $otherNames = filterInput('otherNames');
@@ -186,7 +183,7 @@
             $password = password_hash($username,PASSWORD_BCRYPT);
 
             $sql1 = "INSERT INTO 
-            $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,$department)
+            $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,department_id)
             VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department)";
             if($unit){
                 $sql1 = "INSERT INTO 
@@ -248,6 +245,12 @@
                     'status'=>'SUCCESS'
                 ]);
             }
+        }
+
+
+        // User
+        function generateEmployeeProjectList($employeeId){
+
         }
     }
 ?>

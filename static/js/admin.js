@@ -192,11 +192,13 @@ class AdminControl{
         $('#save-role').click(function(){
             const roleEdit = $(this).data('roleEdit');
             const roleId = $(this).data('roleId');
-            const isValidated = baseControl.validateFields(['#role']);
+            const isValidated = baseControl.validateFields(['#role','#name']);
             if(isValidated){
-                const role = baseControl.capitalize($('#role').val());
+                const name = baseControl.capitalize($('#name').val());
+                const role = $('#role').val();
                 const data = {
                     role,
+                    name,
                     task: roleEdit ? 'editRole' : 'saveRole',
                     roleId,
                 }
@@ -350,14 +352,18 @@ class AdminControl{
         this.saveDepartment();
         this.searchDepartmentHead();
         this.deleteDepartment();
+        this.selectDepartmentHead();
     }
 
     selectDepartmentHead(){
         $('.department-head-options').click(function(){
+            const isSelected = $(this).attr('id');
             $('.department-head-options').each(function(){
                 $(this).removeAttr('id');
             });
-            $(this).attr('id','selected-department-head');
+            isSelected 
+            ? $(this).removeAttr('id') 
+            : $(this).attr('id','selected-department-head');
         });
     }
 
@@ -412,8 +418,8 @@ class AdminControl{
             const departmentEdit =  $(this).data('departmentEdit');
             const departmentId = $(this).data('departmentId');
             const isValid = baseControl.validateFields(['#department']);
-            const departmentHeadId = $('#selected-department-head').data('departmentHeadId');
-            if(isValid && departmentHeadId){
+            if(isValid){
+                const departmentHeadId = $('#selected-department-head').data('departmentHeadId');
                 const department = baseControl.capitalize($('#department').val());
                 const data = {
                     department,departmentHeadId,departmentId,

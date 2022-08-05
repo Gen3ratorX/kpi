@@ -10,9 +10,15 @@
             $this->tableName = 'unit';
         }
 
-        function getUnitsList($q = null,$columns = null){
+        function getUnitsList($q=null,$columns=null){
             $units = [];
-            $sql1 = "SELECT * FROM unit";
+            if($q){
+                $spreadColumns = spreadSearchColumns($columns,$q);
+                $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+            }
+            else{
+                $sql1 = "SELECT * FROM $this->tableName";
+            }
             $results1 = $this->con->query($sql1);
             while($row1 = $results1->fetch_assoc()){
                 $units[] = $row1;

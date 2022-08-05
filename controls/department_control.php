@@ -11,9 +11,15 @@
             $this->tableName = 'department';
         }
 
-        function getDepartmentsList(){
+        function getDepartmentsList($q=null,$columns=null){
             $departments = [];
-            $sql1 = "SELECT * FROM $this->tableName";
+            if($q){
+                $spreadColumns = spreadSearchColumns($columns,$q);
+                $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+            }
+            else{
+                $sql1 = "SELECT * FROM $this->tableName";
+            }
             $results1 = $this->con->query($sql1);
             while($row1 = $results1->fetch_assoc()){
                 $departments[] = $row1;
@@ -66,16 +72,33 @@
             return $departmentsHtml;
         }
 
-        function generateDefaultDepartmentHeadContent($edit = false,$department = null){
-            if($edit){
+        function generateDefaultDepartmentHeadContent($edit=false,$department=null){
+            if($edit and $department){
                 echo "<div class='col-auto'>
-                            <div data-department-head-id='{$department['employee_id']}' class='department-head-options' id='selected-department-head'>{$department['departmentHeadName']}</div>
-                        </div>";
+                <div data-department-head-id='{$department['employee_id']}' class='department-head-options' id='selected-department-head'>{$department['departmentHeadName']}</div>
+                </div>";
             }
             else{
-                echo "<div class='col-12'>
-                        <p class='text-center text-muted lead'>No Employee Has Been Selected.</p>
-                    </div>";
+                // Get all managers
+                $sql1 = "SELECT CONCAT_WS(' ',surname,other_names) AS name,id FROM employee 
+                WHERE employee_role_id IN (SELECT id FROM employee_role WHERE role=2) AND id NOT IN (SELECT IFNULL(employee_id,0) FROM department)";
+                $results1 = $this->con->query($sql1);
+                if($results1->num_rows > 0){
+                    $returnValue = "";
+                    while($row1 = $results1->fetch_assoc()){
+                        $returnValue .= "
+                            <div class='col-auto'>
+                                <div data-department-head-id='{$row1['id']}' class='department-head-options'>{$row1['name']}</div>
+                            </div>
+                        ";
+                    }
+                    echo $returnValue;
+                }
+                else{
+                    echo "<div class='col-12'>
+                            <p class='text-center text-muted lead'>No Employee Has Been Selected.</p>
+                        </div>";
+                }
             }
         }
 
@@ -84,7 +107,9 @@
             $q = filterInput('q',false);
             $columns = ['surname','other_names'];
             $speadColumns = spreadSearchColumns($columns,$q);
-            $sql1 = "SELECT CONCAT_WS(' ',surname,other_names) AS name, id FROM employee WHERE $speadColumns";
+            $sql1 = "SELECT CONCAT_WS(' ',surname,other_names) AS name, id FROM employee 
+            WHERE employee_role_id IN (SELECT id FROM employee_role WHERE role=2) 
+            AND $speadColumns";
             $results1 = $this->con->query($sql1);
             while($row1 = $results1->fetch_assoc()){
                 $employees[] = $row1;
@@ -93,18 +118,22 @@
         }
         
         function getDepartment($departmentId){
-            $sql1 = "SELECT name, employee_id, CONCAT_WS(' ',surname,other_names) AS departmentHeadName FROM department
-            INNER JOIN employee
-            ON department.id = $departmentId AND employee.id = department.employee_id;";
+            $sql1 = "SELECT * FROM department WHERE id=$departmentId";
             $result1 = $this->con->query($sql1);
-            $row1 = $result1->fetch_assoc();
-            if($row1['employee_id'] == null){
-                $sql2 = "SELECT * FROM department WHERE id=$departmentId";
-                $result2 = $this->con->query($sql2);
-                $row1 = $result2->fetch_assoc();
+            if($result1->num_rows == 1){
+                $row1 = $result1->fetch_assoc();
+                if($row1['employee_id']){
+                    $employeeId = $row1['employee_id'];
+                    $sql2 = "SELECT CONCAT_WS(' ',surname,other_names) AS departmentHeadName, `employee`.`id` AS departmentHeadId, name, employee_id FROM employee
+                    INNER JOIN department
+                    ON  `employee`.`id` = $employeeId AND `department`.`id`=$departmentId";
+                    $result2 = $this->con->query($sql2);
+                    $row2 = $result2->fetch_assoc();
+                    return $row2;
+                }
+                return $row1;
             }
-            return $row1;
-
+            return null;
         }
 
         function saveDepartment(){
@@ -112,6 +141,10 @@
             $department = filterInput('department');
             $sql1 = "INSERT IGNORE INTO department(name,employee_id) 
             VALUE('$department',$departmentHeadId)";
+            if(!$departmentHeadId){
+                $sql1 = "INSERT IGNORE INTO department(name) 
+                VALUE('$department')";
+            }
             if($this->con->query($sql1)){
                 http_response_code(201);
                 echo json_encode([
@@ -131,10 +164,14 @@
             $department = filterInput('department');
             $departmentId = filterInput('departmentId');
             $sql1 = "UPDATE IGNORE department SET name='$department', employee_id=$departmentHeadId WHERE id=$departmentId";
+            if(!$departmentHeadId){
+                $sql1 = "UPDATE IGNORE department SET name='$department', employee_id=null WHERE id=$departmentId";
+            }
             if($this->con->query($sql1)){
                 http_response_code(200);
                 echo json_encode([
-                    'status'=>'SUCCESS'
+                    'status'=>'SUCCESS',
+                    'sql'=> $sql1
                 ]);
             }
             else{

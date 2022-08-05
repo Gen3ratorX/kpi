@@ -7,10 +7,14 @@
 <?php
     $roleId = $_GET['id'] ?? '';
     $roleName = "";
+    $roleNumber = "";
     // Check if we are editing
     if($roleId){
         $role = $roleControl->getRole($roleId);
-        $roleName = $role ? $role['name'] : '';
+        if($role){
+            $roleName = $role['name'];
+            $roleNumber = $role['role'];
+        }
     }
 ?>
 
@@ -22,13 +26,17 @@
         <div class="container">
             <section class="mb-3">
                 <h1 class="header">Create Role</h1>
-                <section>
-                    <div>
-                        <label for="role" class="required">Role:</label>
-                        <input type="text" value="<?php echo $roleName; ?>" class="form-control" id="role">
+                <section class="row">
+                    <div class="col">
+                        <label for="name" class="required">Name:</label>
+                        <input type="text" value="<?php echo $roleName; ?>" class="form-control" id="name">
                         <div class="invalid-feedback">
                             Please provide a role.
                         </div>
+                    </div>
+                    <div class="col-12 col-sm-auto">
+                        <label for="role" class="required">Role Number:</label>
+                        <input type="number" min='0' value="<?php echo $roleNumber;?>" class="form-control" id="role">
                     </div>
                 </section>
                 <div class="text-center my-5">

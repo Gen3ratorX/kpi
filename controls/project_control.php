@@ -7,11 +7,18 @@
         function __construct($con)
         {
             $this->con = $con;
+            $this->tableName = 'project';
         }
 
-        function getProjectsList(){
-            $sql1 = "SELECT * FROM project";
+        function getProjectsList($q=null,$columns=null){
             $projects = [];
+            if($q){
+                $spreadColumns = spreadSearchColumns($columns,$q);
+                $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+            }
+            else{
+                $sql1 = "SELECT * FROM $this->tableName";
+            }
             $results1 = $this->con->query($sql1);
             if($results1->num_rows > 0){
                 while($row = $results1->fetch_assoc()){
@@ -35,7 +42,7 @@
             // Get project details
             $project = $this->getProject($projectId);
             $generalItems['projectName'] = $project['name'];
-            $dateCreated = new DateTime($project['date_created']);
+            $dateCreated = new DateTime();
             $deadline = new DateTime($project['deadline']);
             $generalItems['daysLeft'] = $deadline->diff($dateCreated)->format('%a');
 
@@ -266,7 +273,7 @@
             $assignEmployeesHtml = "";
             // Get all roles apart from auditors
             $roles = [];
-            $sql1 = "SELECT * FROM employee_role WHERE name <> 'Auditor'";
+            $sql1 = "SELECT * FROM employee_role WHERE role <> 1";
             $results1 = $this->con->query($sql1);
             while($row1 = $results1->fetch_assoc()){
                 $roles[] = $row1;

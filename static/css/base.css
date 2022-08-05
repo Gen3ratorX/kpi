@@ -40,7 +40,7 @@ nav{
 }
 #nav-brand{
     text-decoration: none;
-    max-width: 380px;
+    max-width: 400px;
 }
 #nav-brand h1, #phone-menu > a > h1, footer > a > h1{
     font-size: 22px;
@@ -432,14 +432,32 @@ footer > a > h1{
 @media only screen and (max-width:500px){
     /* Nav */
     #nav-brand h1{
-        font-size: 20px;
+        font-size: 18px;
     }
     #nav-brand img{
-        width: 80px;
+        width: 70px;
     }
     /* Hamburger */
     #hamburger{
         top: 25.5px;
+        width: 22px;
+        right: 12px;
+        height: 19px;
+    }
+    #hamburger p{
+        width: 20px;
+        height: 1.5px;
+        right: -1px;
+    }
+    #hamburger p::before{
+        width: 20px;
+        height: 1.5px;
+        top: -6px;
+    }
+    #hamburger p::after{
+        width: 20px;
+        height: 1.5px;
+        top: 4px;
     }
     #main-body{
         margin-top: 74px;

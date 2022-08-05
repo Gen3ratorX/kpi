@@ -246,11 +246,5 @@
                 ]);
             }
         }
-
-
-        // User
-        function generateEmployeeProjectList($employeeId){
-
-        }
     }
 ?>

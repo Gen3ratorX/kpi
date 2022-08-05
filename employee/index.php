@@ -4,6 +4,7 @@
     require_once '../controls/project_control.php';
     require_once '../controls/project_control.php';
     $projectControl = new ProjectControl($con);
+    $projectsHtml = $projectControl->generateEmployeeProjectList(1);
 ?>
 
 <?php
@@ -15,7 +16,7 @@
             <section class="mb-3">
                 <h1 class="header">Projects</h1>
                 <section>
-                    <a href="#">
+                    <!-- <a href="#">
                         <div class='card shadow-sm item mb-3'>
                             <div class='card-body d-flex justify-content-between align-items-center'>
                                 <div class='flex-grow-1'>
@@ -28,7 +29,8 @@
                                 <h1 class='text-success display-4'>64%</h1>
                             </div>
                         </div>
-                    </a>
+                    </a> -->
+                    <?php echo $projectsHtml;?>
                 </section>
             </section>
         </div>

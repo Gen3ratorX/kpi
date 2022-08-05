@@ -434,5 +434,71 @@
                 echo json_encode(['status'=>"ERROR"]);
             }
         }
+
+
+        // User
+        function generateEmployeeProjectList($employeeId,$auditor=false,$q=null,$columns=null){
+            $projects = [];
+            $employeeProjectsHtml = "";
+            // Get projects that employee is part of
+            if($auditor){
+                if($q){
+                    $spreadColumns = spreadSearchColumns($columns,$q);
+                    $sql1 = "SELECT * FROM project
+                    WHERE $spreadColumns";
+                }
+                else{
+                    $sq1 = "SELECT * FROM project";
+                }
+            }
+            else{
+                if($q){
+                    $spreadColumns = spreadSearchColumns($columns,$q);
+                    $sql1 = "SELECT * FROM project 
+                    INNER JOIN assign
+                    ON `project`.`id`=`assign`.`project_id` AND `assign`.`employee_id`=$employeeId
+                    WHERE $spreadColumns";
+                }
+                else{
+                    $sq1 = "SELECT * FROM project 
+                    INNER JOIN assign
+                    ON `project`.`id`=`assign`.`project_id` AND `assign`.`employee_id`=$employeeId";
+                }
+            }
+            $results1 = $this->con->query($sq1);
+            if($results1->num_rows > 0){
+
+                while($row1 = $results1->fetch_assoc()){
+                    $projectId = $row1['id'];
+                    $projectName = $row1['name'];
+                    $generalItems = $this->generalDashboardItems($projectId);
+                    $projects[] = $row1;
+                    $employeeProjectsHtml .= "
+                        <a href='#'>
+                            <div class='card shadow-sm item mb-3'>
+                                <div class='card-body d-flex justify-content-between align-items-center'>
+                                    <div class='flex-grow-1'>
+                                        <h4 class='project-name'>$projectName</h4>
+                                        <div class='d-flex flex-column flex-md-row'>
+                                            <p class='project-item'>Tasks: <span>{$generalItems['tasks']}</span></p>
+                                            <p class='project-item'>Days Left: <span>{$generalItems['daysLeft']}</span></p>
+                                        </div>
+                                    </div>
+                                    <h1 class='text-success display-4'>{$generalItems['totalProgress']}%</h1>
+                                </div>
+                            </div>
+                        </a>
+                    ";
+                }
+            }
+            else{
+                $employeeProjectsHtml .= "
+                    <div class='no-item'>
+                        You haven't been assigned to any project yet....
+                    </div>
+                ";
+            }
+            return $employeeProjectsHtml;
+        }
     }
 ?>

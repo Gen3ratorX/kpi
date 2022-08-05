@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 29, 2022 at 05:52 PM
+-- Generation Time: Aug 05, 2022 at 02:47 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -74,7 +74,22 @@ CREATE TABLE `employee` (
 CREATE TABLE `employee_role` (
   `id` int(100) NOT NULL,
   `name` varchar(200) NOT NULL,
-  `can_delete` tinyint(1) NOT NULL DEFAULT 0
+  `role` tinyint(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `performance`
+--
+
+CREATE TABLE `performance` (
+  `id` int(200) NOT NULL,
+  `task_id` int(200) NOT NULL,
+  `employee_id` int(200) NOT NULL,
+  `rating` tinyint(3) NOT NULL,
+  `date` date NOT NULL,
+  `comments` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -89,6 +104,21 @@ CREATE TABLE `project` (
   `date_created` date NOT NULL,
   `deadline` date NOT NULL,
   `is_open` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `task`
+--
+
+CREATE TABLE `task` (
+  `id` int(200) NOT NULL,
+  `project_id` int(200) NOT NULL,
+  `employee_id` int(200) NOT NULL,
+  `descrition` text NOT NULL,
+  `date_created` date NOT NULL,
+  `deadline` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -137,13 +167,28 @@ ALTER TABLE `employee`
 --
 ALTER TABLE `employee_role`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
+  ADD UNIQUE KEY `name` (`name`),
+  ADD UNIQUE KEY `role` (`role`);
+
+--
+-- Indexes for table `performance`
+--
+ALTER TABLE `performance`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `project`
 --
 ALTER TABLE `project`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `task`
+--
+ALTER TABLE `task`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `employee_id` (`employee_id`),
+  ADD KEY `project_id` (`project_id`);
 
 --
 -- Indexes for table `unit`
@@ -175,10 +220,22 @@ ALTER TABLE `employee_role`
   MODIFY `id` int(100) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `performance`
+--
+ALTER TABLE `performance`
+  MODIFY `id` int(200) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `project`
 --
 ALTER TABLE `project`
   MODIFY `id` int(100) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `task`
+--
+ALTER TABLE `task`
+  MODIFY `id` int(200) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `unit`
@@ -210,6 +267,13 @@ ALTER TABLE `employee`
   ADD CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`employee_role_id`) REFERENCES `employee_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `employee_ibfk_2` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   ADD CONSTRAINT `employee_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `unit` (`id`) ON DELETE SET NULL ON UPDATE SET NULL;
+
+--
+-- Constraints for table `task`
+--
+ALTER TABLE `task`
+  ADD CONSTRAINT `task_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `task_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `unit`

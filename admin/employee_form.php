@@ -23,6 +23,7 @@
     $phone = "";
     $email = "";
     $location = "";
+    $username = "";
     if($employeeId){
         $employee = $employeeControl->getEmployee($employeeId);
         if($employee){
@@ -30,6 +31,7 @@
             $otherNames = $employee['other_names'];
             $phone = $employee['phone'];
             $email = $employee['email'];
+            $username = $employee['username'];
             $location = $employee['location'];
             $roleId = $employee['employee_role_id'];
             $departmentId = $employee['department_id'] ?: null;
@@ -72,7 +74,7 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-6">
-                        <label for="email">Email:</label>
+                        <label for="email" class="required">Email:</label>
                         <input type="email" id="email" value="<?php echo $email; ?>" class="form-control">
                         <div class="invalid-feedback">
                             Enter a full email or leave it blank.
@@ -84,6 +86,11 @@
                         <div class="invalid-feedback">
                             Please provide a location.
                         </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="username" class="required">Username:</label>
+                        <input type="text" class="form-control" value="<?php echo $username; ?>" id="username">
+                        <div class="invalid-feedback">Please provide a username.</div>
                     </div>
                     <div class="col-12 col-md-6">
                         <label for="role" class="required">Role:</label>

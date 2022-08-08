@@ -36,7 +36,7 @@
                     $name = "{$employee['surname']} {$employee['other_names']}";
                     $employeeHtml .= "
                         <div class='col'>
-                            <div class='card shadow-sm employee action-item'>
+                            <div class='card shadow-sm h-100 employee action-item'>
                                 <div class='options d-flex align-items-center justify-content-center'>
                                     <div>
                                         <button class='btn btn-md btn-2 mb-2 delete-employee-attempt' id='employee-{$employee['id']}' data-bs-toggle='modal' data-bs-target='#deleteItem'>Delete</button>
@@ -179,7 +179,7 @@
             $role = filterInput('role');
             $unit = filterInput('unit');
             $department = filterInput('department');
-            $username = $this->generateUsername($surname,$otherNames);
+            $username = filterInput('username');
             $password = password_hash($username,PASSWORD_BCRYPT);
 
             $sql1 = "INSERT INTO 
@@ -195,8 +195,8 @@
                 http_response_code(201);
                 echo json_encode(['status'=>'SUCCESS']);
             }else{
-                http_response_code(500);
-                echo json_encode(['status'=>'ERROR','sql'=>$sql1]);
+                http_response_code(400);
+                echo json_encode(['status'=>'ERROR']);
             }
         }
 
@@ -210,12 +210,13 @@
             $role = filterInput('role');
             $unit = filterInput('unit');
             $department = filterInput('department');
+            $username = filterInput('username');
 
             $sql1 = "UPDATE $this->tableName 
-            SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, department_id=$department, unit_id=null WHERE id=$employeeId";
+            SET surname='$surname', other_names='$otherNames', username='$username', phone='$phone', email='$email', location='$location', employee_role_id=$role, department_id=$department, unit_id=null WHERE id=$employeeId";
             if($unit){
                 $sql1 = "UPDATE $this->tableName 
-                SET surname='$surname', other_names='$otherNames', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
+                SET surname='$surname', other_names='$otherNames', username='$username', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
                 department_id=$department, unit_id=$unit WHERE id=$employeeId";
             }
 
@@ -223,8 +224,8 @@
                 http_response_code(201);
                 echo json_encode(['status'=>'SUCCESS']);
             }else{
-                http_response_code(500);
-                echo json_encode(['status'=>'ERROR','sql'=>$sql1]);
+                http_response_code(400);
+                echo json_encode(['status'=>'ERROR']);
             }
 
 
@@ -246,5 +247,6 @@
                 ]);
             }
         }
+
     }
 ?>

@@ -60,7 +60,7 @@ class AdminControl{
                     </div>`
                 );
             }
-            inst?.toggleEventState('.assigned-employee > span',() => inst.removeAssignedEmployee());
+            baseControl?.toggleEventState('.assigned-employee > span',() => inst.removeAssignedEmployee());
         });
     }
 
@@ -106,7 +106,7 @@ class AdminControl{
                         );
                     }
                     // Add event
-                    inst.toggleEventState('.employee-item',() => inst.assignEmployee())
+                    baseControl.toggleEventState('.employee-item',() => inst.assignEmployee())
                 }
                 
             }
@@ -262,25 +262,29 @@ class AdminControl{
         $('#save-employee').click(function(){
             const employeeEdit = $(this).data('employeeEdit');
             const employeeId = $(this).data('employeeId');
-            const isValidated = baseControl.validateFields(['#surname','#otherNames','#phone','#location']);
+            const isValidated = baseControl.validateFields(['#surname','#otherNames','#phone','#location','#username']);
             const email = $('#email').val();
             const emailIsValid = baseControl.validateEmail('#email');
-            if(isValidated && (email ? emailIsValid : true)){
+            if(isValidated && emailIsValid){
                 const surname = baseControl.capitalize($('#surname').val());
                 const otherNames = baseControl.capitalize($('#otherNames').val());
                 const phone = $('#phone').val();
+                const username = $('#username').val();
                 const location = baseControl.capitalize($('#location').val());
                 const role = $('#role').val();
                 const unit = $('#unit').val();
                 const department = $('#department').val();
                 const data = {
-                    surname,otherNames,phone,location,role,unit,department,email,employeeId,
+                    surname,otherNames,phone,location,role,unit,department,email,username,employeeId,
                     task: employeeEdit ? 'editEmployee' :'saveEmployee',
                 }
                 const success = (res,statusCode,status) => {
                     window.location.assign('./employees.php');
                 };
-                baseControl.fetchData(inst.url,data,'Save Employee','#save-employee',false,success)
+                const error  = (status) => {
+                    status === 400 && baseControl.showToast("It seems the username and/or email has been taken by another user.");
+                }
+                baseControl.fetchData(inst.url,data,'Save Employee','#save-employee',false,success,error)
             }
         });
     }
@@ -392,7 +396,7 @@ class AdminControl{
                             );
                         }
                         // Add event
-                        inst.toggleEventState('.department-head-options',inst.selectDepartmentHead)
+                        baseControl.toggleEventState('.department-head-options',inst.selectDepartmentHead)
                     }
                 }
                 const data = {

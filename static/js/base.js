@@ -5,6 +5,11 @@ class BaseControl{
         this.togglePhoneMenu();
     }
 
+    toggleEventState(ele,action,event='click'){
+        $(ele).off(event);
+        action();
+    }
+
     pageInit(){
         // Copyright
         const currentYear = new Date().getFullYear();
@@ -129,7 +134,7 @@ class BaseControl{
                 const {status} = xhr;
                 console.log(xhr);
                 inst.endLoading(btnId,bntText);
-                inst.showToast("The server has encounted an error.")
+                status == 500 && inst.showToast("The server has encounted an error.");
                 error(status);
             },
             dataType: 'json',

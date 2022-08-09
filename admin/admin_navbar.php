@@ -1,3 +1,6 @@
+<?php
+    require_once '../misc/admin_login_required.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -88,7 +91,7 @@
                         </ul>
                     </li>
                     <li class="logout">
-                        <a href="">Logout</a>
+                        <a href="../misc/logout.php">Logout</a>
                     </li>
                     <li class="create">
                         <a href="create.php">Create</a>
@@ -120,7 +123,7 @@
                         <a href="./units.php">Units</a>
                     </li>
                     <li class="logout">
-                        <a href="">Logout</a>
+                        <a href="../misc/logout.php">Logout</a>
                     </li>
                     <li class="create">
                         <a href="create.php">Create</a>

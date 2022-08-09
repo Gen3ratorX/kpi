@@ -69,6 +69,7 @@
         </div>
     </section>
     <script src="./static/js/jquery-3.6.0.min.js"></script>
+    <script src="./static/js/bootstrap.bundle.min.js"></script>
     <script src="./static/js/base.js"></script>
     <script src="./static/js/auth.js"></script>
 </body>

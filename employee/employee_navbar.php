@@ -1,3 +1,7 @@
+<?php
+    require_once '../misc/employee_login_required.php';
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -49,7 +53,7 @@
                         <a href="./index.php">Home</a>
                     </li>
                     <li class="logout">
-                        <a href="">Logout</a>
+                        <a href="../misc/logout.php">Logout</a>
                     </li>
                 </ul>
             </div>
@@ -66,7 +70,7 @@
                         <a href="./index.php">Home</a>
                     </li>
                     <li class="logout">
-                        <a href="">Logout</a>
+                        <a href="../misc/logout.php">Logout</a>
                     </li>
                 </ul>
             </div>

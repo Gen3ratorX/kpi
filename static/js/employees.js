@@ -2,9 +2,12 @@ class EmployeeControl{
     constructor(){
         this.url = 'utils.php';
         this.saveTask();
-        // this.editTask();
-        // this.deleteTaskAttempt();
+        this.editTask();
+        this.deleteTaskAttempt();
         this.deleteTask();
+        // Assessment
+        this.assessEmployeeAttempt();
+        this.closeAssessment();
     }
 
     saveTask(){
@@ -15,8 +18,9 @@ class EmployeeControl{
             const taskId = $(this).data('taskId');
             if(isValidated){
                 const employeeTask = $('#task').val();
+                const employeeId = $(this).data('employeeId');
+                const projectId = $(this).data('projectId');
                 const success = function(res,statusCode,status){
-                    console.log(res);
                     // Close modal
                     $('#close-save-task').click();
                     // Editing task
@@ -25,7 +29,8 @@ class EmployeeControl{
                     }
                     // New task
                     else{
-                        const taskId = $('.task').length + 1;
+                        // const taskId = $('.task').length + 1;
+                        const taskId = res.taskId;
                         const tasksCount = $('.task').length;
                         if(tasksCount === 0){
                             $('#tasks').empty();
@@ -43,6 +48,8 @@ class EmployeeControl{
                                 </div>
                             </div>`
                         );
+                        // Increase number of tasks
+                        $('#no-of-tasks').text(tasksCount + 1);
                         // Add events
                         baseControl.toggleEventState('.edit-task',inst.editTask) // Edit
                         baseControl.toggleEventState('.delete-task-attempt',inst.deleteTaskAttempt) // Delete
@@ -54,6 +61,8 @@ class EmployeeControl{
                 const data = {
                     employeeTask,
                     editTask,
+                    employeeId,
+                    projectId,
                     task: editTask ? 'editTask' : 'saveTask',
                     taskId,
                 }
@@ -90,7 +99,6 @@ class EmployeeControl{
                 task: 'deleteTask'
             }
             const success = (res,statusCode,status) => {
-                console.log(res);
                 // Close modal
                 $('#close-delete-task').click();
                 // Remove task
@@ -110,10 +118,42 @@ class EmployeeControl{
                     else{
                         $(this).remove();
                     }
+                    // Decrease task
+                    $('#no-of-tasks').text(taskCount - 1);
                 });
             }
 
             baseControl.fetchData(inst.url,data,'Yes','#delete-task',false,success);
+        });
+    }
+
+    // Assessment
+    assessEmployeeAttempt(){
+        const inst = this;
+        $('.assess-employee').click(function(){
+            const employeeData = $(this).data();
+            console.log(employeeData);
+            const success = (res,statusCode,status) => {
+                console.log(res);
+                $('#assessment-attempt-wrapper').slideUp(function(){
+                    $('#assessment-wrapper').slideDown();
+                });
+            }
+            const data = {
+                ...employeeData,
+                task: 'getTaskAssessments'
+            };
+
+            baseControl.fetchData(inst.url,data,'','',true,success);
+
+        });
+    }
+
+    closeAssessment(){
+        $('#close-assessment').click(function(){
+            $('#assessment-wrapper').slideUp(function(){
+                $('#assessment-attempt-wrapper').slideDown();
+            });
         });
     }
 }

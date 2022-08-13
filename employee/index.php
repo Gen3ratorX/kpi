@@ -2,10 +2,12 @@
 <?php
     require_once '../misc/database_auth.php';
     require_once '../controls/project_control.php';
+    session_start();
     $projectControl = new ProjectControl($con);
-    $employeeId = 1;
-    $projectsHtml = $projectControl->generateEmployeeProjectList($employeeId);
-?>
+    $employeeId = $_SESSION['employeeId'];
+    $employeeRole = $_SESSION['employeeRole'];
+    $projectsHtml = $projectControl->generateEmployeeProjectList($employeeId,$employeeRole)
+    ?>
 
 <?php
     $pageTitle = "NLA KPI | Projects";

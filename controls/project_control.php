@@ -437,11 +437,11 @@
 
 
         // User
-        function generateEmployeeProjectList($employeeId,$auditor=false,$q=null,$columns=null){
+        function generateEmployeeProjectList($employeeId,$employeeRole,$q=null,$columns=null){
             $projects = [];
             $employeeProjectsHtml = "";
-            // Get projects that employee is part of
-            if($auditor){
+            // Auditor
+            if($employeeRole == 1){
                 if($q){
                     $spreadColumns = spreadSearchColumns($columns,$q);
                     $sql1 = "SELECT * FROM project
@@ -451,6 +451,10 @@
                     $sq1 = "SELECT * FROM project";
                 }
             }
+            // if($employeeRole == 2){
+
+            // }
+            // Staff
             else{
                 if($q){
                     $spreadColumns = spreadSearchColumns($columns,$q);
@@ -467,13 +471,12 @@
             }
             $results1 = $this->con->query($sq1);
             if($results1->num_rows > 0){
-
                 while($row1 = $results1->fetch_assoc()){
                     $projectId = $row1['id'];
                     $projectName = $row1['name'];
                     $generalItems = $this->generalDashboardItems($projectId);
                     // Auditor
-                    if($auditor){
+                    if($employeeRole == 1){
                         $tasks = $generalItems['tasks'];
                         $daysLeft = $generalItems['daysLeft'];
                         $progress = $generalItems['totalProgress'];

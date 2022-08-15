@@ -8,8 +8,6 @@ class EmployeeControl{
         // Assessment
         this.assessEmployeeAttempt();
         this.closeAssessment();
-        this.toggleRating();
-        this.saveAssessment();
     }
 
     saveTask(){
@@ -156,9 +154,9 @@ class EmployeeControl{
         const inst = this;
         $('.assess-employee').click(function(){
             const employeeData = $(this).data();
-            console.log(employeeData);
+            // console.log(employeeData);
             const success = (res,statusCode,status) => {
-                console.log(res);
+                // console.log(res);
                 // Tasks added
                 if(res.assessments.length > 0){
                     $('#assessment-wrapper').prepend(
@@ -166,9 +164,67 @@ class EmployeeControl{
                             ${
                                 res.assessments.map(
                                     assessment => {
+                                        // Employee has been assessed
                                         if(assessment.isAssessed){
-
+                                            const {taskId,description,projectId,employeeId,assessorId,rating,comments} =  assessment;
+                                            if(assessment.readOnly){
+                                                return `
+                                                    <div class="accordion-item" id="task-${taskId}">
+                                                        <h2 class="accordion-header" id="heading${taskId}">
+                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                                ${description}
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                            <div class="accordion-body">
+                                                                <section class="d-flex justify-content-between align-items-center">
+                                                                Rating: 
+                                                                    <h1 class="display-6 text-primary">
+                                                                        <strong>${rating || 0}%</strong>
+                                                                    </h1>
+                                                                </section>
+                                                                <section>
+                                                                    <p class="m-0">Comments</p>
+                                                                    <div class="lead text-secondary">
+                                                                        <p class='text-center'>${ comments || 'No Comments'}</p>
+                                                                    </div>
+                                                                </section>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            }
+                                            else{
+                                                return `
+                                                    <div class="accordion-item" id="task-${taskId}">
+                                                        <h2 class="accordion-header" id="heading${taskId}">
+                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                                ${description}
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                            <div class="accordion-body">
+                                                                <p class="alert alert-danger d-none error">You have to rate the task before saving.</p>
+                                                                <div>
+                                                                    <label for="" class="required">Rating:</label>
+                                                                    <div class="row g-3">
+                                                                        ${inst.generateRatings(rating)}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mt-3">
+                                                                    <label for="required">Comments:</label>
+                                                                    <textarea class="form-control">${comments}</textarea>
+                                                                </div>
+                                                                <div class="text-center my-3">
+                                                                    <button type="button" class="btn btn-1 btn-md save-assessment" data-task-id="task-${taskId}" data-assessor-id="${assessorId}">Save</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            }
                                         }
+                                        // Employee has not been assessed
                                         else{
                                             const {taskId,description,projectId,employeeId,assessorId} =  assessment;
                                             // Not assessed and readonly
@@ -196,7 +252,8 @@ class EmployeeControl{
                                                                 </section>
                                                             </div>
                                                         </div>
-                                                    </div>`
+                                                    </div>
+                                                `;
                                             }
                                             // Not assessed and not readonly
                                             else{
@@ -221,7 +278,7 @@ class EmployeeControl{
                                                                     <textarea class="form-control"></textarea>
                                                                 </div>
                                                                 <div class="text-center my-3">
-                                                                    <button type="button" class="btn btn-1 btn-md save-assessment" data-task-id="task-${taskId}">Save</button>
+                                                                    <button type="button" class="btn btn-1 btn-md save-assessment" data-task-id="task-${taskId}" data-assessor-id="${assessorId}">Save</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -234,6 +291,9 @@ class EmployeeControl{
                             }
                         </div>`
                     );
+                    // Toggle event handler
+                    baseControl.toggleEventState('.save-assessment',() => inst.saveAssessment());
+                    baseControl.toggleEventState('.rating',() => inst.toggleRating());
                 }
                 // No tasks added
                 else{
@@ -281,7 +341,8 @@ class EmployeeControl{
     saveAssessment(){
         const inst = this;
         $('.save-assessment').click(function(){
-            const taskId = $(this).data('taskId');
+            const taskId = $(this).data('taskId').split('-')[1];
+            const assesorId = $(this).data('assessorId');
             let rating = $(`#${taskId}`).find('.selected-rating');
             const comments = $(`#${taskId}`).find('textarea').val();
             if(rating.length == 0 && comments){
@@ -291,6 +352,10 @@ class EmployeeControl{
                 $(`#${taskId} .error`).addClass('d-none');
                 rating = $($(`#${taskId}`).find('.selected-rating')[0]).text();
                 const data = {
+                    assesorId,
+                    taskId,
+                    rating,
+                    comments,
                     task: 'saveAssessment'
                 }
                 const success = (res,statusCode,status) => {

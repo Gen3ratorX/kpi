@@ -1,5 +1,4 @@
 <?php
-    // $employeeRole = 3;
     $employeesAssignmentHtml  = $taskControl->generateEmployeesForProjectHtml($employeeRole,$projectId,$employeeId);
     // $employees = $taskControl->getEmployeesForProject($employeeRole,$projectId,$employeeId);
     // echo print_r($employees);

@@ -1,5 +1,5 @@
 <?php
-    require_once '../misc/utils.php';
+    require_once '../misc/utils.php'; 
     class TaskControl{
         private $con;
 
@@ -135,7 +135,7 @@
 
         function getEmployeesForProject($employeeRole,$projectId,$employeeId){
             $employees = [];
-            // Auditor
+            // Auditor TODO: Will add general manager and others
             if($employeeRole == 1){
                 $sql1 = "SELECT CONCAT_WS(' ',surname,other_names) as name, id FROM employee 
                 WHERE id IN 
@@ -145,8 +145,9 @@
                     $employees[] = $row1; 
                 }
             }
+            // Manager
             elseif($employeeRole == 2){
-                // Get the managers id
+                // Get the managers department id
                 $sql1 = "SELECT department_id FROM employee WHERE id=$employeeId";
                 $result1 = $this->con->query($sql1);
                 if($result1->num_rows == 1){
@@ -158,6 +159,7 @@
                     $results2 = $this->con->query($sql2);
                     while($row2 = $results2->fetch_assoc()){
                         $row2['readOnly'] = false;
+                        // Identify the manager in the list of employees
                         if($employeeId == $row2['id']){
                             $employeeName = $row2['name'];
                             $row2['name'] = $employeeName.' (Yourself)';
@@ -211,7 +213,8 @@
             $employees = $this->getEmployeesForProject($employeeRole,$projectId,$employeeId);
             if($employees){
                 foreach($employees as $employee){
-                    $employeeRole = $employee['role'] ?? '';
+                    // FIXME: Reemove later
+                    // $employeeRole = $employee['role'] ?? '';
                     $readOnly = $employee['readOnly'] ?? '';
                     $employeesForProjectHtml .= "
                         <div class='col-auto'>
@@ -238,51 +241,10 @@
             $employeeId = filterInput('employeeId',false);
             $assessorId = filterInput('assessorId',false);
             $tasks = $this->getTaskList($employeeId,$projectId);
-            if($readOnly){
-                foreach($tasks as $task){
-                    $taskId = $task['id'];
-                    // Get the performance for each task
-                    $sql1 = "SELECT * FROM performance WHERE task_id=$taskId 
-                    AND assessor_id IN 
-                    (SELECT id FROM employee WHERE employee_role_id IN 
-                    (SELECT id FROM employee_role WHERE role=1))";
-                    $result1 = $this->con->query($sql1);
-                    if($result1->num_rows == 1){
-                        $assessment = $result1->fetch_assoc();
-                        $assessments[] = [
-                            'isAssessed'=> true,
-                            'taskId'=> $taskId,
-                            'description'=>$task['description'],
-                            'performanceId'=> $assessment['id'],
-                            'comments'=>$assessment['comments'],
-                            'rating'=>$assessment['rating'],
-                            'assessorId'=>$assessorId,
-                            'employeeId'=>$employeeId,
-                            'projectId'=>$projectId,
-                            'readOnly'=>$readOnly ? true : false,
-                        ];
-                    }
-                    else{
-                        $assessments[] = [
-                            'isAssessed'=> false,
-                            'taskId'=> $taskId,
-                            'description'=>$task['description'],
-                            'assessorId'=>$assessorId,
-                            'employeeId'=>$employeeId,
-                            'projectId'=>$projectId,
-                            'readOnly'=>$readOnly ? true : false,
-                        ];
-                    }
-                }
-                // echo json_encode(['assessments'=>$tasks]);
-                echo json_encode([
-                    'status'=>"SUCCESS",
-                    'assessments'=>$assessments,
-                ]);
-            }
-            else{
-                foreach($tasks as $task){
-                    $taskId = $task['id'];
+            foreach($tasks as $task){
+                $taskId = $task['id'];
+                // TODO: Add general manager and others
+                if($employeeRole != 1){ // All employees aprt from auditors and generak manager
                     // Get the performance for each task
                     $sql1 = "SELECT * FROM performance WHERE task_id=$taskId AND assessor_id=$assessorId";
                     $result1 = $this->con->query($sql1);
@@ -313,16 +275,76 @@
                         ];
                     }
                 }
-                echo json_encode([
-                    'status'=>"SUCCESS",
-                    'assessments'=>$assessments,
-                ]);
+                // Auditor
+                else{
+                    $sql1 = "SELECT * FROM performance WHERE task_id=$taskId 
+                    AND assessor_id IN 
+                    (SELECT id FROM employee WHERE employee_role_id IN 
+                    (SELECT id FROM employee_role WHERE role=1))";
+                    $result1 = $this->con->query($sql1);
+                    // No auditor has assessed the employee
+                    if($result1->num_rows == 0){
+                        $assessments[] = [
+                            'isAssessed'=> false,
+                            'taskId'=> $taskId,
+                            'description'=>$task['description'],
+                            'assessorId'=>$assessorId,
+                            'employeeId'=>$employeeId,
+                            'projectId'=>$projectId,
+                            'readOnly'=> false
+                        ];
+                    }
+                    // An auditor has assessed an employee
+                    elseif($result1->num_rows == 1){
+                        $assessment = $result1->fetch_assoc();
+                        // The same auditor has assessed the employee
+                        if($assessment['assessor_id'] == $assessorId){
+                            $assessments[] = [
+                                'isAssessed'=> true,
+                                'taskId'=> $taskId,
+                                'description'=>$task['description'],
+                                'performanceId'=> $assessment['id'],
+                                'comments'=>$assessment['comments'],
+                                'rating'=>$assessment['rating'],
+                                'assessorId'=>$assessorId,
+                                'employeeId'=>$employeeId,
+                                'projectId'=>$projectId,
+                                'readOnly'=> false,
+                            ];
+                        }
+                        // A different auditor has assessed the employee
+                        else{
+                            $assessments[] = [
+                                'isAssessed'=> true,
+                                'taskId'=> $taskId,
+                                'description'=>$task['description'],
+                                'performanceId'=> $assessment['id'],
+                                'comments'=>$assessment['comments'],
+                                'rating'=>$assessment['rating'],
+                                'assessorId'=>$assessorId,
+                                'employeeId'=>$employeeId,
+                                'projectId'=>$projectId,
+                                'readOnly'=> true,
+                            ];
+                        }
+                    }
+                    // TODO: Make sure only one auditor assess an employee
+                    // Two aditors has assessed the employee
+                    else{
+
+                    }
+                }
                 
             }
+            echo json_encode([
+                'status'=>"SUCCESS",
+                "assessments"=>$assessments,
+                'employeeRole'=>$employeeRole
+            ]);
         }
 
         function saveAssessment(){
-            echo json_encode("Thank you Lord Jesus.");
+            echo json_encode($_POST);
         }
     }
 

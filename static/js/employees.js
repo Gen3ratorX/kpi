@@ -8,6 +8,8 @@ class EmployeeControl{
         // Assessment
         this.assessEmployeeAttempt();
         this.closeAssessment();
+        this.toggleRating();
+        this.saveAssessment();
     }
 
     saveTask(){
@@ -128,6 +130,28 @@ class EmployeeControl{
     }
 
     // Assessment
+    generateRatings(rating = null){
+        const ratings = [10,20,30,40,50,60,70,80,90,100];
+        let ratingsHtml = "";
+        for(let i of ratings){
+            if(i === rating){
+                ratingsHtml += `
+                    <div class="col-auto">
+                        <p class="rating selected-rating">${i}%</p>
+                    </div>
+                `;
+            }
+            else{
+                ratingsHtml += `
+                    <div class="col-auto">
+                        <p class="rating">${i}%</p>
+                    </div>
+                `;
+            }
+        }
+        return ratingsHtml;
+    }
+
     assessEmployeeAttempt(){
         const inst = this;
         $('.assess-employee').click(function(){
@@ -135,6 +159,89 @@ class EmployeeControl{
             console.log(employeeData);
             const success = (res,statusCode,status) => {
                 console.log(res);
+                // Tasks added
+                if(res.assessments.length > 0){
+                    $('#assessment-wrapper').prepend(
+                        `<div class='accordion' id='assessmentsAccordion'>
+                            ${
+                                res.assessments.map(
+                                    assessment => {
+                                        if(assessment.isAssessed){
+
+                                        }
+                                        else{
+                                            const {taskId,description,projectId,employeeId,assessorId} =  assessment;
+                                            // Not assessed and readonly
+                                            if(assessment.readOnly){
+                                                return `
+                                                    <div class="accordion-item" id="task-${taskId}">
+                                                        <h2 class="accordion-header" id="heading${taskId}">
+                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                                ${description}
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                            <div class="accordion-body">
+                                                                <section class="d-flex justify-content-between align-items-center">
+                                                                Rating: 
+                                                                    <h1 class="display-6 text-primary">
+                                                                        <strong>0%</strong>
+                                                                    </h1>
+                                                                </section>
+                                                                <section>
+                                                                    <p class="m-0">Comments</p>
+                                                                    <div class="lead text-secondary">
+                                                                        <p class='text-center'>No Comments</p>
+                                                                    </div>
+                                                                </section>
+                                                            </div>
+                                                        </div>
+                                                    </div>`
+                                            }
+                                            // Not assessed and not readonly
+                                            else{
+                                                return `
+                                                    <div class="accordion-item" id="task-${taskId}">
+                                                        <h2 class="accordion-header" id="heading${taskId}">
+                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                                ${description}
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                            <div class="accordion-body">
+                                                                <p class="alert alert-danger d-none error">You have to rate the task before saving.</p>
+                                                                <div>
+                                                                    <label for="" class="required">Rating:</label>
+                                                                    <div class="row g-3">
+                                                                        ${inst.generateRatings()}
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mt-3">
+                                                                    <label for="required">Comments:</label>
+                                                                    <textarea class="form-control"></textarea>
+                                                                </div>
+                                                                <div class="text-center my-3">
+                                                                    <button type="button" class="btn btn-1 btn-md save-assessment" data-task-id="task-${taskId}">Save</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            }
+                                        }
+                                    }
+                                ).join('')
+                            }
+                        </div>`
+                    );
+                }
+                // No tasks added
+                else{
+                    $('#assessment-wrapper').prepend(
+                        `<div class="no-item">No Tasks have been added...</div>`
+                    );
+                }
+                // Show assessments wrapper
                 $('#assessment-attempt-wrapper').slideUp(function(){
                     $('#assessment-wrapper').slideDown();
                 });
@@ -153,7 +260,44 @@ class EmployeeControl{
         $('#close-assessment').click(function(){
             $('#assessment-wrapper').slideUp(function(){
                 $('#assessment-attempt-wrapper').slideDown();
+                // Remove previous element
+                $('#close-assessment').parent().prev().remove();
             });
+        });
+    }
+
+    toggleRating(){
+        $(".rating").click(function(){
+            const isSelected = $(this).hasClass('selected-rating');
+            // Get container id
+            const containerId = $(this).parents('.accordion-item').attr('id');
+            $(`#${containerId} .rating`).removeClass('selected-rating');
+            if(!isSelected){
+                $(this).addClass('selected-rating');
+            }
+        });
+    }
+
+    saveAssessment(){
+        const inst = this;
+        $('.save-assessment').click(function(){
+            const taskId = $(this).data('taskId');
+            let rating = $(`#${taskId}`).find('.selected-rating');
+            const comments = $(`#${taskId}`).find('textarea').val();
+            if(rating.length == 0 && comments){
+                $(`#${taskId} .error`).removeClass('d-none');
+            }
+            else{
+                $(`#${taskId} .error`).addClass('d-none');
+                rating = $($(`#${taskId}`).find('.selected-rating')[0]).text();
+                const data = {
+                    task: 'saveAssessment'
+                }
+                const success = (res,statusCode,status) => {
+                    console.log(res);
+                }
+                baseControl.fetchData(inst.url,data,'Save','.save-assessment',false,success);
+            }
         });
     }
 }

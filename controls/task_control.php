@@ -215,7 +215,7 @@
                     $readOnly = $employee['readOnly'] ?? '';
                     $employeesForProjectHtml .= "
                         <div class='col-auto'>
-                            <div class='card shadow-sm item assess-employee' data-employee-id='{$employee['id']}' data-project-id='$projectId' data-read-only='$readOnly' data-employee-role='$employeeRole'>
+                            <div class='card shadow-sm item assess-employee' data-employee-id='{$employee['id']}' data-assessor-id='{$employeeId}' data-project-id='$projectId' data-read-only='$readOnly' data-employee-role='$employeeRole'>
                                 <div class='card-body'>
                                     {$employee['name']}
                                 </div>
@@ -225,25 +225,105 @@
                 }
             }
             else{
-
+                $employeesForProjectHtml = "header(Location: ./)";
             }
             return $employeesForProjectHtml;
         }
 
         function getTaskAssessments(){
+            $assessments = [];
             $employeeRole = filterInput('employeeRole',false);
             $readOnly = filterInput('readOnly',false);
             $projectId = filterInput('projectId',false);
             $employeeId = filterInput('employeeId',false);
+            $assessorId = filterInput('assessorId',false);
+            $tasks = $this->getTaskList($employeeId,$projectId);
             if($readOnly){
-
-                echo json_encode("God is working he is up to something");
+                foreach($tasks as $task){
+                    $taskId = $task['id'];
+                    // Get the performance for each task
+                    $sql1 = "SELECT * FROM performance WHERE task_id=$taskId 
+                    AND assessor_id IN 
+                    (SELECT id FROM employee WHERE employee_role_id IN 
+                    (SELECT id FROM employee_role WHERE role=1))";
+                    $result1 = $this->con->query($sql1);
+                    if($result1->num_rows == 1){
+                        $assessment = $result1->fetch_assoc();
+                        $assessments[] = [
+                            'isAssessed'=> true,
+                            'taskId'=> $taskId,
+                            'description'=>$task['description'],
+                            'performanceId'=> $assessment['id'],
+                            'comments'=>$assessment['comments'],
+                            'rating'=>$assessment['rating'],
+                            'assessorId'=>$assessorId,
+                            'employeeId'=>$employeeId,
+                            'projectId'=>$projectId,
+                            'readOnly'=>$readOnly ? true : false,
+                        ];
+                    }
+                    else{
+                        $assessments[] = [
+                            'isAssessed'=> false,
+                            'taskId'=> $taskId,
+                            'description'=>$task['description'],
+                            'assessorId'=>$assessorId,
+                            'employeeId'=>$employeeId,
+                            'projectId'=>$projectId,
+                            'readOnly'=>$readOnly ? true : false,
+                        ];
+                    }
+                }
+                // echo json_encode(['assessments'=>$tasks]);
+                echo json_encode([
+                    'status'=>"SUCCESS",
+                    'assessments'=>$assessments,
+                ]);
             }
             else{
-                $tasks = $this->getTaskList($employeeId,$projectId);
-                echo json_encode($tasks);
+                foreach($tasks as $task){
+                    $taskId = $task['id'];
+                    // Get the performance for each task
+                    $sql1 = "SELECT * FROM performance WHERE task_id=$taskId AND assessor_id=$assessorId";
+                    $result1 = $this->con->query($sql1);
+                    if($result1->num_rows == 1){
+                        $assessment = $result1->fetch_assoc();
+                        $assessments[] = [
+                            'isAssessed'=> true,
+                            'taskId'=> $taskId,
+                            'description'=>$task['description'],
+                            'performanceId'=> $assessment['id'],
+                            'comments'=>$assessment['comments'],
+                            'rating'=>$assessment['rating'],
+                            'assessorId'=>$assessorId,
+                            'employeeId'=>$employeeId,
+                            'projectId'=>$projectId,
+                            'readOnly'=>$readOnly ? true : false,
+                        ];
+                    }
+                    else{
+                        $assessments[] = [
+                            'isAssessed'=> false,
+                            'taskId'=> $taskId,
+                            'description'=>$task['description'],
+                            'assessorId'=>$assessorId,
+                            'employeeId'=>$employeeId,
+                            'projectId'=>$projectId,
+                            'readOnly'=>$readOnly ? true : false,
+                        ];
+                    }
+                }
+                echo json_encode([
+                    'status'=>"SUCCESS",
+                    'assessments'=>$assessments,
+                ]);
                 
             }
         }
+
+        function saveAssessment(){
+            echo json_encode("Thank you Lord Jesus.");
+        }
     }
+
 ?>

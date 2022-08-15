@@ -13,8 +13,12 @@
     elseif(isset($_POST['task']) and $_POST['task'] == 'deleteTask'){
         $taskControl->deleteTask();
     }
+    // Assessment
     elseif(isset($_GET['task']) and $_GET['task'] == 'getTaskAssessments'){
         $taskControl->getTaskAssessments();
+    }
+    elseif(isset($_POST['task']) and $_POST['task'] == 'saveAssessment'){
+        $taskControl->saveAssessment();
     }
     else{
         echo json_encode("God is good all the time");

@@ -16,7 +16,20 @@
             $username = '';
             // $otherNamesLst = explode()
         }
+        
+        function createSuperuser($username,$password){
+            $hasgedPasssword = password_hash($password,PASSWORD_BCRYPT);
+            $sql1 = "INSERT IGNORE INTO admin(username,password) 
+            VALUE('$username','$hasgedPasssword')";
+            if($this->con->query($sql1)){
+                echo "Superuser created successfully";
+            }
+            else{
+                echo "Error in creating superuser";
+            }
+        }
     }
 
     $testControl = new TestControl($con);
+    $testControl->createSuperuser('eoffei','crescue7536')
 ?>

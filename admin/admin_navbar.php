@@ -1,5 +1,5 @@
 <?php
-    // require_once '../misc/admin_login_required.php';
+    require_once '../misc/admin_login_required.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

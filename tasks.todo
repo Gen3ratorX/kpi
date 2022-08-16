@@ -17,4 +17,7 @@ Main:
     - When auditors signs in they will be showed the total progress and tasks for a project but when other stuff signs in they will be showed thier progress and tasks concerning the project. 
     -Don't forget login required function
 Misc:
+    -Make admin username and email unique
+    - Add last_login to employees table 
     -Remove all unwanted code when done. 
+

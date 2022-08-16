@@ -171,7 +171,8 @@
                         'name'=>'Auditor',
                         'readOnly'=> true,
                         'role'=> 1,
-                        'id'=>$employeeId
+                        'id'=>$employeeId,
+                        'assessorRole'=>1
                     ];
                 }
             }
@@ -194,13 +195,15 @@
                         'name'=>'Auditor',
                         'readOnly'=> true,
                         'role'=> 1,
-                        'id'=>$employeeId
+                        'id'=>$employeeId,
+                        'assessorRole'=>1,
                     ];
                     $employees[] = [
                         'name'=>'Manager',
                         'readOnly'=> true,
                         'role'=> 2,
-                        'id'=>$employeeId
+                        'id'=>$employeeId,
+                        'assessorRole'=>2,
                     ];
                 }
             }
@@ -213,12 +216,11 @@
             $employees = $this->getEmployeesForProject($employeeRole,$projectId,$employeeId);
             if($employees){
                 foreach($employees as $employee){
-                    // FIXME: Reemove later
-                    // $employeeRole = $employee['role'] ?? '';
                     $readOnly = $employee['readOnly'] ?? '';
+                    $assessorRole = $employee['assessorRole'] ?? '';
                     $employeesForProjectHtml .= "
                         <div class='col-auto'>
-                            <div class='card shadow-sm item assess-employee' data-employee-id='{$employee['id']}' data-assessor-id='{$employeeId}' data-project-id='$projectId' data-read-only='$readOnly' data-employee-role='$employeeRole'>
+                            <div class='card shadow-sm item assess-employee' data-employee-id='{$employee['id']}' data-assessor-id='{$employeeId}' data-project-id='$projectId' data-read-only='$readOnly' data-employee-role='$employeeRole' data-assessor-role='{$assessorRole}'>
                                 <div class='card-body'>
                                     {$employee['name']}
                                 </div>
@@ -240,13 +242,24 @@
             $projectId = filterInput('projectId',false);
             $employeeId = filterInput('employeeId',false);
             $assessorId = filterInput('assessorId',false);
+            $assessorRole = filterInput('assessorRole',false);
             $tasks = $this->getTaskList($employeeId,$projectId);
+            $auditorHasAssessed = false;
             foreach($tasks as $task){
                 $taskId = $task['id'];
                 // TODO: Add general manager and others
                 if($employeeRole != 1){ // All employees aprt from auditors and generak manager
-                    // Get the performance for each task
-                    $sql1 = "SELECT * FROM performance WHERE task_id=$taskId AND assessor_id=$assessorId";
+                    // Auditor or manager who has assessed an employee
+                    if($readOnly){
+                        // Get the performance for each task
+                        $sql1 = "SELECT * FROM performance WHERE task_id=$taskId AND assessor_id IN 
+                        (SELECT id FROM employee WHERE employee_role_id IN 
+                        (SELECT id FROM employee_role WHERE role=$assessorRole))";
+                    }
+                    else{
+                        // Get the performance for each task
+                        $sql1 = "SELECT * FROM performance WHERE task_id=$taskId AND assessor_id=$assessorId";
+                    }
                     $result1 = $this->con->query($sql1);
                     if($result1->num_rows == 1){
                         $assessment = $result1->fetch_assoc();
@@ -257,8 +270,10 @@
                             'performanceId'=> $assessment['id'],
                             'comments'=>$assessment['comments'],
                             'rating'=>$assessment['rating'],
+                            'assessmentId'=>$assessment['id'],
                             'assessorId'=>$assessorId,
                             'employeeId'=>$employeeId,
+                            'employeeRole'=>$employeeRole,
                             'projectId'=>$projectId,
                             'readOnly'=>$readOnly ? true : false,
                         ];
@@ -270,6 +285,7 @@
                             'description'=>$task['description'],
                             'assessorId'=>$assessorId,
                             'employeeId'=>$employeeId,
+                            'employeeRole'=>$employeeRole,
                             'projectId'=>$projectId,
                             'readOnly'=>$readOnly ? true : false,
                         ];
@@ -277,6 +293,7 @@
                 }
                 // Auditor
                 else{
+                    // TODO: If an auditor starts assessing an employee no auditor can assess other employees
                     $sql1 = "SELECT * FROM performance WHERE task_id=$taskId 
                     AND assessor_id IN 
                     (SELECT id FROM employee WHERE employee_role_id IN 
@@ -290,8 +307,9 @@
                             'description'=>$task['description'],
                             'assessorId'=>$assessorId,
                             'employeeId'=>$employeeId,
+                            'employeeRole'=>$employeeRole,
                             'projectId'=>$projectId,
-                            'readOnly'=> false
+                            'readOnly'=> $auditorHasAssessed ? true : false,
                         ];
                     }
                     // An auditor has assessed an employee
@@ -306,14 +324,17 @@
                                 'performanceId'=> $assessment['id'],
                                 'comments'=>$assessment['comments'],
                                 'rating'=>$assessment['rating'],
+                                'assessmentId'=>$assessment['id'],
                                 'assessorId'=>$assessorId,
                                 'employeeId'=>$employeeId,
+                                'employeeRole'=>$employeeRole,
                                 'projectId'=>$projectId,
                                 'readOnly'=> false,
                             ];
                         }
                         // A different auditor has assessed the employee
                         else{
+                            $auditorHasAssessed = true;
                             $assessments[] = [
                                 'isAssessed'=> true,
                                 'taskId'=> $taskId,
@@ -321,8 +342,10 @@
                                 'performanceId'=> $assessment['id'],
                                 'comments'=>$assessment['comments'],
                                 'rating'=>$assessment['rating'],
+                                'assessmentId'=>$assessment['id'],
                                 'assessorId'=>$assessorId,
                                 'employeeId'=>$employeeId,
+                                'employeeRole'=>$employeeRole,
                                 'projectId'=>$projectId,
                                 'readOnly'=> true,
                             ];
@@ -344,7 +367,55 @@
         }
 
         function saveAssessment(){
-            echo json_encode($_POST);
+            $taskId = filterInput('taskId');
+            $assessorId = filterInput('assessorId');
+            $employeeId = filterInput('employeeId');
+            $employeeRole = filterInput('employeeRole');
+            $assessmentId = filterInput('assessmentId');
+            $comments = filterInput('comments');
+            $rating = filterInput('rating');
+
+            $todaysDate = date('Y-m-d');
+            // Task has been assessed already
+            if($assessmentId){
+                $sql1 = "UPDATE performance SET comments='$comments', rating=$rating WHERE id=$assessmentId";
+                if($this->con->query($sql1)){
+                    echo json_encode([
+                        'status'=>"SUCCESS"
+                    ]);
+                }
+                else{
+                    http_response_code(500);
+                    echo json_encode(['status'=>"ERROR"]);
+                }
+            }
+            // Task has not been assessed
+            else{
+                $sql1 = "INSERT INTO performance(task_id,assessor_id,date,rating,comments) 
+                VALUE($taskId,$assessorId,'$todaysDate',$rating,'$comments')";
+                // Insert data
+                if($this->con->query($sql1)){
+                    // Get last inserted data
+                    $sql2 = "SELECT id FROM performance WHERE task_id=$taskId AND assessor_id=$assessorId ORDER BY id DESC LIMIT 1";
+                    $result2 = $this->con->query($sql2);
+                    $assessmentId = $result2->fetch_assoc()['id'];
+                    echo json_encode([
+                        'status'=>"SUCCESS",
+                        'assessmentId'=>$assessmentId,
+                    ]);
+                }
+                // Error inserting
+                else{
+                    http_response_code(500);
+                    echo json_encode(['status'=>"ERROR"]);
+                }
+                // echo json_encode([
+                //     'status'=>"SUCCESS",
+                //     'assessmentId'=>1,
+                // ]);
+
+            }
+            // echo json_encode($_POST);
         }
     }
 

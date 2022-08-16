@@ -5,7 +5,7 @@
 ?>
 
 <h1 class="header">Assessment</h1>
-<section class="mb-4" id="assessment-attempt-wrapper">
+<section class="mb-4" id="assessment-attempt-wrapper" data-is-assessment-open="<?php echo $assessProject;?>">
     <div class="row g-3">
         <?php echo $employeesAssignmentHtml; ?>
     </div>

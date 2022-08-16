@@ -132,7 +132,7 @@ class EmployeeControl{
         const ratings = [10,20,30,40,50,60,70,80,90,100];
         let ratingsHtml = "";
         for(let i of ratings){
-            if(i === rating){
+            if(i === Number(rating)){
                 ratingsHtml += `
                     <div class="col-auto">
                         <p class="rating selected-rating">${i}%</p>
@@ -152,9 +152,10 @@ class EmployeeControl{
 
     assessEmployeeAttempt(){
         const inst = this;
+        const isAssessmentOpen = $('#assessment-attempt-wrapper').data('isAssessmentOpen');
         $('.assess-employee').click(function(){
             const employeeData = $(this).data();
-            // console.log(employeeData);
+            console.log(employeeData);
             const success = (res,statusCode,status) => {
                 // console.log(res);
                 // Tasks added
@@ -164,127 +165,161 @@ class EmployeeControl{
                             ${
                                 res.assessments.map(
                                     assessment => {
-                                        // Employee has been assessed
-                                        if(assessment.isAssessed){
-                                            const {taskId,description,projectId,employeeId,assessorId,rating,comments} =  assessment;
-                                            if(assessment.readOnly){
-                                                return `
-                                                    <div class="accordion-item" id="task-${taskId}">
-                                                        <h2 class="accordion-header" id="heading${taskId}">
-                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
-                                                                ${description}
-                                                            </button>
-                                                        </h2>
-                                                        <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
-                                                            <div class="accordion-body">
-                                                                <section class="d-flex justify-content-between align-items-center">
-                                                                Rating: 
-                                                                    <h1 class="display-6 text-primary">
-                                                                        <strong>${rating || 0}%</strong>
-                                                                    </h1>
-                                                                </section>
-                                                                <section>
-                                                                    <p class="m-0">Comments</p>
-                                                                    <div class="lead text-secondary">
-                                                                        <p class='text-center'>${ comments || 'No Comments'}</p>
-                                                                    </div>
-                                                                </section>
+                                        // Project is open for asssessment
+                                        if(isAssessmentOpen){
+                                            // Employee has been assessed
+                                            if(assessment.isAssessed){
+                                                // TODO: Delete it when not needed
+                                                const {taskId,description,projectId,employeeId,employeeRole,assessorId,rating,comments,assessmentId} =  assessment;
+                                                if(assessment.readOnly){
+                                                    return `
+                                                        <div class="accordion-item" id="task-${taskId}">
+                                                            <h2 class="accordion-header" id="heading${taskId}">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                                    ${description}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                                <div class="accordion-body">
+                                                                    <section class="d-flex justify-content-between align-items-center">
+                                                                    Rating: 
+                                                                        <h1 class="display-6 text-primary">
+                                                                            <strong>${rating || 0}%</strong>
+                                                                        </h1>
+                                                                    </section>
+                                                                    <section>
+                                                                        <p class="m-0">Comments</p>
+                                                                        <div class="lead text-secondary">
+                                                                            <p class=${!comments && 'text-center'}>${ comments || 'No Comments'}</p>
+                                                                        </div>
+                                                                    </section>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                `;
+                                                    `;
+                                                }
+                                                else{
+                                                    return `
+                                                        <div class="accordion-item" id="task-${taskId}">
+                                                            <h2 class="accordion-header" id="heading${taskId}">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                                    ${description}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                                <div class="accordion-body">
+                                                                    <p class="alert alert-danger d-none error">You have to rate the task before saving.</p>
+                                                                    <div>
+                                                                        <label for="" class="required">Rating:</label>
+                                                                        <div class="row g-3">
+                                                                            ${inst.generateRatings(rating)}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="mt-3">
+                                                                        <label for="required">Comments:</label>
+                                                                        <textarea class="form-control">${comments}</textarea>
+                                                                    </div>
+                                                                    <div class="text-center my-3">
+                                                                        <button type="button" class="btn btn-1 btn-md save-assessment" data-task-id="task-${taskId}" data-assessor-id="${assessorId}" data-assessment-id="${assessmentId}" data-employee-role="${employeeRole}" data-employee-id="${employeeId}">Save</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                                }
                                             }
+                                            // Employee has not been assessed
                                             else{
-                                                return `
-                                                    <div class="accordion-item" id="task-${taskId}">
-                                                        <h2 class="accordion-header" id="heading${taskId}">
-                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
-                                                                ${description}
-                                                            </button>
-                                                        </h2>
-                                                        <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
-                                                            <div class="accordion-body">
-                                                                <p class="alert alert-danger d-none error">You have to rate the task before saving.</p>
-                                                                <div>
-                                                                    <label for="" class="required">Rating:</label>
-                                                                    <div class="row g-3">
-                                                                        ${inst.generateRatings(rating)}
-                                                                    </div>
-                                                                </div>
-                                                                <div class="mt-3">
-                                                                    <label for="required">Comments:</label>
-                                                                    <textarea class="form-control">${comments}</textarea>
-                                                                </div>
-                                                                <div class="text-center my-3">
-                                                                    <button type="button" class="btn btn-1 btn-md save-assessment" data-task-id="task-${taskId}" data-assessor-id="${assessorId}">Save</button>
+                                                // TODO: Delete it when not needed
+                                                const {taskId,description,projectId,employeeId,employeeRole,assessorId} =  assessment;
+                                                // Not assessed and readonly
+                                                if(assessment.readOnly){
+                                                    return `
+                                                        <div class="accordion-item" id="task-${taskId}">
+                                                            <h2 class="accordion-header" id="heading${taskId}">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                                    ${description}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                                <div class="accordion-body">
+                                                                    <section class="d-flex justify-content-between align-items-center">
+                                                                    Rating: 
+                                                                        <h1 class="display-6 text-primary">
+                                                                            <strong>0%</strong>
+                                                                        </h1>
+                                                                    </section>
+                                                                    <section>
+                                                                        <p class="m-0">Comments</p>
+                                                                        <div class="lead text-secondary">
+                                                                            <p class='text-center'>No Comments</p>
+                                                                        </div>
+                                                                    </section>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                `;
+                                                    `;
+                                                }
+                                                // Not assessed and not readonly
+                                                else{
+                                                    return `
+                                                        <div class="accordion-item" id="task-${taskId}">
+                                                            <h2 class="accordion-header" id="heading${taskId}">
+                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                                    ${description}
+                                                                </button>
+                                                            </h2>
+                                                            <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                                <div class="accordion-body">
+                                                                    <p class="alert alert-danger d-none error">You have to rate the task before saving.</p>
+                                                                    <div>
+                                                                        <label for="" class="required">Rating:</label>
+                                                                        <div class="row g-3">
+                                                                            ${inst.generateRatings()}
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="mt-3">
+                                                                        <label for="required">Comments:</label>
+                                                                        <textarea class="form-control"></textarea>
+                                                                    </div>
+                                                                    <div class="text-center my-3">
+                                                                        <button type="button" class="btn btn-1 btn-md save-assessment" data-task-id="task-${taskId}" data-assessor-id="${assessorId}" data-employee-role="${employeeRole}" data-employee-id="${employeeId}">Save</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    `;
+                                                }
                                             }
                                         }
-                                        // Employee has not been assessed
+                                        // Project isn't open for assessment
                                         else{
-                                            const {taskId,description,projectId,employeeId,assessorId} =  assessment;
-                                            // Not assessed and readonly
-                                            if(assessment.readOnly){
-                                                return `
-                                                    <div class="accordion-item" id="task-${taskId}">
-                                                        <h2 class="accordion-header" id="heading${taskId}">
-                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
-                                                                ${description}
-                                                            </button>
-                                                        </h2>
-                                                        <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
-                                                            <div class="accordion-body">
-                                                                <section class="d-flex justify-content-between align-items-center">
-                                                                Rating: 
-                                                                    <h1 class="display-6 text-primary">
-                                                                        <strong>0%</strong>
-                                                                    </h1>
-                                                                </section>
-                                                                <section>
-                                                                    <p class="m-0">Comments</p>
-                                                                    <div class="lead text-secondary">
-                                                                        <p class='text-center'>No Comments</p>
-                                                                    </div>
-                                                                </section>
-                                                            </div>
+                                            const {taskId,description,rating,comments} =  assessment;
+                                            return `
+                                                <div class="accordion-item" id="task-${taskId}">
+                                                    <h2 class="accordion-header" id="heading${taskId}">
+                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
+                                                            ${description}
+                                                        </button>
+                                                    </h2>
+                                                    <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
+                                                        <div class="accordion-body">
+                                                            <section class="d-flex justify-content-between align-items-center">
+                                                            Rating: 
+                                                                <h1 class="display-6 text-primary">
+                                                                    <strong>${rating || 0}%</strong>
+                                                                </h1>
+                                                            </section>
+                                                            <section>
+                                                                <p class="m-0">Comments</p>
+                                                                <div class="lead text-secondary">
+                                                                    <p class=${!comments && 'text-center'}>${ comments || 'No Comments'}</p>
+                                                                </div>
+                                                            </section>
                                                         </div>
                                                     </div>
-                                                `;
-                                            }
-                                            // Not assessed and not readonly
-                                            else{
-                                                return `
-                                                    <div class="accordion-item" id="task-${taskId}">
-                                                        <h2 class="accordion-header" id="heading${taskId}">
-                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${taskId}" aria-expanded="false" aria-controls="collapse${taskId}">
-                                                                ${description}
-                                                            </button>
-                                                        </h2>
-                                                        <div id="collapse${taskId}" class="accordion-collapse collapse" aria-labelledby="heading${taskId}" data-bs-parent="#assessmentsAccordion">
-                                                            <div class="accordion-body">
-                                                                <p class="alert alert-danger d-none error">You have to rate the task before saving.</p>
-                                                                <div>
-                                                                    <label for="" class="required">Rating:</label>
-                                                                    <div class="row g-3">
-                                                                        ${inst.generateRatings()}
-                                                                    </div>
-                                                                </div>
-                                                                <div class="mt-3">
-                                                                    <label for="required">Comments:</label>
-                                                                    <textarea class="form-control"></textarea>
-                                                                </div>
-                                                                <div class="text-center my-3">
-                                                                    <button type="button" class="btn btn-1 btn-md save-assessment" data-task-id="task-${taskId}" data-assessor-id="${assessorId}">Save</button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                `;
-                                            }
+                                                </div>
+                                            `;
                                         }
                                     }
                                 ).join('')
@@ -342,26 +377,37 @@ class EmployeeControl{
         const inst = this;
         $('.save-assessment').click(function(){
             const taskId = $(this).data('taskId').split('-')[1];
-            const assesorId = $(this).data('assessorId');
-            let rating = $(`#${taskId}`).find('.selected-rating');
-            const comments = $(`#${taskId}`).find('textarea').val();
-            if(rating.length == 0 && comments){
-                $(`#${taskId} .error`).removeClass('d-none');
-            }
-            else{
-                $(`#${taskId} .error`).addClass('d-none');
-                rating = $($(`#${taskId}`).find('.selected-rating')[0]).text();
+            const assessorId = $(this).data('assessorId');
+            const assessmentId = $(this).data('assessmentId');
+            const employeeRole = $(this).data('employeeRole');
+            const employeeId = $(this).data('employeeId');
+            let rating = $(`#task-${taskId}`).find('.selected-rating');
+            const comments = $(`#task-${taskId}`).find('textarea').val();
+            if(rating.length === 1){
+                $(`#task-${taskId} .error`).addClass('d-none');
+                rating = $($(`#task-${taskId}`).find('.selected-rating')[0]).text();
+                rating = rating.substring(0,rating.length - 1);
                 const data = {
-                    assesorId,
+                    assessorId,
+                    assessmentId,
                     taskId,
                     rating,
+                    employeeId,
+                    employeeRole,
                     comments,
                     task: 'saveAssessment'
                 }
                 const success = (res,statusCode,status) => {
-                    console.log(res);
+                    // console.log(res);
+                    baseControl.showToast("Assessment saved successfully");
+                    
+                    // Add assessment id for newly saved assessment
+                    !assessmentId && $(this).data('assessmentId',res.assessmentId);
                 }
                 baseControl.fetchData(inst.url,data,'Save','.save-assessment',false,success);
+            }
+            else{
+                $(`#task-${taskId} .error`).removeClass('d-none');
             }
         });
     }

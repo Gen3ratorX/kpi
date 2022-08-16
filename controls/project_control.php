@@ -58,16 +58,16 @@
 
             // Get total progress
             $totalEmployeeProgress = [];
-            $sql4 = "SELECT employee_id FROM assign WHERE project_id=$projectId";
+            $sql4 = "SELECT IFNULL(rating,0) as rating FROM `performance` INNER JOIN task
+            ON `task`.`id`=`performance`.`task_id`
+            WHERE `task`.`project_id`=$projectId;";
             $results4 = $this->con->query($sql4);
 
             // Get employee progress
             while($row4 = $results4->fetch_assoc()){
-                $employeeId = $row4['employee_id'];
-                $employeeProgress = $this->employeeProgress($employeeId,$projectId);
-                $totalEmployeeProgress[] = $employeeProgress;
+                $totalEmployeeProgress[] = $row4['rating'];
             }
-            $generalItems['totalProgress'] = array_sum($totalEmployeeProgress) / count($totalEmployeeProgress);
+            $generalItems['totalProgress'] = round(array_sum($totalEmployeeProgress) / count($totalEmployeeProgress),2);
 
             return $generalItems;
         }
@@ -195,16 +195,18 @@
         function employeeProgress($employeeId,$projectId){
             $ratings = 0;
             // Get all tasks and their ratings
-            $sql1 = "SELECT IFNULL(AVG(`performance`.`rating`),0) as rating FROM performance
+            $sql1 = "SELECT IFNULL(`performance`.`rating`,0) as rating FROM performance
             INNER JOIN task
             ON `task`.`id`=`performance`.`task_id`
             WHERE `task`.`project_id`=$projectId AND `task`.`employee_id` = $employeeId";
             $results1 = $this->con->query($sql1);
-            while($row1 = $results1->fetch_assoc()){
-                $ratings += $row1['rating'];
+            if($results1->num_rows > 0){
+                while($row1 = $results1->fetch_assoc()){
+                    $ratings += $row1['rating'];
+                }
+                return round($ratings / $results1->num_rows,2);
             }
-            $employeeProgress = $ratings / $results1->num_rows;
-            return $employeeProgress;
+            return $ratings;
         }
 
 

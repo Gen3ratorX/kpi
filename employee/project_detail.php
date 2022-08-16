@@ -125,15 +125,8 @@
                             ";
                         }
                         // Assessment
-                        elseif($assessProject){
+                        else{
                             require_once './assessment.php';
-                        }
-                        elseif(!$assessProject){
-                            echo "
-                                <div class='no-item'>
-                                    Assessment haven't been opened yet....
-                                </div>
-                            ";
                         }
                     ?>
                 </section>

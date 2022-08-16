@@ -11,6 +11,8 @@
         // Get project
         $project = $projectControl->getProject($projectId);
         if($project){
+            $isOpen = $project['is_open'];
+            $assess = $project['assess'];
             $generalItems = $projectControl->generalDashboardItems($projectId);
             $employeeProgressHtml = $projectControl->generateEmployeeProgressItems($projectId);
             $departmentProgressHtml = $projectControl->generateDepartmentProgressItems($projectId);
@@ -29,7 +31,7 @@
     require_once 'admin_navbar.php';
 ?>
 
-    <main id='main-body'
+    <main id='main-body' data-project-id="<?php echo $projectId;?>">
         <div class="container">
             <section class="mb-3">
                 <h1 class="header"><?php echo $generalItems['projectName'];?></h1>
@@ -99,6 +101,51 @@
                             </div>
                         </div>
                     </div>
+                </section>
+
+                <!-- Options -->
+                <section class="mt-5">
+                    <h3 style="font-weight: 400;" class="text-secondary">Project Options</h3>
+                    <section class="row row-cols-2 g-3">
+                        <div class="col">
+                            <!-- Assess -->
+                            <section>
+                                <label for="">Assess Employees:</label>
+                                <div>
+                                    <?php
+                                        echo $assess
+                                            ? "
+                                                <button class='btn btn-1-solid assess-employees-toggle' data-value='yes'>Yes</button>
+                                                <button class='btn btn-2-outline assess-employees-toggle' data-value='no'>No</button>
+                                            "
+                                            : "
+                                                <button class='btn btn-1-outline assess-employees-toggle' data-value='yes'>Yes</button>
+                                                <button class='btn btn-2-solid assess-employees-toggle' data-value='no'>No</button>
+                                            ";
+                                    ?>
+                                </div>
+                            </section>
+                        </div>
+                        <div class="col">
+                            <!-- Is Open To Add Tasks -->
+                            <section>
+                                <label for="">Employees Can Add Tasks:</label>
+                                <div>
+                                    <?php
+                                        echo $isOpen
+                                        ? "
+                                            <button class='btn btn-1-solid employees-can-add-tasks-toggle' data-value='yes'>Yes</button>
+                                            <button class='btn btn-2-outline employees-can-add-tasks-toggle' data-value='no'>No</button>
+                                        "
+                                        : "
+                                            <button class='btn btn-1-outline employees-can-add-tasks-toggle' data-value='yes'>Yes</button>
+                                            <button class='btn btn-2-solid employees-can-add-tasks-toggle' data-value='no'>No</button>
+                                        ";
+                                    ?>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
                 </section>
 
                 <!-- Departments Progress -->

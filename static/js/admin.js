@@ -29,6 +29,7 @@ class AdminControl{
         this.assignEmployee();
         this.searchProjectEmployees();
         this.deleteProject();
+        this.toggleProjectOptions();
     }
 
     toggleProjectIsOpen(){
@@ -37,6 +38,57 @@ class AdminControl{
             $('#isOpen > .btn').attr('class','btn btn-4-outline btn-sm');
             $(this).attr('class','btn btn-4-solid btn-sm');
             $('#isOpen').data('value',value.toLowerCase()  == 'yes' ? 1 : 0)
+        });
+    }
+
+    toggleProjectOptions(){
+        const inst = this;
+        const projectId = $('#main-body').data('projectId');
+        const success = (res,statusCode,status) => {
+            baseControl.showToast("Project option have been successfully saved.");
+        }
+        const data = {
+            task: 'updateProjectOptions',
+            projectId,
+        }
+
+
+        // Assess Employees
+        $('.assess-employees-toggle').click(function() {
+            const value = $(this).data('value');
+
+            data['option'] = 'assessment';
+            data['value'] = value;
+
+            if(value === 'yes'){
+                $('.assess-employees-toggle').eq(1).removeClass('btn-2-solid').addClass('btn-2-outline');
+                $(this).removeClass('btn-1-outline').addClass('btn-1-solid')
+            }
+            else{
+                $('.assess-employees-toggle').eq(0).removeClass('btn-1-solid').addClass('btn-1-outline');
+                $(this).removeClass('btn-2-outline').addClass('btn-2-solid')
+            }
+            baseControl.fetchData(inst.url,data,'','',false,success);
+
+        });
+
+        // Assess Employees
+        $('.employees-can-add-tasks-toggle').click(function() {
+            const value = $(this).data('value');
+
+            data['value'] = value;
+            data['option'] ='tasks';
+
+            if(value === 'yes'){
+                $('.employees-can-add-tasks-toggle').eq(1).removeClass('btn-2-solid').addClass('btn-2-outline');
+                $(this).removeClass('btn-1-outline').addClass('btn-1-solid')
+            }
+            else{
+                $('.employees-can-add-tasks-toggle').eq(0).removeClass('btn-1-solid').addClass('btn-1-outline');
+                $(this).removeClass('btn-2-outline').addClass('btn-2-solid')
+            }
+            baseControl.fetchData(inst.url,data,'','',false,success);
+
         });
     }
 

@@ -427,6 +427,11 @@ nav{
     text-decoration: none;
 }
 
+/* Toast */
+.toast-container{
+    z-index: 2;
+}
+
 /* Footer */
 footer{
     background-color: #222;

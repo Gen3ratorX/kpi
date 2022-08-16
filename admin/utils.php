@@ -22,6 +22,9 @@
     elseif (isset($_POST['task']) and $_POST['task'] == 'deleteProject') {
         $projectControl->deleteProject();
     }
+    elseif (isset($_POST['task']) and $_POST['task'] == 'updateProjectOptions') {
+        $projectControl->updateProjectOptions();
+    }
 
     // Employee
     elseif (isset($_POST['task']) and $_POST['task'] == 'saveEmployee') {

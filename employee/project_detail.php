@@ -117,13 +117,13 @@
                         if($employeeRole != 1  and !$assessProject and $projectIsOpen){
                             require_once './staff_and_manager_tasks.php';
                         }
-                        elseif($employeeRole != 1  and !$assessProject and !$projectIsOpen){
-                            echo "
-                                <div class='no-item'>
-                                    The project isn't open for adding tasks.
-                                </div>
-                            ";
-                        }
+                        // elseif($employeeRole != 1  and !$assessProject and !$projectIsOpen){
+                        //     echo "
+                        //         <div class='no-item'>
+                        //             The project isn't open for adding tasks.
+                        //         </div>
+                        //     ";
+                        // }
                         // Assessment
                         else{
                             require_once './assessment.php';

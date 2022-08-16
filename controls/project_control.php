@@ -437,6 +437,26 @@
             }
         }
 
+        function updateProjectOptions(){
+            $option = filterInput('option');
+            $projectId = filterInput('projectId');
+            $value = filterInput('value') == 'yes'? 1: 0;
+            if($option == 'assessment'){
+                $sql1 = "UPDATE project SET assess=$value WHERE id=$projectId";
+            }
+            else{
+                $sql1 = "UPDATE project SET is_open=$value WHERE id=$projectId";
+            }
+
+            if($this->con->query($sql1)){
+                echo json_encode(['status'=>"SUCCESS"]);
+            }
+            else{
+                http_response_code(500);
+                echo json_encode(['status'=>"ERROR"]);
+            }
+        }
+
 
         // User
         function generateEmployeeProjectList($employeeId,$employeeRole,$q=null,$columns=null){

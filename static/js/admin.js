@@ -201,7 +201,7 @@ class AdminControl{
         $('#delete-project').click(function(){
             const projectId = $(this).data('id');
             const success = (res,statusCode,status) => {
-                console.log(res);
+                // console.log(res);
                 if($('#projects').children().length - 1 == 0){
                     $('#projects').hide('slow',function(){
                         $(this).before(

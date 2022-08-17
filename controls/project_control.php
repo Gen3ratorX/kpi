@@ -72,9 +72,6 @@
             return $generalItems;
         }
 
-        function colorCodesForProgress($progress){
-
-        }
 
         function generateEmployeeProgressItems($projectId){
             $employeeProgressHtml = "";
@@ -94,6 +91,7 @@
                 $row2 = $results2->fetch_assoc();
                 $employeeName = $row2['name'];
                 $department = $row2['department'];
+                $colorCodeForProgress = colorCodesForProgress($employeeProgress);
 
                 // Get number of tasks
                 $tasks = $this->employeeTasks($employeeId,$projectId);
@@ -113,7 +111,7 @@
                                     </p>
                                 </div>
                             </section>
-                            <section class='percentage text-danger'>
+                            <section class='percentage $colorCodeForProgress text-danger'>
                                 $employeeProgress%
                             </section>
                         </div>
@@ -133,6 +131,21 @@
             while($row1 = $results1->fetch_assoc()){
                 $employeeId = $row1['employee_id'];
                 $employeeProgress = $this->employeeProgress($employeeId,$projectId);
+                // FIXME: Error in generating department progress
+                // Get all tasks and their ratings for an employee
+                // $employeeProgress = 0;
+                // $sql3 = "SELECT IFNULL(`performance`.`rating`,0) as rating FROM performance
+                // INNER JOIN task
+                // ON `task`.`id`=`performance`.`task_id`
+                // WHERE `task`.`project_id`=$projectId AND `task`.`employee_id` = $employeeId";
+                // $results3 = $this->con->query($sql1);
+                // if($results3->num_rows > 0){
+                //     while($row3 = $results1->fetch_assoc()){
+                //         $$employeeProgress += $row3['rating'];
+                //     }
+                // }
+
+                // 
                 $employeeTasks = $this->employeeTasks($employeeId,$projectId);
                 // Get department details
                 $sql2 = "SELECT `department`.`name` AS department, `department`.`id` AS id FROM employee 
@@ -163,9 +176,10 @@
             // Go through department data
             foreach($departmentsData as $departmentData){
                 $tasks = array_sum($departmentData['tasks']);
-                $progress = array_sum($departmentData['progress']) /count($departmentData['progress']);
+                $progress = round(array_sum($departmentData['progress']) /count($departmentData['progress']),2);
                 $employeesAssigned = $departmentData['employeesAssigned'];
                 $departmentName = $departmentData['name'];
+                $colorCodeForProgress = colorCodesForProgress($progress);
 
                 $departmentProgressHtml .= "
                     <div class='card item shadow-sm department-progress-item mb-3'>
@@ -181,7 +195,7 @@
                                     </p>
                                 </div>
                             </section>
-                            <section class='percentage text-danger'>
+                            <section class='percentage $colorCodeForProgress'>
                                 $progress%
                             </section>
                         </div>
@@ -226,6 +240,8 @@
                 foreach($projects as $project){
                     $projectId = $project['id'];
                     $generalItems = $this->generalDashboardItems($projectId);
+                    $totalProgress = $generalItems['totalProgress'];
+                    $colorCodeForProgress = colorCodesForProgress($totalProgress);
                     
                     $projectHtml .= "
                         <div class='card shadow-sm action-item mb-3'>
@@ -245,7 +261,7 @@
                                         <p class='project-item'>Days Left: <span>{$generalItems['daysLeft']}</span></p>
                                     </div>
                                 </div>
-                                <h1 class='text-success display-4'>{$generalItems['totalProgress']}%</h1>
+                                <h1 class='$colorCodeForProgress display-4'>$totalProgress%</h1>
                             </div>
                         </div>
                     ";
@@ -513,6 +529,7 @@
                         $daysLeft = $deadline->diff($currentDate)->format('%a');
                     }
                     $projects[] = $row1;
+                    $colorCodeForProgress = colorCodesForProgress($progress);
                     $employeeProjectsHtml .= "
                         <a href='./project_detail.php?id=$projectId'>
                             <div class='card shadow-sm item mb-3'>
@@ -524,7 +541,7 @@
                                             <p class='project-item'>Days Left: <span>$daysLeft</span></p>
                                         </div>
                                     </div>
-                                    <h1 class='text-success display-4'>$progress%</h1>
+                                    <h1 class='text-success $colorCodeForProgress display-4'>$progress%</h1>
                                 </div>
                             </div>
                         </a>

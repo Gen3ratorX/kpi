@@ -36,33 +36,23 @@
             </div>
         </div>
     </div>
-
+    <style>
+    </style>
     <main id='main-body'
         <div class="container">
             <section class="mb-3">
                 <h1 class="header">Projects</h1>
                 <?php echo $projectsHtml; ?>
-                <!-- <div id="projects">
-                    <div class='card shadow-sm action-item'>
-                        <div class='options d-flex align-items-center justify-content-center'>
-                            <div>
-                                <button class='btn btn-md btn-2 me-2 delete-employee-attempt' id='' data-bs-toggle='modal' data-bs-target='#deleteItem'>Delete</button>
-                                <a href='' class='btn btn-md btn-4 me-2'>Edit</a>
-                                <a href='' class='btn btn-md btn-3'>View</a>
-                            </div>
-                        </div>
-                        <div class='card-body d-flex justify-content-between align-items-center'>
-                            <div class="flex-grow-1">
-                                <h4 class="project-name">Lorem ipsum dolor sit amet consectetur a</h4>
-                                <div class="row g-2 row-cols-1 row-cols-sm-2 mt-3">
-                                    <p class="project-item col">Tasks: <span>30</span></p>
-                                    <p class="project-item col">Employees Assigned: <span>30</span></p>
-                                </div>
-                            </div>
-                            <h1 class='text-success display-4'>100%</h1>
-                        </div>
-                    </div>
-                </div> -->
+            </section>
+            <section class="row row-cols-4">
+                <div class="col below-average" style="height: 100px; ">
+                </div>
+                <div class="col average" style="height: 100px; ">
+                </div>
+                <div class="col above-average" style="height: 100px; ">
+                </div>
+                <div class="col excellent" style="height: 100px; ">
+                </div>
             </section>
         </div>
     </main>

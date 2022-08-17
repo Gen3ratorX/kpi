@@ -13,7 +13,7 @@ class AuthControl{
                 const password = $('#password').val();
                 const success = (res,statusCode,status) => {
                     // window.location.assign();
-                    console.log(res);
+                    // console.log(res);
                     res.employee 
                     ? window.location.assign('employee/')
                     : window.location.assign('admin/');

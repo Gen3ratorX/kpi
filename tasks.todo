@@ -2,7 +2,7 @@ Navbar:
     - Make it a little transparent.
     - Find a background color for the phone menu
 Main:
-    -Cross check every foem label 
+    -Cross check every form label 
     -Make sure you set up foreign key constraints for employee table 
     -The links in various places 
     -Check if a user is signed in before redirecting
@@ -17,7 +17,8 @@ Main:
     - When auditors signs in they will be showed the total progress and tasks for a project but when other stuff signs in they will be showed thier progress and tasks concerning the project. 
     -Don't forget login required function
 Misc:
-    -Make admin username and email unique
+    - Days left when passed  
+    - Make admin username and email unique
     - Add last_login to employees table 
     -Remove all unwanted code when done. 
 

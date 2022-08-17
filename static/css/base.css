@@ -432,6 +432,20 @@ nav{
     z-index: 2;
 }
 
+/* Coloe Codes */
+.below-average{
+    color: crimson !important;
+}
+.average{
+    color: goldenrod !important;
+}
+.above-average{
+    color: gold !important;
+}
+.excellent{
+    color: yellowgreen !important;
+}
+
 /* Footer */
 footer{
     background-color: #222;

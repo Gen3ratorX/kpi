@@ -1,5 +1,6 @@
 <?php
     require_once 'database_auth.php';
+    require_once 'utils.php';
     class TestControl{
         private $con;
 
@@ -31,5 +32,6 @@
     }
 
     $testControl = new TestControl($con);
-    $testControl->createSuperuser('eoffei','crescue7536')
+    // $testControl->createSuperuser('eoffei','crescue7536')
+    echo colorCodesForProgress(0);
 ?>

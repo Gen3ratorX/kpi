@@ -155,7 +155,7 @@ class EmployeeControl{
         const isAssessmentOpen = $('#assessment-attempt-wrapper').data('isAssessmentOpen');
         $('.assess-employee').click(function(){
             const employeeData = $(this).data();
-            console.log(employeeData);
+            // console.log(employeeData);
             const success = (res,statusCode,status) => {
                 // console.log(res);
                 // Tasks added
@@ -171,6 +171,7 @@ class EmployeeControl{
                                             if(assessment.isAssessed){
                                                 // TODO: Delete it when not needed
                                                 const {taskId,description,projectId,employeeId,employeeRole,assessorId,rating,comments,assessmentId} =  assessment;
+                                                const colorCodeForProgress = baseControl.colorCodesForProgress(rating);
                                                 if(assessment.readOnly){
                                                     return `
                                                         <div class="accordion-item" id="task-${taskId}">
@@ -183,7 +184,7 @@ class EmployeeControl{
                                                                 <div class="accordion-body">
                                                                     <section class="d-flex justify-content-between align-items-center">
                                                                     Rating: 
-                                                                        <h1 class="display-6 text-primary">
+                                                                        <h1 class="display-6 ${colorCodeForProgress}">
                                                                             <strong>${rating || 0}%</strong>
                                                                         </h1>
                                                                     </section>
@@ -234,6 +235,7 @@ class EmployeeControl{
                                                 const {taskId,description,projectId,employeeId,employeeRole,assessorId} =  assessment;
                                                 // Not assessed and readonly
                                                 if(assessment.readOnly){
+                                                    const colorCodeForProgress = baseControl.colorCodesForProgress(0);
                                                     return `
                                                         <div class="accordion-item" id="task-${taskId}">
                                                             <h2 class="accordion-header" id="heading${taskId}">
@@ -245,7 +247,7 @@ class EmployeeControl{
                                                                 <div class="accordion-body">
                                                                     <section class="d-flex justify-content-between align-items-center">
                                                                     Rating: 
-                                                                        <h1 class="display-6 text-primary">
+                                                                        <h1 class="display-6 ${colorCodeForProgress}">
                                                                             <strong>0%</strong>
                                                                         </h1>
                                                                     </section>
@@ -295,6 +297,7 @@ class EmployeeControl{
                                         // Project isn't open for assessment
                                         else{
                                             const {taskId,description,rating,comments} =  assessment;
+                                            const colorCodeForProgress = baseControl.colorCodesForProgress(rating || 0);
                                             return `
                                                 <div class="accordion-item" id="task-${taskId}">
                                                     <h2 class="accordion-header" id="heading${taskId}">
@@ -306,7 +309,7 @@ class EmployeeControl{
                                                         <div class="accordion-body">
                                                             <section class="d-flex justify-content-between align-items-center">
                                                             Rating: 
-                                                                <h1 class="display-6 text-primary">
+                                                                <h1 class="display-6 ${colorCodeForProgress}">
                                                                     <strong>${rating || 0}%</strong>
                                                                 </h1>
                                                             </section>

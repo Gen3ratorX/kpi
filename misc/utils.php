@@ -32,7 +32,18 @@
         $wordLst = explode($delimiter,strtolower($word));
         return implode('-',$wordLst);
     }
-    
-    // echo spreadSeachColumns(['name','other_names'],'hrllo');
 
+    function colorCodesForProgress($progress){
+        if($progress >= 0 and $progress <= 25){
+            return 'below-average';
+        }
+        elseif($progress >= 26  and $progress <= 50){
+            return 'average';
+        }
+        elseif($progress >= 51 and $progress <= 75){
+            return 'above-average';
+        }
+        return 'excellent';
+    }
+    
 ?>

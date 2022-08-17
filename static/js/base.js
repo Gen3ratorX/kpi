@@ -109,19 +109,6 @@ class BaseControl{
     {
         const inst = this;
         inst.startLoading(btnId);
-        // $.post(
-        //     url,
-        //     data,
-        //     function(res,statusCode,{status}){
-        //         baseControl.endLoading(btnId,bntText);
-        //         success(res,statusCode,status)
-        //     }
-        // )
-        // .fail(() => {
-        //     baseControl.endLoading(btnId,bntText);
-        //     baseControl.showToast("The server has encounted an error.")
-        //     error();
-        // })
         $.ajax({
             url: url,
             method : get ? "GET" : "POST",
@@ -132,17 +119,13 @@ class BaseControl{
             },
             error: function(xhr){
                 const {status} = xhr;
-                console.log(xhr);
+                // console.log(xhr);
                 inst.endLoading(btnId,bntText);
                 status == 500 && inst.showToast("The server has encounted an error.");
                 error(status);
             },
             dataType: 'json',
         })
-        // .always(()=> {
-        //     inst.endLoading(btnId,bntText);
-        //     inst.showToast( "Check your internet connection and try again.");
-        // })
     }
 
     capitalize(word){
@@ -152,6 +135,19 @@ class BaseControl{
             capitalizedWordLst.push(`${i[0].toUpperCase()}${i.substring(1,)}`);
         }
         return capitalizedWordLst.join(' ');
+    }
+
+    colorCodesForProgress(progress){
+        if(progress >= 0 && progress <= 25){
+            return 'below-average';
+        }
+        else if(progress >= 26  && progress <= 50){
+            return 'average';
+        }
+        else if(progress >= 51 && progress <= 75){
+            return 'above-average';
+        }
+        return 'excellent';
     }
 }
 

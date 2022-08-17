@@ -25,8 +25,9 @@
             $daysLeft = $deadline->diff($currentDate)->format('%a');
             // Check if employee is assigned
             if($taskControl->isEmployeeAssignedToProject($employeeRole,$employeeId,$projectId)){
-                // Auditor
-                if($employeeRole == 1){
+                // TODO: Special roles
+                // Auditor or General Manager
+                if($employeeRole == 1 or $employeeRole == 0){
                     $generalItems = $projectControl->generalDashboardItems($projectId);
                     $tasks = $generalItems['tasks'];
                     $progress = $generalItems['totalProgress'];

@@ -125,7 +125,9 @@
         
         // Assessments
         function isEmployeeAssignedToProject($employeeRole,$employeeId,$projectId){
-            if($employeeRole != 1){
+            // TODO: Special role
+            // Auditor or General Manager
+            if($employeeRole != 1 and $employeeRole != 0){
                 $sql1 = "SELECT * FROM assign WHERE project_id=$projectId AND employee_id=$employeeId";
                 $result1 = $this->con->query($sql1);
                 return $result1->num_rows == 1 ? true : false;
@@ -135,8 +137,9 @@
 
         function getEmployeesForProject($employeeRole,$projectId,$employeeId){
             $employees = [];
-            // Auditor TODO: Will add general manager and others
-            if($employeeRole == 1){
+            // TODO: Special Roles
+            // Auditor or General Manager
+            if($employeeRole == 1 or $employeeRole == 0){
                 $sql1 = "SELECT CONCAT_WS(' ',surname,other_names) as name, id FROM employee 
                 WHERE id IN 
                 (SELECT employee_id FROM assign WHERE project_id=$projectId)";
@@ -174,6 +177,13 @@
                         'id'=>$employeeId,
                         'assessorRole'=>1
                     ];
+                    $employees[] = [
+                        'name'=>'General Manager',
+                        'readOnly'=> true,
+                        'role'=> 0,
+                        'id'=>$employeeId,
+                        'assessorRole'=>0,
+                    ];
                 }
             }
             else{
@@ -204,6 +214,13 @@
                         'role'=> 2,
                         'id'=>$employeeId,
                         'assessorRole'=>2,
+                    ];
+                    $employees[] = [
+                        'name'=>'General Manager',
+                        'readOnly'=> true,
+                        'role'=> 0,
+                        'id'=>$employeeId,
+                        'assessorRole'=>0,
                     ];
                 }
             }
@@ -248,7 +265,7 @@
             foreach($tasks as $task){
                 $taskId = $task['id'];
                 // TODO: Add general manager and others
-                if($employeeRole != 1){ // All employees aprt from auditors and generak manager
+                if($employeeRole != 1 and $employeeRole != 0){ // All employees aprt from auditors and generak manager
                     // Auditor or manager who has assessed an employee
                     if($readOnly){
                         // Get the performance for each task
@@ -291,13 +308,13 @@
                         ];
                     }
                 }
-                // Auditor
+                // TODO: Special role
+                // Auditor or General Manager
                 else{
-                    // TODO: If an auditor starts assessing an employee no auditor can assess other employees
                     $sql1 = "SELECT * FROM performance WHERE task_id=$taskId 
                     AND assessor_id IN 
                     (SELECT id FROM employee WHERE employee_role_id IN 
-                    (SELECT id FROM employee_role WHERE role=1))";
+                    (SELECT id FROM employee_role WHERE role=$employeeRole))";
                     $result1 = $this->con->query($sql1);
                     // No auditor has assessed the employee
                     if($result1->num_rows == 0){
@@ -350,11 +367,6 @@
                                 'readOnly'=> true,
                             ];
                         }
-                    }
-                    // TODO: Make sure only one auditor assess an employee
-                    // Two aditors has assessed the employee
-                    else{
-
                     }
                 }
                 
@@ -409,13 +421,8 @@
                     http_response_code(500);
                     echo json_encode(['status'=>"ERROR"]);
                 }
-                // echo json_encode([
-                //     'status'=>"SUCCESS",
-                //     'assessmentId'=>1,
-                // ]);
 
             }
-            // echo json_encode($_POST);
         }
     }
 

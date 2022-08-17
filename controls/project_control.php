@@ -275,7 +275,7 @@
             $assignEmployeesHtml = "";
             // Get all roles apart from auditors
             $roles = [];
-            $sql1 = "SELECT * FROM employee_role WHERE role <> 1";
+            $sql1 = "SELECT * FROM employee_role WHERE role NOT IN  (0,1)";
             $results1 = $this->con->query($sql1);
             while($row1 = $results1->fetch_assoc()){
                 $roles[] = $row1;
@@ -462,8 +462,9 @@
         function generateEmployeeProjectList($employeeId,$employeeRole,$q=null,$columns=null){
             $projects = [];
             $employeeProjectsHtml = "";
-            // Auditor
-            if($employeeRole == 1){
+            // TODO: Special roles
+            // Auditor or General Manager
+            if($employeeRole == 1 or $employeeRole == 0){
                 if($q){
                     $spreadColumns = spreadSearchColumns($columns,$q);
                     $sql1 = "SELECT * FROM project
@@ -497,8 +498,9 @@
                     $projectId = $row1['id'];
                     $projectName = $row1['name'];
                     $generalItems = $this->generalDashboardItems($projectId);
-                    // Auditor
-                    if($employeeRole == 1){
+                    // TODO: Special roles
+                    // Auditor or General Manager
+                    if($employeeRole == 1 or $employeeRole == 0){
                         $tasks = $generalItems['tasks'];
                         $daysLeft = $generalItems['daysLeft'];
                         $progress = $generalItems['totalProgress'];

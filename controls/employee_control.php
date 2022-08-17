@@ -196,7 +196,7 @@
                 echo json_encode(['status'=>'SUCCESS']);
             }else{
                 http_response_code(400);
-                echo json_encode(['status'=>'ERROR']);
+                echo json_encode(['status'=>'ERROR',$sql1]);
             }
         }
 

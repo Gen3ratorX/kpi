@@ -125,25 +125,25 @@
         function generateDepartmentProgressItems($projectId){
             $departmentsData = [];
             $departmentProgressHtml = "";
+            $noOfAssessments = 0;
             // Get all employees 
             $sql1 = "SELECT employee_id FROM assign WHERE project_id=$projectId";
             $results1 = $this->con->query($sql1);
             while($row1 = $results1->fetch_assoc()){
                 $employeeId = $row1['employee_id'];
-                $employeeProgress = $this->employeeProgress($employeeId,$projectId);
-                // FIXME: Error in generating department progress
                 // Get all tasks and their ratings for an employee
-                // $employeeProgress = 0;
-                // $sql3 = "SELECT IFNULL(`performance`.`rating`,0) as rating FROM performance
-                // INNER JOIN task
-                // ON `task`.`id`=`performance`.`task_id`
-                // WHERE `task`.`project_id`=$projectId AND `task`.`employee_id` = $employeeId";
-                // $results3 = $this->con->query($sql1);
-                // if($results3->num_rows > 0){
-                //     while($row3 = $results1->fetch_assoc()){
-                //         $$employeeProgress += $row3['rating'];
-                //     }
-                // }
+                $employeeProgress = 0;
+                $sql3 = "SELECT IFNULL(`performance`.`rating`,0) as rating FROM performance
+                INNER JOIN task
+                ON `task`.`id`=`performance`.`task_id`
+                WHERE `task`.`project_id`=$projectId AND `task`.`employee_id` = $employeeId";
+                $results3 = $this->con->query($sql3);
+                if($results3->num_rows > 0){
+                    while($row3 = $results3->fetch_assoc()){
+                        $employeeProgress += $row3['rating'];
+                        $noOfAssessments++;
+                    }
+                }
 
                 // 
                 $employeeTasks = $this->employeeTasks($employeeId,$projectId);
@@ -176,7 +176,7 @@
             // Go through department data
             foreach($departmentsData as $departmentData){
                 $tasks = array_sum($departmentData['tasks']);
-                $progress = round(array_sum($departmentData['progress']) /count($departmentData['progress']),2);
+                $progress = round(array_sum($departmentData['progress']) /$noOfAssessments,2);
                 $employeesAssigned = $departmentData['employeesAssigned'];
                 $departmentName = $departmentData['name'];
                 $colorCodeForProgress = colorCodesForProgress($progress);

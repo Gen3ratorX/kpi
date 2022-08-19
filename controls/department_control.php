@@ -185,19 +185,18 @@
         function deleteDepartment(){
             $departmentId = filterInput('departmentId');
             $sql1 = "DELETE FROM department WHERE id=$departmentId";
-            // if($this->con->query($sql1)){
-            //     http_response_code(200);
-            //     echo json_encode([
-            //         'status'=>'SUCCESS'
-            //     ]);
-            // }
-            // else{
-            //     http_response_code(500);
-            //     echo json_encode([
-            //         'status'=>'ERROR'
-            //     ]);
-            // }
-            echo json_encode($sql1);
+            if($this->con->query($sql1)){
+                http_response_code(200);
+                echo json_encode([
+                    'status'=>'SUCCESS'
+                ]);
+            }
+            else{
+                http_response_code(500);
+                echo json_encode([
+                    'status'=>'ERROR'
+                ]);
+            }
         }
 
     }

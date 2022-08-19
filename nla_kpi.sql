@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 05, 2022 at 02:47 PM
+-- Generation Time: Aug 17, 2022 at 04:32 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -20,6 +20,23 @@ SET time_zone = "+00:00";
 --
 -- Database: `nla_kpi`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admin`
+--
+
+CREATE TABLE `admin` (
+  `id` int(200) NOT NULL,
+  `surname` varchar(100) DEFAULT NULL,
+  `other_names` varchar(100) DEFAULT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(200) NOT NULL,
+  `last_login` datetime DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -86,10 +103,10 @@ CREATE TABLE `employee_role` (
 CREATE TABLE `performance` (
   `id` int(200) NOT NULL,
   `task_id` int(200) NOT NULL,
-  `employee_id` int(200) NOT NULL,
+  `assessor_id` int(200) NOT NULL,
   `rating` tinyint(3) NOT NULL,
   `date` date NOT NULL,
-  `comments` text NOT NULL
+  `comments` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -103,7 +120,8 @@ CREATE TABLE `project` (
   `name` varchar(200) NOT NULL,
   `date_created` date NOT NULL,
   `deadline` date NOT NULL,
-  `is_open` tinyint(1) NOT NULL DEFAULT 0
+  `is_open` tinyint(1) NOT NULL DEFAULT 0,
+  `assess` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -116,7 +134,7 @@ CREATE TABLE `task` (
   `id` int(200) NOT NULL,
   `project_id` int(200) NOT NULL,
   `employee_id` int(200) NOT NULL,
-  `descrition` text NOT NULL,
+  `description` text NOT NULL,
   `date_created` date NOT NULL,
   `deadline` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -136,6 +154,12 @@ CREATE TABLE `unit` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `admin`
+--
+ALTER TABLE `admin`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `assign`
@@ -174,7 +198,9 @@ ALTER TABLE `employee_role`
 -- Indexes for table `performance`
 --
 ALTER TABLE `performance`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `task_id` (`task_id`),
+  ADD KEY `assessor_id` (`assessor_id`);
 
 --
 -- Indexes for table `project`
@@ -200,6 +226,12 @@ ALTER TABLE `unit`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `admin`
+--
+ALTER TABLE `admin`
+  MODIFY `id` int(200) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `department`
@@ -267,6 +299,13 @@ ALTER TABLE `employee`
   ADD CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`employee_role_id`) REFERENCES `employee_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `employee_ibfk_2` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   ADD CONSTRAINT `employee_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `unit` (`id`) ON DELETE SET NULL ON UPDATE SET NULL;
+
+--
+-- Constraints for table `performance`
+--
+ALTER TABLE `performance`
+  ADD CONSTRAINT `performance_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `performance_ibfk_2` FOREIGN KEY (`assessor_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `task`

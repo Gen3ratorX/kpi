@@ -542,7 +542,36 @@
                     if($employeeRole == 1 or $employeeRole == 0){
                         $tasks = $generalItems['tasks'];
                         $daysLeft = $generalItems['daysLeft'];
-                        $progress = $generalItems['totalProgress'];
+                        $totalProgress = $generalItems['totalProgress'];
+                        $idealTarget = $row1['target'];
+                        $employeesAssigned = $generalItems['employeesAssigned'];
+
+                        $employeeProjectsHtml .= "
+                            <a href='./project_detail.php?id=$projectId'>
+                                <div class='card shadow-sm action-item mb-3'>
+                                    <div class='card-body d-flex justify-content-between align-items-center'>
+                                        <div class='flex-grow-1'>
+                                            <h4 class='project-name'>{$projectName}</h4>
+                                            <div class='d-flex flex-column flex-md-row'>
+                                                <p class='project-item'>Tasks: <span>{$tasks}</span></p>
+                                                <p class='project-item'>Employees Assigned: <span>{$employeesAssigned}</span></p>
+                                                <p class='project-item'>Days Left: <span>{$daysLeft}</span></p>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <section>
+                                                <p class='m-0 text-center text-dark'>Ideal Target</p>
+                                                <h1 class='text-primary display-6 text-center'>$idealTarget%</h1>
+                                            </section>
+                                            <section>
+                                                <p class='m-0 text-center text-dark'>Achieved Target</p>
+                                                <h1 class='text-warning display-6 text-center'>$totalProgress%</h1>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        ";
                     }
                     else{
                         $tasks = $this->employeeTasks($employeeId,$projectId);
@@ -550,25 +579,25 @@
                         $currentDate = new DateTime();
                         $deadline = new DateTime($row1['deadline']);
                         $daysLeft = $deadline->diff($currentDate)->format('%a');
+                        $colorCodeForProgress = colorCodesForProgress($progress);
+                        $employeeProjectsHtml .= "
+                            <a href='./project_detail.php?id=$projectId'>
+                                <div class='card shadow-sm item mb-3'>
+                                    <div class='card-body d-flex justify-content-between align-items-center'>
+                                        <div class='flex-grow-1'>
+                                            <h4 class='project-name'>$projectName</h4>
+                                            <div class='d-flex flex-column flex-md-row'>
+                                                <p class='project-item'>Tasks: <span>$tasks</span></p>
+                                                <p class='project-item'>Days Left: <span>$daysLeft</span></p>
+                                            </div>
+                                        </div>
+                                        <h1 class='text-success $colorCodeForProgress display-4'>$progress%</h1>
+                                    </div>
+                                </div>
+                            </a>
+                        ";
                     }
                     $projects[] = $row1;
-                    $colorCodeForProgress = colorCodesForProgress($progress);
-                    $employeeProjectsHtml .= "
-                        <a href='./project_detail.php?id=$projectId'>
-                            <div class='card shadow-sm item mb-3'>
-                                <div class='card-body d-flex justify-content-between align-items-center'>
-                                    <div class='flex-grow-1'>
-                                        <h4 class='project-name'>$projectName</h4>
-                                        <div class='d-flex flex-column flex-md-row'>
-                                            <p class='project-item'>Tasks: <span>$tasks</span></p>
-                                            <p class='project-item'>Days Left: <span>$daysLeft</span></p>
-                                        </div>
-                                    </div>
-                                    <h1 class='text-success $colorCodeForProgress display-4'>$progress%</h1>
-                                </div>
-                            </div>
-                        </a>
-                    ";
                 }
             }
             else{

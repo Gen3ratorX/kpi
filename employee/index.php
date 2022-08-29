@@ -7,7 +7,7 @@
     $employeeId = $_SESSION['employeeId'];
     $employeeRole = $_SESSION['employeeRole'];
     $projectsHtml = $projectControl->generateEmployeeProjectList($employeeId,$employeeRole)
-    ?>
+?>
 
 <?php
     $pageTitle = "NLA KPI | Projects";

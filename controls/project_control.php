@@ -67,7 +67,9 @@
             while($row4 = $results4->fetch_assoc()){
                 $totalEmployeeProgress[] = $row4['rating'];
             }
-            $generalItems['totalProgress'] = round(array_sum($totalEmployeeProgress) / count($totalEmployeeProgress),2);
+            $generalItems['totalProgress'] = count($totalEmployeeProgress) > 0
+            ? round(array_sum($totalEmployeeProgress) / count($totalEmployeeProgress),2)
+            : 0;
 
             return $generalItems;
         }
@@ -176,7 +178,9 @@
             // Go through department data
             foreach($departmentsData as $departmentData){
                 $tasks = array_sum($departmentData['tasks']);
-                $progress = round(array_sum($departmentData['progress']) /$noOfAssessments,2);
+                $progress = $noOfAssessments > 0 
+                ? round(array_sum($departmentData['progress']) /$noOfAssessments,2)
+                : 0;
                 $employeesAssigned = $departmentData['employeesAssigned'];
                 $departmentName = $departmentData['name'];
                 $colorCodeForProgress = colorCodesForProgress($progress);

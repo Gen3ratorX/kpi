@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 17, 2022 at 04:32 PM
+-- Generation Time: Aug 29, 2022 at 05:39 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -121,7 +121,8 @@ CREATE TABLE `project` (
   `date_created` date NOT NULL,
   `deadline` date NOT NULL,
   `is_open` tinyint(1) NOT NULL DEFAULT 0,
-  `assess` tinyint(1) NOT NULL DEFAULT 0
+  `assess` tinyint(1) NOT NULL DEFAULT 0,
+  `target` smallint(3) NOT NULL DEFAULT 30
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

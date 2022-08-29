@@ -67,8 +67,16 @@
             while($row4 = $results4->fetch_assoc()){
                 $totalEmployeeProgress[] = $row4['rating'];
             }
+            // $generalItems['totalProgress'] = count($totalEmployeeProgress) > 0
+            // ? round(array_sum($totalEmployeeProgress) / count($totalEmployeeProgress),2)
+            // : 0;
+            $projectTarget = $project['target'];
             $generalItems['totalProgress'] = count($totalEmployeeProgress) > 0
-            ? round(array_sum($totalEmployeeProgress) / count($totalEmployeeProgress),2)
+            ? round(
+                (
+                    array_sum($totalEmployeeProgress) / count($totalEmployeeProgress) *$projectTarget
+                ) / 100,2
+            ) 
             : 0;
 
             return $generalItems;
@@ -245,7 +253,8 @@
                     $projectId = $project['id'];
                     $generalItems = $this->generalDashboardItems($projectId);
                     $totalProgress = $generalItems['totalProgress'];
-                    $colorCodeForProgress = colorCodesForProgress($totalProgress);
+                    $idealTarget = $project['target'];
+                    // $colorCodeForProgress = colorCodesForProgress($totalProgress);
                     
                     $projectHtml .= "
                         <div class='card shadow-sm action-item mb-3'>
@@ -265,7 +274,16 @@
                                         <p class='project-item'>Days Left: <span>{$generalItems['daysLeft']}</span></p>
                                     </div>
                                 </div>
-                                <h1 class='$colorCodeForProgress display-4'>$totalProgress%</h1>
+                                <div>
+                                    <section>
+                                        <p class='m-0 text-center'>Ideal Target</p>
+                                        <h1 class='text-primary display-6 text-center'>$idealTarget%</h1>
+                                    </section>
+                                    <section>
+                                        <p class='m-0 text-center'>Achieved Target</p>
+                                        <h1 class='text-warning display-6 text-center'>$totalProgress%</h1>
+                                    </section>
+                                </div>
                             </div>
                         </div>
                     ";
@@ -404,11 +422,12 @@
             $name = filterInput('projectName');
             $deadline = filterInput('deadline');
             $isOpen = filterInput('isOpen');
+            $idealTarget = filterInput('target');
             $assignedEmployees = explode(',',filterInput('assignedEmployees'));
             $todaysDate = date('Y-m-d');
             // Insert the project and get it's
-            $sql1 = "INSERT INTO project(name,date_created,deadline,is_open)
-            VALUE('$name','$todaysDate','$deadline',$isOpen)";
+            $sql1 = "INSERT INTO project(name,date_created,deadline,is_open,target)
+            VALUE('$name','$todaysDate','$deadline',$isOpen,$idealTarget)";
             if($this->con->query($sql1)){
                 // Get the latest project is
                 $sql2 = "SELECT id FROM project ORDER BY id DESC LIMIT 1";

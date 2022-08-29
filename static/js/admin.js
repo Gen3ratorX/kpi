@@ -169,13 +169,14 @@ class AdminControl{
     saveProject(){
         let inst = this;
         $('#save-project').click(function(){
-            const isValidated = baseControl.validateFields(['#projectName','#projectDeadline']);
-            if(isValidated && inst.assignedEmployees.size > 0){
+            const isValidated = baseControl.validateFields(['#projectName','#projectDeadline','#projectTarget']);
+            const target = $('#projectTarget').val();
+            if(isValidated && inst.assignedEmployees.size > 0 && target <= 100 && target > 0){
                 const projectName = baseControl.capitalize($('#projectName').val());
                 const deadline = $('#projectDeadline').val();
                 const isOpen = $('#isOpen').data('value');
                 const data = {
-                    projectName,deadline,isOpen,
+                    projectName,deadline,isOpen,target,
                     assignedEmployees: Array(...inst.assignedEmployees).join(','),
                     task: 'saveProject'
                 }
@@ -187,6 +188,9 @@ class AdminControl{
             }
             else if(inst.assignedEmployees.size == 0){
                 baseControl.showToast("You haven't assigned any employee to the project.");
+            }
+            else if(target > 100 || target <= 0){
+                baseControl.showToast("Your target shouldn't be more than 100 and less than 1.");
             }
         });
     }

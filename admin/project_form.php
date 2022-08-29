@@ -24,15 +24,22 @@
             <section class="mb-3">
                 <h1 class="header">Create Project</h1>
                 <section class="row g-3">
-                    <div class="col-12">
-                        <label for="project-name" class="required">Project Name:</label>
+                    <div class="col-12 col-sm-8">
+                        <label for="projectName" class="required">Project Name:</label>
                         <input type="text" id="projectName" value="" class="form-control">
                         <div class="invalid-feedback">
                             Please provide a project name.
                         </div>
                     </div>
+                    <div class="col-12 col-sm-4">
+                        <label for="projectTarget" class="required">Target:</label>
+                        <input class="form-control" id="projectTarget" type="number" min='0' max='100'>
+                        <div class="invalid-feedback">
+                            Please provide a valid target eg 20,30,40,50 etc.
+                        </div>
+                    </div>
                     <div class="col-12 col-sm-6">
-                        <label for="project-deadline" class="required">Deadline:</label>
+                        <label for="projectDeadline" class="required">Deadline:</label>
                         <input type="date" min="<?php echo $tomorrowsDate;?>" id="projectDeadline" value="" class="form-control">
                         <div class="invalid-feedback">
                             Please provide a deadline.

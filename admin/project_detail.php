@@ -13,6 +13,7 @@
         if($project){
             $isOpen = $project['is_open'];
             $assess = $project['assess'];
+            $idealTarget = $project['target'];
             $generalItems = $projectControl->generalDashboardItems($projectId);
             $employeeProgressHtml = $projectControl->generateEmployeeProgressItems($projectId);
             $departmentProgressHtml = $projectControl->generateDepartmentProgressItems($projectId);
@@ -37,7 +38,7 @@
                 <h1 class="header"><?php echo $generalItems['projectName'];?></h1>
                 <!-- General Items -->
                 <section class="row my-3 row-cols-1 g-3 row-cols-md-2 row-cols-lg-4">
-                    <!-- Progress -->
+                    <!-- Achieved Target -->
                     <div class="col">
                         <div class="card shadow-sm project-detail-general-dashboard-item h-100" style="background-color: #56c186;">
                             <div class="card-body">
@@ -46,8 +47,24 @@
                                         <img src="../static/images/progress.png" width="35px" alt="Progress">
                                     </section>
                                     <section class="flex-grow-1 me-1">
-                                        <h4>Total Progress</h4>
+                                        <h4>Achieved Target</h4>
                                         <p><?php echo $generalItems['totalProgress'];?>%</p>
+                                    </section>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Ideal Target -->
+                    <div class="col">
+                        <div class="card shadow-sm project-detail-general-dashboard-item h-100" style="background-color: #4cc1ef;">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center jusify-content-around">
+                                    <section class="order-2">
+                                        <img src="../static/images/progress.png" width="35px" alt="Progress">
+                                    </section>
+                                    <section class="flex-grow-1 me-1">
+                                        <h4>Ideal Target</h4>
+                                        <p><?php echo $idealTarget;?>%</p>
                                     </section>
                                 </div>
                             </div>
@@ -55,7 +72,7 @@
                     </div>
                     <!-- Tasks -->
                     <div class="col">
-                        <div class="card shadow-sm project-detail-general-dashboard-item h-100" style="background-color: #4cc1ef;">
+                        <div class="card shadow-sm project-detail-general-dashboard-item h-100" style="background-color: #f4a03e;">
                             <div class="card-body">
                                 <div class="d-flex align-items-center jusify-content-around">
                                     <section class="order-2">
@@ -71,7 +88,7 @@
                     </div>
                     <!-- Employees Assigned -->
                     <div class="col">
-                        <div class="card shadow-sm project-detail-general-dashboard-item h-100" style="background-color: #f4a03e;">
+                        <div class="card shadow-sm project-detail-general-dashboard-item h-100" style="background-color: #ef7f85;">
                             <div class="card-body">
                                 <div class="d-flex align-items-center jusify-content-around">
                                     <section class="order-2">
@@ -85,22 +102,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Days Left -->
-                    <div class="col">
-                        <div class="card shadow-sm project-detail-general-dashboard-item h-100" style="background-color: #ef7f85;">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center jusify-content-around">
-                                    <section class="order-2">
-                                        <img src="../static/images/days_left.png" width="35px" alt="Days Left">
-                                    </section>
-                                    <section class="flex-grow-1 me-1">
-                                        <h4>Days Left</h4>
-                                        <p><?php echo $generalItems['daysLeft']; ?></p>
-                                    </section>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </section>
 
                 <!-- Options -->

@@ -446,6 +446,14 @@ nav{
     color: yellowgreen !important;
 }
 
+/* Pagination */
+#pagination span{
+    font-weight: 500;
+    font-size: 40px;
+    color: gray;
+    margin: 0px 10px;
+}
+
 /* Footer */
 footer{
     background-color: #222;

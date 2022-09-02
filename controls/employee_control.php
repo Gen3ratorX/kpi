@@ -8,16 +8,23 @@
         {
             $this->con = $con;
             $this->tableName = 'employee';
+            $this->itemsPerPage = 2;
         }
 
-        function getEmployeesList($q=null, $columns=null){
+        function getEmployeesList($pageNumber, $q, $columns){
+            $itemsPerPage = $this->itemsPerPage + 1;
+            $start = ($pageNumber * $itemsPerPage) - $itemsPerPage;
             $employees = [];
             if($q){
                 $spreadColumns = spreadSearchColumns($columns,$q);
-                $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+                $sql1 =  $pageNumber 
+                ? "SELECT * FROM $this->tableName WHERE $spreadColumns LIMIT $start, $itemsPerPage"
+                : "SELECT * FROM $this->tableName WHERE $spreadColumns";
             }
             else{
-                $sql1 = "SELECT * FROM $this->tableName";
+                $sql1 = $pageNumber 
+                ? "SELECT * FROM $this->tableName LIMIT $start, $itemsPerPage"
+                : "SELECT * FROM $this->tableName";
             }
 
             $results = $this->con->query($sql1);
@@ -27,10 +34,17 @@
             return $employees;
         }
 
-        function employeeAdminListTemplate(){
-            $employees = $this->getEmployeesList();
+        function employeeAdminListTemplate($pageNumber=null,$q=null,$columns=null){
+            // $pageNumber ??= 1;
+            $employees = $this->getEmployeesList($pageNumber,$q,$columns);
+
             $employeesHtml = "";
             if($employees){
+                // Pagination
+                $paginationFunction = generatePagination($pageNumber,$employees,$this->itemsPerPage);
+                $employees = $paginationFunction['data'];
+                $paginationHtml = $paginationFunction['paginationHtml'];
+
                 $employeeHtml = "";
                 foreach($employees as $employee){
                     $name = "{$employee['surname']} {$employee['other_names']}";
@@ -58,9 +72,10 @@
                     <section id='employees' class='row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3'>
                         $employeeHtml
                     </section>
+                    $paginationHtml
                 ";
             }
-            else{
+            elseif($pageNumber == 1 and !$employees){
                 $employeesHtml .= "
                     <!-- No Item -->
                     <section class='no-item'>
@@ -70,6 +85,10 @@
                         </div>
                     </section>
                 ";
+            }
+            else{
+                // redirect
+                header('Location: ./employees.php');
             }
             return $employeesHtml;
         }

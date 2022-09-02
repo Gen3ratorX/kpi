@@ -1,8 +1,13 @@
 <?php
     require_once '../misc/database_auth.php';
     require_once '../controls/employee_control.php';
+    $pageNumber = $_GET['page'] ?? 1;
     $employeeControl = new EmployeeControl($con);
-    $employeesHtml = $employeeControl->employeeAdminListTemplate();
+    $employeesHtml = $employeeControl->employeeAdminListTemplate($page = $pageNumber);
+    $uri = $_SERVER['REQUEST_URI'];
+    $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
+    $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    
 ?>
 
 <?php
@@ -40,6 +45,9 @@
             <section class="mb-3">
                 <h1 class="header">Employees</h1>
                     <?php echo $employeesHtml;?>
+                <?php
+                 // echo $pageNumber;
+                ?>
             </section>
         </div>
     </main>

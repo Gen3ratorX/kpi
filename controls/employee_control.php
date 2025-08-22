@@ -1,54 +1,58 @@
 <?php
-    require_once '../misc/utils.php';
+require_once '../misc/utils.php';
 
-    class EmployeeControl{
-        private $con;
+class EmployeeControl
+{
+    private $con;
+    private $tableName;
+    private $itemsPerPage;
 
-        function __construct($con)
-        {
-            $this->con = $con;
-            $this->tableName = 'employee';
-            $this->itemsPerPage = 2;
-        }
+    function __construct($con)
+    {
+        $this->con = $con;
+        $this->tableName = 'employee';
+        $this->itemsPerPage = 40;
+    }
 
-        function getEmployeesList($pageNumber, $q, $columns){
-            $itemsPerPage = $this->itemsPerPage + 1;
-            $start = ($pageNumber * $itemsPerPage) - $itemsPerPage;
-            $employees = [];
-            if($q){
-                $spreadColumns = spreadSearchColumns($columns,$q);
-                $sql1 =  $pageNumber 
+    function getEmployeesList($pageNumber, $q, $columns)
+    {
+        $itemsPerPage = $this->itemsPerPage + 1;
+        $start = ($pageNumber * $itemsPerPage) - $itemsPerPage;
+        $employees = [];
+        if ($q) {
+            $spreadColumns = spreadSearchColumns($columns, $q);
+            $sql1 =  $pageNumber
                 ? "SELECT * FROM $this->tableName WHERE $spreadColumns LIMIT $start, $itemsPerPage"
                 : "SELECT * FROM $this->tableName WHERE $spreadColumns";
-            }
-            else{
-                $sql1 = $pageNumber 
+        } else {
+            $sql1 = $pageNumber
                 ? "SELECT * FROM $this->tableName LIMIT $start, $itemsPerPage"
                 : "SELECT * FROM $this->tableName";
-            }
-
-            $results = $this->con->query($sql1);
-            while($row1 = $results->fetch_assoc()){
-                $employees[] = $row1;
-            }
-            return $employees;
         }
 
-        function employeeAdminListTemplate($pageNumber=null,$q=null,$columns=null){
-            // $pageNumber ??= 1;
-            $employees = $this->getEmployeesList($pageNumber,$q,$columns);
+        $results = $this->con->query($sql1);
+        while ($row1 = $results->fetch_assoc()) {
+            $employees[] = $row1;
+        }
+        return $employees;
+    }
 
-            $employeesHtml = "";
-            if($employees){
-                // Pagination
-                $paginationFunction = generatePagination($pageNumber,$employees,$this->itemsPerPage);
-                $employees = $paginationFunction['data'];
-                $paginationHtml = $paginationFunction['paginationHtml'];
+    function employeeAdminListTemplate($pageNumber = null, $q = null, $columns = null)
+    {
+        // $pageNumber ??= 1;
+        $employees = $this->getEmployeesList($pageNumber, $q, $columns);
 
-                $employeeHtml = "";
-                foreach($employees as $employee){
-                    $name = "{$employee['surname']} {$employee['other_names']}";
-                    $employeeHtml .= "
+        $employeesHtml = "";
+        if ($employees) {
+            // Pagination
+            $paginationFunction = generatePagination($pageNumber, $employees, $this->itemsPerPage);
+            $employees = $paginationFunction['data'];
+            $paginationHtml = $paginationFunction['paginationHtml'];
+
+            $employeeHtml = "";
+            foreach ($employees as $employee) {
+                $name = "{$employee['surname']} {$employee['other_names']}";
+                $employeeHtml .= "
                         <div class='col'>
                             <div class='card shadow-sm h-100 employee action-item'>
                                 <div class='options d-flex align-items-center justify-content-center'>
@@ -66,17 +70,16 @@
                             </div>
                         </div>
                     ";
-                }
+            }
 
-                $employeesHtml = "
+            $employeesHtml = "
                     <section id='employees' class='row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3'>
                         $employeeHtml
                     </section>
                     $paginationHtml
                 ";
-            }
-            elseif($pageNumber == 1 and !$employees){
-                $employeesHtml .= "
+        } elseif ($pageNumber == 1 and !$employees) {
+            $employeesHtml .= "
                     <!-- No Item -->
                     <section class='no-item'>
                         No Employee Has Been added.
@@ -85,187 +88,188 @@
                         </div>
                     </section>
                 ";
-            }
-            else{
-                // redirect
-                header('Location: ./employees.php');
-            }
-            return $employeesHtml;
+        } else {
+            // redirect
+            header('Location: ./employees.php');
         }
+        return $employeesHtml;
+    }
 
-        function generateRolesValues($roles,$select = 0){
-            $options = "";
-            foreach($roles as $role){
-                $select == $role['id']
-                    ? $options .= "
+    function generateRolesValues($roles, $select = 0)
+    {
+        $options = "";
+        foreach ($roles as $role) {
+            $select == $role['id']
+                ? $options .= "
                         <option selected value='{$role['id']}'>{$role['name']}</option>
                     "
-                    : $options .= "
+                : $options .= "
                         <option value='{$role['id']}'>{$role['name']}</option>
                     ";
-            }
-            return $options;
         }
+        return $options;
+    }
 
-        
 
-        function generateDepartmentsValues($departments,$select = 0){
-            $options = "";
-            foreach($departments as $department){
-                $select == $department['id']
-                    ? $options .= "
+
+    function generateDepartmentsValues($departments, $select = 0)
+    {
+        $options = "";
+        foreach ($departments as $department) {
+            $select == $department['id']
+                ? $options .= "
                         <option selected value='{$department['id']}'>{$department['name']}</option>
                     "
-                    : $options .= "
+                : $options .= "
                         <option value='{$department['id']}'>{$department['name']}</option>
                     ";
-            }
-            return $options;
+        }
+        return $options;
+    }
+
+    function getUnitsForDepartment($departmentId = null, $returnData = false)
+    {
+        if (!$departmentId) {
+            $departmentId = filterInput('departmentId', false);
         }
 
-        function getUnitsForDepartment($departmentId=null,$returnData = false){
-            if(!$departmentId){
-                $departmentId = filterInput('departmentId',false);
-            }
-
-            $units = [];
-            $sql1 = "SELECT * FROM unit WHERE department_id=$departmentId";
-            $results1 = $this->con->query($sql1);
-            while($row1 = $results1->fetch_assoc()){
-                $units[] = $row1;
-            }
-            if($returnData){
-                return $units;
-            }
-            else{
-                echo json_encode(['units'=>$units]);
-            }
+        $units = [];
+        $sql1 = "SELECT * FROM unit WHERE department_id=$departmentId";
+        $results1 = $this->con->query($sql1);
+        while ($row1 = $results1->fetch_assoc()) {
+            $units[] = $row1;
         }
+        if ($returnData) {
+            return $units;
+        } else {
+            echo json_encode(['units' => $units]);
+        }
+    }
 
-        function generateUnitsValues($departmentId=null,$select=null){
-            if($departmentId){
-                $units = $this->getUnitsForDepartment($departmentId,true);
-            }
-            else{
-                $sql1 = "SELECT id FROM department ORDER BY id LIMIT 1";
-                $result1 = $this->con->query($sql1);
-                $departmentId = $result1->fetch_assoc()['id'];
-                $units = $this->getUnitsForDepartment($departmentId,true);
-            }
-            $options = "";
-            foreach($units as $unit){
-                $select == $unit['id']
-                    ? $options .= "
+    function generateUnitsValues($departmentId = null, $select = null)
+    {
+        if ($departmentId) {
+            $units = $this->getUnitsForDepartment($departmentId, true);
+        } else {
+            $sql1 = "SELECT id FROM department ORDER BY id LIMIT 1";
+            $result1 = $this->con->query($sql1);
+            $departmentId = $result1->fetch_assoc()['id'];
+            $units = $this->getUnitsForDepartment($departmentId, true);
+        }
+        $options = "";
+        foreach ($units as $unit) {
+            $select == $unit['id']
+                ? $options .= "
                         <option selected value='{$unit['id']}'>{$unit['name']}</option>
                     "
-                    : $options .= "
+                : $options .= "
                         <option value='{$unit['id']}'>{$unit['name']}</option>
                     ";
-            }
-            return $options;
         }
+        return $options;
+    }
 
-        function generateUsername($surname,$otherNames){
-            $username = '';
-            $otherNamesLst = explode(' ',$otherNames);
-            foreach($otherNamesLst as $otherName){
-                $username .= strtolower($otherName[0]);
-            }
-            $username .= strtolower($surname);
-
-            // Check if it exists in the database
-            $sql1 = "SELECT * FROM $this->tableName WHERE username='$username'";
-            $results1 = $this->con->query($sql1);
-            $numRows = $results1->num_rows + 1;
-            $username .= "$numRows";
-            return $username;
+    function generateUsername($surname, $otherNames)
+    {
+        $username = '';
+        $otherNamesLst = explode(' ', $otherNames);
+        foreach ($otherNamesLst as $otherName) {
+            $username .= strtolower($otherName[0]);
         }
+        $username .= strtolower($surname);
 
-        
-        function getEmployee($employeeId){
-            $sql1 = "SELECT * FROM $this->tableName WHERE id=$employeeId";
-            $result1 = $this->con->query($sql1);
-            return $result1->fetch_assoc();
-        }
+        // Check if it exists in the database
+        $sql1 = "SELECT * FROM $this->tableName WHERE username='$username'";
+        $results1 = $this->con->query($sql1);
+        $numRows = $results1->num_rows + 1;
+        $username .= "$numRows";
+        return $username;
+    }
 
-        
-        function saveEmployee(){
-            $surname = filterInput('surname');
-            $otherNames = filterInput('otherNames');
-            $phone = filterInput('phone');
-            $email = filterInput('email');
-            $location = filterInput('location');
-            $role = filterInput('role');
-            $unit = filterInput('unit');
-            $department = filterInput('department');
-            $username = filterInput('username');
-            $password = password_hash($username,PASSWORD_BCRYPT);
 
-            $sql1 = "INSERT INTO 
+    function getEmployee($employeeId)
+    {
+        $sql1 = "SELECT * FROM $this->tableName WHERE id=$employeeId";
+        $result1 = $this->con->query($sql1);
+        return $result1->fetch_assoc();
+    }
+
+
+    function saveEmployee()
+    {
+        $surname = filterInput('surname');
+        $otherNames = filterInput('otherNames');
+        $phone = filterInput('phone');
+        $email = filterInput('email');
+        $location = filterInput('location');
+        $role = filterInput('role');
+        $unit = filterInput('unit');
+        $department = filterInput('department');
+        $username = filterInput('username');
+        $password = password_hash($username, PASSWORD_BCRYPT);
+
+        $sql1 = "INSERT INTO 
             $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,department_id)
             VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department)";
-            if($unit){
-                $sql1 = "INSERT INTO 
+        if ($unit) {
+            $sql1 = "INSERT INTO 
                 $this->tableName(surname,other_names,phone,email,employee_role_id,location,username,password,department_id,unit_id)
                 VALUE('$surname','$otherNames','$phone','$email',$role,'$location','$username','$password',$department,$unit)";
-            }
-
-            if($this->con->query($sql1)){
-                http_response_code(201);
-                echo json_encode(['status'=>'SUCCESS']);
-            }else{
-                http_response_code(400);
-                echo json_encode(['status'=>'ERROR',$sql1]);
-            }
         }
 
-        function editEmployee(){
-            $employeeId = filterInput('employeeId');
-            $surname = filterInput('surname');
-            $otherNames = filterInput('otherNames');
-            $phone = filterInput('phone');
-            $email = filterInput('email');
-            $location = filterInput('location');
-            $role = filterInput('role');
-            $unit = filterInput('unit');
-            $department = filterInput('department');
-            $username = filterInput('username');
+        if ($this->con->query($sql1)) {
+            http_response_code(201);
+            echo json_encode(['status' => 'SUCCESS']);
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'ERROR', $sql1]);
+        }
+    }
 
-            $sql1 = "UPDATE $this->tableName 
+    function editEmployee()
+    {
+        $employeeId = filterInput('employeeId');
+        $surname = filterInput('surname');
+        $otherNames = filterInput('otherNames');
+        $phone = filterInput('phone');
+        $email = filterInput('email');
+        $location = filterInput('location');
+        $role = filterInput('role');
+        $unit = filterInput('unit');
+        $department = filterInput('department');
+        $username = filterInput('username');
+
+        $sql1 = "UPDATE $this->tableName 
             SET surname='$surname', other_names='$otherNames', username='$username', phone='$phone', email='$email', location='$location', employee_role_id=$role, department_id=$department, unit_id=null WHERE id=$employeeId";
-            if($unit){
-                $sql1 = "UPDATE $this->tableName 
+        if ($unit) {
+            $sql1 = "UPDATE $this->tableName 
                 SET surname='$surname', other_names='$otherNames', username='$username', phone='$phone', email='$email', location='$location', employee_role_id=$role, 
                 department_id=$department, unit_id=$unit WHERE id=$employeeId";
-            }
-
-            if($this->con->query($sql1)){
-                http_response_code(201);
-                echo json_encode(['status'=>'SUCCESS']);
-            }else{
-                http_response_code(400);
-                echo json_encode(['status'=>'ERROR']);
-            }
-
-
         }
 
-        function deleteEmployee(){
-            $employeeId = filterInput('employeeId');
-            $sql1 = "DELETE FROM $this->tableName WHERE id='$employeeId'";
-            if($this->con->query($sql1)){
-                http_response_code(204);
-                echo json_encode([
-                    'status'=> "SUCCESS"
-                ]);
-            }
-            else{
-                http_response_code(500);
-                echo json_encode([
-                    'status'=>'SUCCESS'
-                ]);
-            }
+        if ($this->con->query($sql1)) {
+            http_response_code(201);
+            echo json_encode(['status' => 'SUCCESS']);
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'ERROR']);
         }
-
     }
-?>
+
+    function deleteEmployee()
+    {
+        $employeeId = filterInput('employeeId');
+        $sql1 = "DELETE FROM $this->tableName WHERE id='$employeeId'";
+        if ($this->con->query($sql1)) {
+            http_response_code(204);
+            echo json_encode([
+                'status' => "SUCCESS"
+            ]);
+        } else {
+            http_response_code(500);
+            echo json_encode([
+                'status' => 'SUCCESS'
+            ]);
+        }
+    }
+}

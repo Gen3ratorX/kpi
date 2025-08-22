@@ -1,5 +1,5 @@
 <?php
-    $tasksHtml = $taskControl->generateEmployeeTasksHtml($employeeId,$projectId);
+$tasksHtml = $taskControl->generateEmployeeTasksHtml($employeeId, $projectId);
 ?>
 
 <!-- Add item -->

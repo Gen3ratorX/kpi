@@ -1,9 +1,10 @@
 <?php
-    require_once '../misc/employee_login_required.php';
+require_once '../misc/employee_login_required.php';
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,9 +16,10 @@
     <link rel="stylesheet" href="../static/css/employees.css">
     <title><?php echo $pageTitle; ?></title>
     <style>
-        
+
     </style>
 </head>
+
 <body>
     <!-- Information Toast -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -25,7 +27,7 @@
             <div class="toast-header bg-info text-white">
                 <strong class="me-auto">Information</strong>
                 <small>Now</small>
-            <button type="button" class="btn-close bg-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close bg-white" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body" id="toastBody">
                 Hello, world! This is a toast message.
@@ -42,8 +44,8 @@
         <div class="d-flex align-items-center justify-content-between">
             <!-- Nav brand -->
             <a href="./index.php" class="d-flex align-items-center" id="nav-brand">
-                <img src="../static/images/nla-logo.png" width="auto" alt="NLA">
-                <h1>National Lottery Authority <br> Target Performance Appraisal</h1>
+                <img style="width: 60px;" src="../static/images/logo.png" alt="Logo">
+                <h1>Target Performance Appraisal</h1>
             </a>
             <!-- Desktop Menu -->
             <div id="desktop-menu">
@@ -61,8 +63,8 @@
         <div class="d-flex" id="phone-menu-wrapper">
             <div id="phone-menu">
                 <a href="index.php">
-                    <img src="../static/images/nla-logo.png" alt="NLA Logo">
-                    <h1>National Lottery Authority <br> Target Performance Appraisal</h1>
+                    <img style="width: 100px;" src="../static/images/logo.png" alt="Logo">
+                    <h1>Target Performance Appraisal</h1>
                 </a>
                 <ul>
                     <li>

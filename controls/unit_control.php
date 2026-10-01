@@ -3,6 +3,7 @@
 
     class UnitControl{
         private $con;
+        private $tableName;
 
         function __construct($con)
         {
@@ -12,14 +13,15 @@
 
         function getUnitsList($q=null,$columns=null){
             $units = [];
+            $params = [];
             if($q){
-                $spreadColumns = spreadSearchColumns($columns,$q);
-                $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+                [$condition, $params] = searchCondition($columns,$q);
+                $sql1 = "SELECT * FROM $this->tableName WHERE $condition";
             }
             else{
                 $sql1 = "SELECT * FROM $this->tableName";
             }
-            $results1 = $this->con->query($sql1);
+            $results1 = $this->con->execute_query($sql1, $params);
             while($row1 = $results1->fetch_assoc()){
                 $units[] = $row1;
             }
@@ -72,8 +74,7 @@
         }
 
         function getUnit($unitId){
-            $sql1 = "SELECT * FROM unit WHERE id=$unitId";
-            $result1 = $this->con->query($sql1);
+            $result1 = $this->con->execute_query("SELECT * FROM unit WHERE id=?", [$unitId]);
             return $result1->fetch_assoc();
         }
 
@@ -94,9 +95,8 @@
         function saveUnit(){
             $name = filterInput('unit');
             $departmentId = filterInput('department');
-            $sql1 = "INSERT IGNORE INTO unit(name,department_id)
-            VALUE('$name',$departmentId)";
-            if($this->con->query($sql1)){
+            $sql1 = "INSERT IGNORE INTO unit(name,department_id) VALUE(?,?)";
+            if($this->con->execute_query($sql1, [$name, $departmentId])){
                 http_response_code(201);
                 echo json_encode([
                     'status'=>"SUCCESS"
@@ -115,8 +115,8 @@
             $name = filterInput('unit');
             $departmentId = filterInput('department');
 
-            $sql1 = "UPDATE unit SET name='$name', department_id=$departmentId WHERE id=$unitId";
-            if($this->con->query($sql1)){
+            $sql1 = "UPDATE unit SET name=?, department_id=? WHERE id=?";
+            if($this->con->execute_query($sql1, [$name, $departmentId, $unitId])){
                 http_response_code(200);
                 echo json_encode([
                     'status'=>"SUCCESS"
@@ -132,9 +132,7 @@
 
         function deleteUnit(){
             $unitId = filterInput('unitId');
-            $sql1 = "DELETE FROM unit WHERE id=$unitId";
-
-            if($this->con->query($sql1)){
+            if($this->con->execute_query("DELETE FROM unit WHERE id=?", [$unitId])){
                 http_response_code(200);
                 echo json_encode([
                     'status'=>"SUCCESS"

@@ -300,8 +300,14 @@ class AdminControl {
                 $('#close-delete-role').click();
 
             }
+            const error = (status, responseText) => {
+                let message = 'Could not delete the role.';
+                try { message = JSON.parse(responseText).message || message; } catch (e) {}
+                status !== 500 && baseControl.showToast(message);
+                $('#close-delete-role').click();
+            };
             const data = { task: 'deleteRole', roleId }
-            baseControl.fetchData(inst.url, data, 'Yes', '#delete-role', false, success);
+            baseControl.fetchData(inst.url, data, 'Yes', '#delete-role', false, success, error);
         });
     }
 
@@ -309,7 +315,8 @@ class AdminControl {
     // Employee
     employeeInit() {
         this.saveEmployee();
-        this.deleteEmployee();
+        this.markEmployeeLeft();
+        this.reinstateEmployee();
         this.getUnitsForDepartment();
     }
 
@@ -330,8 +337,9 @@ class AdminControl {
                 const role = $('#role').val();
                 const unit = $('#unit').val();
                 const department = $('#department').val();
+                const hireDate = $('#hireDate').val();
                 const data = {
-                    surname, otherNames, phone, location, role, unit, department, email, username, employeeId,
+                    surname, otherNames, phone, location, role, unit, department, email, username, employeeId, hireDate,
                     task: employeeEdit ? 'editEmployee' : 'saveEmployee',
                 }
                 const success = (res, statusCode, status) => {
@@ -345,43 +353,50 @@ class AdminControl {
         });
     }
 
-    deleteEmployee() {
+    markEmployeeLeft() {
         const inst = this;
-        $('.delete-employee-attempt').click(function () {
+        $('.mark-left-attempt').click(function () {
             const employeeId = $(this).attr('id').split('-')[1];
-            $('#delete-employee').data('id', employeeId);
+            $('#mark-left').data('id', employeeId);
         });
 
-        $('#delete-employee').click(function () {
+        $('#mark-left').click(function () {
             const employeeId = $(this).data('id');
-            const success = (res, statusCode, status) => {
-                if ($('#employees').children().length - 1 == 0) {
-                    $('#employees').hide('slow', function () {
-                        $(this).before(
-                            `<!-- No Item -->
-                                <section class='no-item'>
-                                    No Employee Has Been added.
-                                    <div>
-                                        <a href='./employee_form.php' class='btn btn-1 btn-md'> Add Employee </a>
-                                    </div>
-                                </section>`
-                        );
-                        $(this).remove();
-
-                    });
-                }
-                else {
-                    $(`#employee-${employeeId}`).parents('.col').hide('slow', function () {
-                        $(this).remove();
-                    });
-                }
-
-                // Close modal
-                $('#close-delete-employee').click();
-
+            const exitDate = $('#exitDate').val();
+            if (!exitDate) {
+                baseControl.showToast('Please choose the exit date.');
+                return;
             }
-            const data = { task: 'deleteEmployee', employeeId }
-            baseControl.fetchData(inst.url, data, 'Yes', '#delete-employee', false, success);
+            const data = {
+                task: 'markEmployeeLeft',
+                employeeId,
+                exitDate,
+                exitType: $('#exitType').val(),
+                reason: $('#exitReason').val(),
+            };
+            const success = () => window.location.reload();
+            const error = (status, responseText) => {
+                let message = 'Could not mark the employee as left.';
+                try { message = JSON.parse(responseText).message || message; } catch (e) {}
+                status !== 500 && baseControl.showToast(message);
+            };
+            baseControl.fetchData(inst.url, data, 'Mark as Left', '#mark-left', false, success, error);
+        });
+    }
+
+    reinstateEmployee() {
+        const inst = this;
+        $('.reinstate-employee').click(function () {
+            if (!confirm('Reinstate this employee? They will be able to sign in again.')) {
+                return;
+            }
+            const employeeId = $(this).attr('id').split('-')[1];
+            const btnId = `#employee-${employeeId}`;
+            const success = () => window.location.reload();
+            const error = (status) => {
+                status !== 500 && baseControl.showToast('Could not reinstate the employee.');
+            };
+            baseControl.fetchData(inst.url, { task: 'reinstateEmployee', employeeId }, 'Reinstate', btnId, false, success, error);
         });
     }
 

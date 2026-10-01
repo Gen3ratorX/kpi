@@ -3,6 +3,7 @@
     require_once '../misc/utils.php';
     class ProjectControl{
         private $con;
+        private $tableName;
 
         function __construct($con)
         {
@@ -12,14 +13,15 @@
 
         function getProjectsList($q=null,$columns=null){
             $projects = [];
+            $params = [];
             if($q){
-                $spreadColumns = spreadSearchColumns($columns,$q);
-                $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+                [$condition, $params] = searchCondition($columns,$q);
+                $sql1 = "SELECT * FROM $this->tableName WHERE $condition";
             }
             else{
                 $sql1 = "SELECT * FROM $this->tableName";
             }
-            $results1 = $this->con->query($sql1);
+            $results1 = $this->con->execute_query($sql1, $params);
             if($results1->num_rows > 0){
                 while($row = $results1->fetch_assoc()){
                     $projects[] = $row;
@@ -29,10 +31,7 @@
         }
 
         function getProject($projectId){
-            // $sql1 = "SELECT *,COUNT(`assign`.`project_id`) AS employeesAssigned 
-            // FROM project,assign WHERE id=$projectId";
-            $sql1 = "SELECT * FROM project WHERE id=$projectId";
-            $result1 = $this->con->query($sql1);
+            $result1 = $this->con->execute_query("SELECT * FROM project WHERE id=?", [$projectId]);
             if($result1->num_rows == 1){
                 return $result1->fetch_assoc();
             }
@@ -48,33 +47,28 @@
             $generalItems['daysLeft'] = $deadline->diff($currentDate)->format('%a');
 
             // Get task and employee details
-            $sql2 = "SELECT COUNT(project_id) AS employeesAssigned FROM assign WHERE project_id=$projectId";
-            $result2 = $this->con->query($sql2);
+            $result2 = $this->con->execute_query("SELECT COUNT(project_id) AS employeesAssigned FROM assign WHERE project_id=?", [$projectId]);
             $generalItems['employeesAssigned'] = $result2->fetch_assoc()['employeesAssigned'];
 
-            $sql3 = "SELECT COUNT(project_id) AS tasks FROM task WHERE project_id=$projectId";
-            $result3 = $this->con->query($sql3);
+            $result3 = $this->con->execute_query("SELECT COUNT(project_id) AS tasks FROM task WHERE project_id=?", [$projectId]);
             $generalItems['tasks'] = $result3->fetch_assoc()['tasks'];
 
             // Get total progress
             $totalEmployeeProgress = [];
             $sql4 = "SELECT IFNULL(rating,0) as rating FROM `performance` INNER JOIN task
             ON `task`.`id`=`performance`.`task_id`
-            WHERE `task`.`project_id`=$projectId;";
-            $results4 = $this->con->query($sql4);
+            WHERE `task`.`project_id`=?";
+            $results4 = $this->con->execute_query($sql4, [$projectId]);
 
             // Get employee progress
             while($row4 = $results4->fetch_assoc()){
                 $totalEmployeeProgress[] = $row4['rating'];
             }
-            // $generalItems['totalProgress'] = count($totalEmployeeProgress) > 0
-            // ? round(array_sum($totalEmployeeProgress) / count($totalEmployeeProgress),2)
-            // : 0;
             $projectTarget = $project['target'];
             $generalItems['totalProgress'] = count($totalEmployeeProgress) > 0
             ? round(
                 (
-                    array_sum($totalEmployeeProgress) / count($totalEmployeeProgress) *$projectTarget
+                    array_sum($totalEmployeeProgress) / count($totalEmployeeProgress) * $projectTarget
                 ) / 100,2
             ) 
             : 0;
@@ -86,8 +80,7 @@
         function generateEmployeeProgressItems($projectId){
             $employeeProgressHtml = "";
             // Get all employees in the project
-            $sql1 = "SELECT employee_id FROM assign WHERE project_id=$projectId";
-            $results1 = $this->con->query($sql1);
+            $results1 = $this->con->execute_query("SELECT employee_id FROM assign WHERE project_id=?", [$projectId]);
             while($row1 = $results1->fetch_assoc()){
                 $employeeId = $row1['employee_id'];
                 $employeeProgress = $this->employeeProgress($employeeId,$projectId);
@@ -96,8 +89,8 @@
                 `department`.`name` AS department
                 FROM employee
                 INNER JOIN department
-                ON `employee`.`department_id`=`department`.`id` AND `employee`.`id`=$employeeId";
-                $results2 = $this->con->query($sql2);
+                ON `employee`.`department_id`=`department`.`id` AND `employee`.`id`=?";
+                $results2 = $this->con->execute_query($sql2, [$employeeId]);
                 $row2 = $results2->fetch_assoc();
                 $employeeName = $row2['name'];
                 $department = $row2['department'];
@@ -137,8 +130,7 @@
             $departmentProgressHtml = "";
             $noOfAssessments = 0;
             // Get all employees 
-            $sql1 = "SELECT employee_id FROM assign WHERE project_id=$projectId";
-            $results1 = $this->con->query($sql1);
+            $results1 = $this->con->execute_query("SELECT employee_id FROM assign WHERE project_id=?", [$projectId]);
             while($row1 = $results1->fetch_assoc()){
                 $employeeId = $row1['employee_id'];
                 // Get all tasks and their ratings for an employee
@@ -146,8 +138,8 @@
                 $sql3 = "SELECT IFNULL(`performance`.`rating`,0) as rating FROM performance
                 INNER JOIN task
                 ON `task`.`id`=`performance`.`task_id`
-                WHERE `task`.`project_id`=$projectId AND `task`.`employee_id` = $employeeId";
-                $results3 = $this->con->query($sql3);
+                WHERE `task`.`project_id`=? AND `task`.`employee_id` = ?";
+                $results3 = $this->con->execute_query($sql3, [$projectId, $employeeId]);
                 if($results3->num_rows > 0){
                     while($row3 = $results3->fetch_assoc()){
                         $employeeProgress += $row3['rating'];
@@ -161,8 +153,8 @@
                 $sql2 = "SELECT `department`.`name` AS department, `department`.`id` AS id FROM employee 
                 INNER JOIN department
                 ON `employee`.`department_id`=`department`.`id`
-                WHERE  `employee`.`id`=$employeeId";
-                $results2 = $this->con->query($sql2);
+                WHERE  `employee`.`id`=?";
+                $results2 = $this->con->execute_query($sql2, [$employeeId]);
                 $row2 = $results2->fetch_assoc();
                 $departmentId = $row2['id'];
                 $department = $row2['department'];
@@ -187,7 +179,7 @@
             foreach($departmentsData as $departmentData){
                 $tasks = array_sum($departmentData['tasks']);
                 $progress = $noOfAssessments > 0 
-                ? round(array_sum($departmentData['progress']) /$noOfAssessments,2)
+                ? round(array_sum($departmentData['progress']) / $noOfAssessments,2)
                 : 0;
                 $employeesAssigned = $departmentData['employeesAssigned'];
                 $departmentName = $departmentData['name'];
@@ -224,8 +216,8 @@
             $sql1 = "SELECT IFNULL(`performance`.`rating`,0) as rating FROM performance
             INNER JOIN task
             ON `task`.`id`=`performance`.`task_id`
-            WHERE `task`.`project_id`=$projectId AND `task`.`employee_id` = $employeeId";
-            $results1 = $this->con->query($sql1);
+            WHERE `task`.`project_id`=? AND `task`.`employee_id` = ?";
+            $results1 = $this->con->execute_query($sql1, [$projectId, $employeeId]);
             if($results1->num_rows > 0){
                 while($row1 = $results1->fetch_assoc()){
                     $ratings += $row1['rating'];
@@ -237,8 +229,7 @@
 
 
         function employeeTasks($employeeId,$projectId){
-            $sql1 = "SELECT COUNT(*) as tasks FROM task WHERE employee_id=$employeeId AND project_id=$projectId";
-            $results1 = $this->con->query($sql1);
+            $results1 = $this->con->execute_query("SELECT COUNT(*) as tasks FROM task WHERE employee_id=? AND project_id=?", [$employeeId, $projectId]);
             return $results1->fetch_assoc()['tasks'];
 
         }
@@ -335,11 +326,11 @@
                     </li>
                 ";
                 // Get employees with that role
-                $sql2 = "SELECT id,CONCAT_WS(' ',surname,other_names) as name FROM employee WHERE employee_role_id=$employeeRoleId";
+                $sql2 = "SELECT id,CONCAT_WS(' ',surname,other_names) as name FROM employee WHERE employee_role_id=? AND status='active'";
                 
                 // No employees
                 $employeesHtml = "<p class='text-center text-muted lead'>No Employee Found.</p>";
-                $results2 = $this->con->query($sql2);
+                $results2 = $this->con->execute_query($sql2, [$employeeRoleId]);
                 // Employees 
                 if($results2->num_rows > 0){
                     $employeesHtml = "";
@@ -390,20 +381,19 @@
             $employeeRole = filterInput('employeeRole',false);
             $q = filterInput('q',false);
             // Get employee role id
-            $sql1 = "SELECT id FROM employee_role WHERE name='$employeeRole'";
-            $results1 = $this->con->query($sql1);
+            $results1 = $this->con->execute_query("SELECT id FROM employee_role WHERE name=?", [$employeeRole]);
             if($results1->num_rows == 1){
                 $employeeRoleId = $results1->fetch_assoc()['id'];
                 $employees = [];
                 // Get employees
+                $sql2 = "SELECT id, CONCAT_WS(' ',surname,other_names) AS name FROM employee WHERE employee_role_id=? AND status='active'";
+                $params = [$employeeRoleId];
                 if($q){
-                    $searchColumns = spreadSearchColumns(['surname','other_names'],$q);
-                    $sql2 = "SELECT id, CONCAT_WS(' ',surname,other_names) AS name FROM employee WHERE employee_role_id=$employeeRoleId AND $searchColumns";
+                    [$condition, $searchParams] = searchCondition(['surname','other_names'],$q);
+                    $sql2 .= " AND $condition";
+                    $params = array_merge($params, $searchParams);
                 }
-                else{
-                    $sql2 = "SELECT id, CONCAT_WS(' ',surname,other_names) AS name FROM employee WHERE employee_role_id=$employeeRoleId";
-                }
-                $results2 = $this->con->query($sql2);
+                $results2 = $this->con->execute_query($sql2, $params);
                 while($row2 = $results2->fetch_assoc()){
                     $employees[] = $row2;
                 }
@@ -426,19 +416,15 @@
             $assignedEmployees = explode(',',filterInput('assignedEmployees'));
             $todaysDate = date('Y-m-d');
             // Insert the project and get it's
-            $sql1 = "INSERT INTO project(name,date_created,deadline,is_open,target)
-            VALUE('$name','$todaysDate','$deadline',$isOpen,$idealTarget)";
-            if($this->con->query($sql1)){
-                // Get the latest project is
-                $sql2 = "SELECT id FROM project ORDER BY id DESC LIMIT 1";
-                $results2 = $this->con->query($sql2);
-                if($results2->num_rows == 1){
-                    $projectId = $results2->fetch_assoc()['id'];
+            $sql1 = "INSERT INTO project(name,date_created,deadline,is_open,target) VALUE(?,?,?,?,?)";
+            if($this->con->execute_query($sql1, [$name, $todaysDate, $deadline, $isOpen, $idealTarget])){
+                // The id of the project just inserted (not "the newest row", which another save could change)
+                $projectId = $this->con->insert_id;
+                if($projectId){
                     $errorAssigning = false;
                     // Assign employees to project
-                    foreach($assignedEmployees as $employee){
-                        $sql3 = "INSERT INTO assign(project_id,employee_id) VALUE($projectId,$employee)";
-                        if(!$this->con->query($sql3)){
+                    foreach(array_filter($assignedEmployees, 'strlen') as $employee){
+                        if(!$this->con->execute_query("INSERT INTO assign(project_id,employee_id) VALUE(?,?)", [$projectId, $employee])){
                             $errorAssigning = true; 
                         }
                     }
@@ -465,8 +451,7 @@
 
         function deleteProject(){
             $projectId = filterInput('projectId');
-            $sql1 = "DELETE FROM project WHERE id=$projectId";
-            if($this->con->query($sql1)){
+            if($this->con->execute_query("DELETE FROM project WHERE id=?", [$projectId])){
                 http_response_code(204);
                 echo json_encode(['status'=>"SUCCESS"]);
             }
@@ -481,13 +466,13 @@
             $projectId = filterInput('projectId');
             $value = filterInput('value') == 'yes'? 1: 0;
             if($option == 'assessment'){
-                $sql1 = "UPDATE project SET assess=$value WHERE id=$projectId";
+                $sql1 = "UPDATE project SET assess=? WHERE id=?";
             }
             else{
-                $sql1 = "UPDATE project SET is_open=$value WHERE id=$projectId";
+                $sql1 = "UPDATE project SET is_open=? WHERE id=?";
             }
 
-            if($this->con->query($sql1)){
+            if($this->con->execute_query($sql1, [$value, $projectId])){
                 echo json_encode(['status'=>"SUCCESS"]);
             }
             else{
@@ -503,35 +488,25 @@
             $employeeProjectsHtml = "";
             // TODO: Special roles
             // Auditor or General Manager
+            $params = [];
+            $condition = '';
+            if($q){
+                [$condition, $params] = searchCondition($columns,$q);
+            }
             if($employeeRole == 1 or $employeeRole == 0){
-                if($q){
-                    $spreadColumns = spreadSearchColumns($columns,$q);
-                    $sql1 = "SELECT * FROM project
-                    WHERE $spreadColumns";
-                }
-                else{
-                    $sq1 = "SELECT * FROM project";
-                }
+                $sql1 = "SELECT * FROM project" . ($q ? " WHERE $condition" : "");
             }
             // if($employeeRole == 2){
 
             // }
             // Staff
             else{
-                if($q){
-                    $spreadColumns = spreadSearchColumns($columns,$q);
-                    $sql1 = "SELECT * FROM project 
+                $sql1 = "SELECT * FROM project 
                     INNER JOIN assign
-                    ON `project`.`id`=`assign`.`project_id` AND `assign`.`employee_id`=$employeeId
-                    WHERE $spreadColumns";
-                }
-                else{
-                    $sq1 = "SELECT * FROM project 
-                    INNER JOIN assign
-                    ON `project`.`id`=`assign`.`project_id` AND `assign`.`employee_id`=$employeeId";
-                }
+                    ON `project`.`id`=`assign`.`project_id` AND `assign`.`employee_id`=?" . ($q ? " WHERE $condition" : "");
+                $params = array_merge([$employeeId], $params);
             }
-            $results1 = $this->con->query($sq1);
+            $results1 = $this->con->execute_query($sql1, $params);
             if($results1->num_rows > 0){
                 while($row1 = $results1->fetch_assoc()){
                     $projectId = $row1['id'];
@@ -609,5 +584,66 @@
             }
             return $employeeProjectsHtml;
         }
+    }
+
+    // ===== AJAX REQUEST HANDLER =====
+    // Check if this file is being called directly for AJAX
+    if (basename($_SERVER['SCRIPT_FILENAME']) == 'project_control.php' && isset($_POST['task'])) {
+        // Only logged-in admins may call this handler
+        require_once __DIR__ . '/../misc/admin_login_required.php';
+        
+        header('Content-Type: application/json');
+        
+        // Get database connection
+        require_once '../misc/database_auth.php';
+        
+        // Create instance of ProjectControl
+        $projectControl = new ProjectControl($con);
+        
+        $task = isset($_POST['task']) ? $_POST['task'] : '';
+        $projectId = isset($_POST['project_id']) ? (int)$_POST['project_id'] : 0;
+        $value = isset($_POST['value']) ? (int)$_POST['value'] : 0;
+        
+        // Validate inputs
+        if (empty($task) || $projectId <= 0) {
+            http_response_code(400);
+            echo json_encode(['status' => 'ERROR', 'message' => 'Missing required parameters']);
+            exit;
+        }
+        
+        try {
+            switch ($task) {
+                case 'updateAssess':
+                    $stmt = $con->prepare("UPDATE project SET assess = ? WHERE id = ?");
+                    $result = $stmt->execute([$value, $projectId]);
+                    
+                    if ($result) {
+                        echo json_encode(['status' => 'SUCCESS', 'message' => 'Assessment updated']);
+                    } else {
+                        echo json_encode(['status' => 'ERROR', 'message' => 'Failed to update assessment']);
+                    }
+                    break;
+                    
+                case 'updateIsOpen':
+                    $stmt = $con->prepare("UPDATE project SET is_open = ? WHERE id = ?");
+                    $result = $stmt->execute([$value, $projectId]);
+                    
+                    if ($result) {
+                        echo json_encode(['status' => 'SUCCESS', 'message' => 'Project status updated']);
+                    } else {
+                        echo json_encode(['status' => 'ERROR', 'message' => 'Failed to update project status']);
+                    }
+                    break;
+                    
+                default:
+                    http_response_code(400);
+                    echo json_encode(['status' => 'ERROR', 'message' => 'Invalid task']);
+            }
+        } catch (Exception $e) {
+            http_response_code(500);
+            error_log('project_control: ' . $e->getMessage());   // details stay in the server log
+            echo json_encode(['status' => 'ERROR', 'message' => 'Could not update the project']);
+        }
+        exit;
     }
 ?>

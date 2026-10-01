@@ -1,0 +1,24 @@
+column,description
+snapshot_date,When the row was measured (quarter end). Features use only information up to this date.
+employee_id,Anonymous ID. No names or contact details anywhere in the data.
+department,Department at snapshot time.
+role,Staff / Manager / Auditor / General Manager (same roles as the app).
+contract_type,permanent or fixed_term.
+grade,Pay/seniority grade 1 (junior) to 6 (senior).
+tenure_months,Months since hire_date.
+months_since_promotion,Months since last grade increase (or hire). Long stalls raise risk.
+compa_ratio,Salary divided by midpoint of their pay band. Below ~0.92 = paid under peers.
+manager_changed_6m,1 if the department manager changed in the last 6 months.
+team_exits_6m,Departures from the same department in the last 6 months.
+avg_rating,"Average task rating this quarter (10-100, as in the app's assessments)."
+rating_change,avg_rating minus last quarter's. Blank on an employee's first snapshot.
+self_vs_manager_rating_gap,Self rating minus manager/auditor rating. Large gaps suggest feeling undervalued.
+tasks_logged,Tasks logged this quarter.
+tasks_vs_dept_avg,tasks_logged divided by the department average (1.0 = typical).
+late_task_pct,Share of tasks logged after their deadline (0-1).
+projects_assigned,Projects assigned this quarter.
+sick_days_q,Sick days this quarter.
+training_hours_12m,Training hours received in the last 12 months.
+days_since_last_login,Days since last app sign-in at snapshot time. Blank before Jul 2025 (not yet tracked) -- realistic missing data.
+resigned_within_6m,LABEL. 1 if the employee resigned within 182 days after snapshot_date. Not a feature.
+exit_type_within_6m,"OUTCOME, not a feature. Any exit type in the next 6 months (resigned/dismissed/retired/contract_ended). Use to exclude or study non-voluntary exits."

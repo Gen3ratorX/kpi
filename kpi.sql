@@ -297,7 +297,7 @@ ALTER TABLE `department`
 -- Constraints for table `employee`
 --
 ALTER TABLE `employee`
-  ADD CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`employee_role_id`) REFERENCES `employee_role` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`employee_role_id`) REFERENCES `employee_role` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT `employee_ibfk_2` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   ADD CONSTRAINT `employee_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `unit` (`id`) ON DELETE SET NULL ON UPDATE SET NULL;
 
@@ -320,6 +320,56 @@ ALTER TABLE `task`
 --
 ALTER TABLE `unit`
   ADD CONSTRAINT `unit_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+-- --------------------------------------------------------
+-- Turnover tracking (phase 1): who joins, who leaves, and when.
+-- Idempotent, so it doubles as the migration for existing databases.
+-- --------------------------------------------------------
+
+ALTER TABLE `employee`
+  ADD COLUMN IF NOT EXISTS `hire_date` date DEFAULT NULL AFTER `unit_id`,
+  ADD COLUMN IF NOT EXISTS `status` enum('active','left') NOT NULL DEFAULT 'active' AFTER `hire_date`,
+  ADD COLUMN IF NOT EXISTS `last_login` datetime DEFAULT NULL AFTER `status`;
+
+-- One row per departure, so a reinstated employee who leaves again keeps both records
+CREATE TABLE IF NOT EXISTS `employee_exit` (
+  `id` int(200) NOT NULL AUTO_INCREMENT,
+  `employee_id` int(100) NOT NULL,
+  `exit_date` date NOT NULL,
+  `exit_type` enum('resigned','dismissed','retired','contract_ended','other') NOT NULL,
+  `reason` text DEFAULT NULL,
+  `recorded_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `employee_id` (`employee_id`),
+  CONSTRAINT `employee_exit_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Files attached to tasks (used by TaskControl::saveTaskWithFile / getTaskFiles).
+-- The code needed this table but neither SQL dump created it, so fresh installs crashed
+-- when viewing assessments. Safe to run on a database that already has it.
+
+CREATE TABLE IF NOT EXISTS `task_files` (
+  `id` int(200) NOT NULL AUTO_INCREMENT,
+  `task_id` int(200) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `file_size` int(11) NOT NULL DEFAULT 0,
+  `file_type` varchar(150) DEFAULT NULL,
+  `uploaded_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `task_id` (`task_id`),
+  CONSTRAINT `task_files_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- Role numbers the code relies on (employee_role.role):
+--   0 = General Manager, 1 = Auditor, 2 = Employee (regular staff), 3 = Manager
+-- The code used to treat role 2 as Manager, which gave every regular employee manager-level
+-- assessment access in their department. Managers now have their own role: after running this,
+-- switch each manager / head of department to "Manager" on their employee page.
+
+INSERT IGNORE INTO `employee_role` (`name`, `role`) VALUES ('Manager', 3);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

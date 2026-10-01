@@ -17,15 +17,20 @@
         return $sanitizedField;
     }
 
-    function spreadSearchColumns($columns,$q){
-        $returnValue = "";
-        for($i = 0; $i < count($columns); $i++){  
-            $i + 1 < count($columns)
-            ? $returnValue .= "$columns[$i] LIKE '%$q%' OR "
-            : $returnValue .= "$columns[$i] LIKE '%$q%'";
+    // Builds "(col1 LIKE ? OR col2 LIKE ?)" plus the values to bind, for prepared statements.
+    // Column names come from code, never from the request; anything unexpected is refused.
+    function searchCondition($columns, $q){
+        $conditions = [];
+        foreach($columns as $column){
+            if(!preg_match('/^[A-Za-z_][A-Za-z0-9_.`]*$/', $column)){
+                throw new InvalidArgumentException("Invalid search column: $column");
+            }
+            $conditions[] = "$column LIKE ?";
         }
-
-        return "($returnValue)";
+        return [
+            '(' . implode(' OR ', $conditions) . ')',
+            array_fill(0, count($columns), "%$q%"),
+        ];
     }
 
     function convertToKhebabCase($word,$delimiter){
@@ -84,7 +89,8 @@
 
         $prevPageNumber = $pageNumber - 1;
         $nextPageNumber = $pageNumber + 1;
-        // Create pagination template
+        // Create pagination template (none needed when everything fits on one page)
+        $paginationHtml = "";
         if($hasNext and $hasPrevious){
             $paginationHtml = "
                 <section id='pagination' class='text-center my-3 d-flex align-items-center justify-content-center'>

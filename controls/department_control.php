@@ -5,6 +5,7 @@ require_once '../misc/utils.php';
 class DepartmentControl
 {
     private $con;
+    private $tableName;
 
     function __construct($con)
     {
@@ -15,13 +16,14 @@ class DepartmentControl
     function getDepartmentsList($q = null, $columns = null)
     {
         $departments = [];
+        $params = [];
         if ($q) {
-            $spreadColumns = spreadSearchColumns($columns, $q);
-            $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+            [$condition, $params] = searchCondition($columns, $q);
+            $sql1 = "SELECT * FROM $this->tableName WHERE $condition";
         } else {
             $sql1 = "SELECT * FROM $this->tableName";
         }
-        $results1 = $this->con->query($sql1);
+        $results1 = $this->con->execute_query($sql1, $params);
         while ($row1 = $results1->fetch_assoc()) {
             $departments[] = $row1;
         }
@@ -82,7 +84,8 @@ class DepartmentControl
         } else {
             // Get all managers
             $sql1 = "SELECT CONCAT_WS(' ',surname,other_names) AS name,id FROM employee 
-                WHERE employee_role_id IN (SELECT id FROM employee_role WHERE role=2) AND id NOT IN (SELECT IFNULL(employee_id,0) FROM department)";
+                WHERE employee_role_id IN (SELECT id FROM employee_role WHERE role=3) AND id NOT IN (SELECT IFNULL(employee_id,0) FROM department)
+                AND status='active'";
             $results1 = $this->con->query($sql1);
             if ($results1->num_rows > 0) {
                 $returnValue = "";
@@ -107,11 +110,11 @@ class DepartmentControl
         $employees = [];
         $q = filterInput('q', false);
         $columns = ['surname', 'other_names'];
-        $speadColumns = spreadSearchColumns($columns, $q);
+        [$condition, $params] = searchCondition($columns, $q);
         $sql1 = "SELECT CONCAT_WS(' ',surname,other_names) AS name, id FROM employee 
-            WHERE employee_role_id IN (SELECT id FROM employee_role WHERE role=2) 
-            AND $speadColumns";
-        $results1 = $this->con->query($sql1);
+            WHERE employee_role_id IN (SELECT id FROM employee_role WHERE role=3) 
+            AND status='active' AND $condition";
+        $results1 = $this->con->execute_query($sql1, $params);
         while ($row1 = $results1->fetch_assoc()) {
             $employees[] = $row1;
         }
@@ -120,8 +123,7 @@ class DepartmentControl
 
     function getDepartment($departmentId)
     {
-        $sql1 = "SELECT * FROM department WHERE id=$departmentId";
-        $result1 = $this->con->query($sql1);
+        $result1 = $this->con->execute_query("SELECT * FROM department WHERE id=?", [$departmentId]);
         if ($result1->num_rows == 1) {
             $row1 = $result1->fetch_assoc();
             return $row1;
@@ -133,13 +135,10 @@ class DepartmentControl
     {
         $hod = filterInput('hod');
         $department = filterInput('department');
-        $sql1 = "INSERT IGNORE INTO department(name,hod) 
-            VALUE('$department','$hod')";
-        if (!$hod) {
-            $sql1 = "INSERT IGNORE INTO department(name) 
-                VALUE('$department')";
-        }
-        if ($this->con->query($sql1)) {
+        $saved = $hod
+            ? $this->con->execute_query("INSERT IGNORE INTO department(name,hod) VALUE(?,?)", [$department, $hod])
+            : $this->con->execute_query("INSERT IGNORE INTO department(name) VALUE(?)", [$department]);
+        if ($saved) {
             http_response_code(201);
             echo json_encode([
                 'status' => 'SUCCESS'
@@ -157,15 +156,13 @@ class DepartmentControl
         $hod = filterInput('hod');
         $department = filterInput('department');
         $departmentId = filterInput('departmentId');
-        $sql1 = "UPDATE IGNORE department SET name='$department', hod='$hod' WHERE id=$departmentId";
-        if (!$hod) {
-            $sql1 = "UPDATE IGNORE department SET name='$department'  WHERE id=$departmentId";
-        }
-        if ($this->con->query($sql1)) {
+        $saved = $hod
+            ? $this->con->execute_query("UPDATE IGNORE department SET name=?, hod=? WHERE id=?", [$department, $hod, $departmentId])
+            : $this->con->execute_query("UPDATE IGNORE department SET name=? WHERE id=?", [$department, $departmentId]);
+        if ($saved) {
             http_response_code(200);
             echo json_encode([
-                'status' => 'SUCCESS',
-                'sql' => $sql1
+                'status' => 'SUCCESS'
             ]);
         } else {
             http_response_code(500);
@@ -178,8 +175,7 @@ class DepartmentControl
     function deleteDepartment()
     {
         $departmentId = filterInput('departmentId');
-        $sql1 = "DELETE FROM department WHERE id=$departmentId";
-        if ($this->con->query($sql1)) {
+        if ($this->con->execute_query("DELETE FROM department WHERE id=?", [$departmentId])) {
             http_response_code(200);
             echo json_encode([
                 'status' => 'SUCCESS'

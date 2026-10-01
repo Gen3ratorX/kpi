@@ -2,3 +2,11 @@ KPI ERD.vsdx
 ~$$KPI ERD.~vsdx
 KPI ERD 2.vsdx
 ~$$KPI ERD 2.~vsdx
+
+# Turnover model: employee-level data must never be committed (regenerate synthetic data with generate_turnover_data.py)
+turnover_model/*.csv
+!turnover_model/data_dictionary.csv
+
+# Files people upload (CVs, evidence) are user data, not code
+uploads/*
+!uploads/.htaccess

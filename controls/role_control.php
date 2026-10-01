@@ -2,6 +2,7 @@
     require_once '../misc/utils.php';
     class RoleControl{
         private $con;
+        private $tableName;
 
         function __construct($con)
         {
@@ -12,8 +13,8 @@
         function saveRole(){
             $name = filterInput('name');
             $role = filterInput('role');
-            $sql1 = "INSERT IGNORE INTO $this->tableName(name,role) VALUE('$name',$role)";
-            if($this->con->query($sql1)){
+            $sql1 = "INSERT IGNORE INTO $this->tableName(name,role) VALUE(?,?)";
+            if($this->con->execute_query($sql1, [$name, $role])){
                 http_response_code(201);
                 echo json_encode([
                     'status'=> "SUCCESS"
@@ -29,15 +30,15 @@
 
         function getRolesList($q=null,$columns=null){
             $roles = [];
+            $params = [];
             if($q){
-                $spreadColumns = spreadSearchColumns($columns,$q);
-                $sql1 = "SELECT * FROM $this->tableName WHERE $spreadColumns";
+                [$condition, $params] = searchCondition($columns,$q);
+                $sql1 = "SELECT * FROM $this->tableName WHERE $condition";
             }
             else{
                 $sql1 = "SELECT * FROM $this->tableName";
             }
-            $sql1 = "SELECT * FROM $this->tableName";
-            $results1 = $this->con->query($sql1);
+            $results1 = $this->con->execute_query($sql1, $params);
             if($results1->num_rows > 0){
                 while($row = $results1->fetch_assoc()){
                     $roles[] = $row;
@@ -117,8 +118,7 @@
         }
 
         function getRole($roleId){
-            $sql1 = "SELECT * FROM $this->tableName WHERE id=$roleId";
-            $result1 = $this->con->query($sql1);
+            $result1 = $this->con->execute_query("SELECT * FROM $this->tableName WHERE id=?", [$roleId]);
             return $result1->num_rows == 1 
             ? $result1->fetch_assoc()
             : null;
@@ -128,8 +128,8 @@
             $roleId = filterInput('roleId');
             $role = filterInput('role');
             $name = filterInput('name');
-            $sql1 = "UPDATE $this->tableName SET name='$name', role=$role WHERE id=$roleId";
-            if($this->con->query($sql1)){
+            $sql1 = "UPDATE $this->tableName SET name=?, role=? WHERE id=?";
+            if($this->con->execute_query($sql1, [$name, $role, $roleId])){
                 echo json_encode([
                     'status'=>"SUCCESS",
                 ]);
@@ -144,9 +144,23 @@
         }
 
         function deleteRole(){
-            $roleId = filterInput('roleId');
-            $sql1 = "DELETE FROM $this->tableName WHERE id=$roleId";
-            if($this->con->query($sql1)){
+            $roleId = (int)filterInput('roleId');
+            // Employees (including ones who have left) must be moved off a role before it can go.
+            // The database also refuses it (ON DELETE RESTRICT), so this is just the friendly message.
+            $stmt1 = $this->con->prepare("SELECT COUNT(*) AS employees FROM employee WHERE employee_role_id=?");
+            $stmt1->bind_param('i', $roleId);
+            $stmt1->execute();
+            $employeeCount = (int)$stmt1->get_result()->fetch_assoc()['employees'];
+            if($employeeCount > 0){
+                http_response_code(409);
+                $noun = $employeeCount == 1 ? 'employee still has' : 'employees still have';
+                echo json_encode([
+                    'status'=>"ERROR",
+                    'message'=>"$employeeCount $noun this role. Move them to another role first.",
+                ]);
+                return;
+            }
+            if($this->con->execute_query("DELETE FROM $this->tableName WHERE id=?", [$roleId])){
                 http_response_code(204);
                 echo json_encode([
                     'status'=>"SUCCESS",

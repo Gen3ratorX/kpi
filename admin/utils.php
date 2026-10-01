@@ -1,4 +1,5 @@
 <?php
+    require_once '../misc/admin_login_required.php';
     require_once '../misc/database_auth.php';
     require_once '../controls/project_control.php';
     require_once '../controls/role_control.php';
@@ -33,8 +34,11 @@
     elseif (isset($_POST['task']) and $_POST['task'] == 'editEmployee') {
         $employeeControl->editEmployee();
     }
-    elseif (isset($_POST['task']) and $_POST['task'] == 'deleteEmployee') {
-        $employeeControl->deleteEmployee();
+    elseif (isset($_POST['task']) and $_POST['task'] == 'markEmployeeLeft') {
+        $employeeControl->markEmployeeLeft();
+    }
+    elseif (isset($_POST['task']) and $_POST['task'] == 'reinstateEmployee') {
+        $employeeControl->reinstateEmployee();
     }
     elseif (isset($_GET['task']) and $_GET['task'] == 'getUnitsForDepartment') {
         $employeeControl->getUnitsForDepartment();

@@ -19,6 +19,6 @@ Main:
 Misc:
     - Days left when passed  
     - Make admin username and email unique
-    - Add last_login to employees table 
+    - Add last_login to employees table @done
     -Remove all unwanted code when done. 
 

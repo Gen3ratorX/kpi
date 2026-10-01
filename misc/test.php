@@ -24,9 +24,7 @@ class TestControl
     function createSuperuser($username, $password)
     {
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $sql1 = "INSERT IGNORE INTO admin(username,password) 
-            VALUE('$username','$hashedPassword')";
-        if ($this->con->query($sql1)) {
+        if ($this->con->execute_query("INSERT IGNORE INTO admin(username,password) VALUE(?,?)", [$username, $hashedPassword])) {
             echo "Superuser created successfully";
         } else {
             echo "Error in creating superuser";
@@ -35,5 +33,4 @@ class TestControl
 }
 
 $testControl = new TestControl($con);
-// $testControl->createSuperuser('eoffei', 'testing321');
 // echo colorCodesForProgress(0);

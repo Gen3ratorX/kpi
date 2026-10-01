@@ -1,0 +1,56 @@
+Training data: 4264 rows, 624 employees, 313 resignation rows (7.3%); dropped 149 rows with dismissal/retirement/contract-end exits
+Train: 2023-12-31 .. 2025-03-31 (2554 rows, 169 leavers)
+Test:  2025-09-30 .. 2026-03-31 (1284 rows, 114 leavers)
+Not used: days_since_last_login is blank in 100% of training rows
+
+Choosing the regularisation strength (rolling validation inside the training period):
+  lambda 0.001  validation log-loss 0.2840   AUC 0.619  (3 folds)
+  lambda 0.003  validation log-loss 0.2790   AUC 0.619  (3 folds)
+  lambda 0.01   validation log-loss 0.2726   AUC 0.619  (3 folds)
+  lambda 0.03   validation log-loss 0.2668   AUC 0.622  (3 folds)
+  lambda 0.1    validation log-loss 0.2631   AUC 0.628  (3 folds)
+  lambda 0.3    validation log-loss 0.2640   AUC 0.631  (3 folds)
+  lambda 1.0    validation log-loss 0.2676   AUC 0.632  (3 folds)
+  lambda 3.0    validation log-loss 0.2701   AUC 0.630  (3 folds)
+  -> lambda = 0.1
+
+Held-out test (2025-09-30 .. 2026-03-31):
+  AUC                          0.627   (random = 0.500)
+  Rule 'no promotion in 3 yrs' 0.513
+  Best single signal           0.626   (late_task_pct)
+  Top 10% flagged who resigned  18.0%  vs 8.9% overall  -> lift 2.0x
+  Log-loss 0.2930 (always predicting the base rate: 0.3035)
+  Brier score 0.0792
+  Calibration (does 'x% risk' mean x%?):
+    predicted   3.3%   actual   5.8%   (257 rows)
+    predicted   4.7%   actual   5.4%   (257 rows)
+    predicted   6.0%   actual   8.2%   (256 rows)
+    predicted   7.9%   actual   9.3%   (257 rows)
+    predicted  13.3%   actual  15.6%   (257 rows)
+
+Final model: refitted on all 4264 labelled rows, lambda 0.1
+Strongest signals (standardised weight, odds ratio per 1 std):
+  late_task_pct                      +0.170   x1.19  raises risk
+  self_vs_manager_rating_gap         +0.136   x1.15  raises risk
+  sick_days_q                        +0.126   x1.13  raises risk
+  department=IT                      +0.084   x1.09  raises risk
+  manager_changed_6m                 +0.083   x1.09  raises risk
+  tasks_vs_dept_avg                  -0.081   x0.92  lowers risk
+  avg_rating                         -0.069   x0.93  lowers risk
+  role=Auditor                       -0.063   x0.94  lowers risk
+  department=Legal                   -0.060   x0.94  lowers risk
+  department=Finance                 -0.059   x0.94  lowers risk
+  compa_ratio                        -0.056   x0.95  lowers risk
+  rating_change__missing             -0.052   x0.95  lowers risk
+
+Drift check: average risk now 9.6% vs 7.0% in the training history; 31% of current staff exceed the historical top-10% threshold (11.3%).
+  Risk is running well above the past. Check for a real change (pay, reorganisation) before trusting individual ranks.
+Scored 444 current employees: 44 High, 89 Medium, 311 Low
+Highest risk:
+  E0604  Operations        44.1%  High    76% of tasks logged late; Rates self 30 points above assessors; Manager changed in the last 6 months
+  E0238  Sales             32.5%  High    7 sick days this quarter; Rates self 32 points above assessors; 45% of tasks logged late
+  E0088  Operations        26.3%  High    6 sick days this quarter; 40% of tasks logged late; Manager changed in the last 6 months
+  E0602  Sales             25.4%  High    5 sick days this quarter; 40% of tasks logged late; Rates self 22 points above assessors
+  E0600  Audit             23.2%  High    Rates self 30 points above assessors; 48% of tasks logged late; 5 sick days this quarter
+
+Wrote turnover_model.json, risk_scores.csv, training_report.txt to /Users/bigwolf/Documents/kpi1/kpi/turnover_model

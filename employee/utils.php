@@ -1,9 +1,5 @@
 <?php
     require_once '../misc/employee_login_required.php';
-    // Enable error reporting
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-    
     require_once '../misc/database_auth.php';
     require_once '../controls/task_control.php';
     
@@ -40,12 +36,6 @@
             forbidden();
         }
     }
-
-    // Debug: Log what's being received
-    error_log("=== utils.php REQUEST ===");
-    error_log("METHOD: " . $_SERVER['REQUEST_METHOD']);
-    error_log("POST: " . print_r($_POST, true));
-    error_log("GET: " . print_r($_GET, true));
 
     // ===== HANDLE POST REQUESTS =====
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -131,8 +121,7 @@
                     http_response_code(400);
                     echo json_encode([
                         'status' => 'ERROR', 
-                        'message' => 'Invalid task: ' . $task,
-                        'received_data' => $_POST
+                        'message' => 'Invalid task'
                     ]);
                     break;
             }
@@ -140,8 +129,7 @@
             http_response_code(400);
             echo json_encode([
                 'status' => 'ERROR', 
-                'message' => 'No task specified',
-                'post_data' => $_POST
+                'message' => 'No task specified'
             ]);
         }
     }
@@ -179,8 +167,7 @@
             http_response_code(400);
             echo json_encode([
                 'status' => 'ERROR', 
-                'message' => 'Invalid GET request',
-                'get_data' => $_GET
+                'message' => 'Invalid GET request'
             ]);
         }
     }

@@ -1,95 +1,65 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
+-- KPI Management System - demo database
 --
--- Host: 127.0.0.1
--- Generation Time: Aug 22, 2025 at 02:30 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- WARNING: drops and recreates every table. Use only on a demo/test database.
+-- Tested on MariaDB 13; written for MariaDB 10.4+ (as in XAMPP). MySQL 8 is untested.
+--
+-- Demo logins (employee passwords follow the app's rule: password = username):
+--   admin    / Admin@123  Administrator
+--   jmensah  / jmensah    Auditor
+--   kboateng / kboateng   General Manager
+--   aowusu   / aowusu     Manager (Information Systems)
+--   petra    / petra      Employee
+--   eaddo    / eaddo      Employee
+--   ytetteh  / ytetteh    Employee who has left (sign-in is refused)
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
 SET time_zone = "+00:00";
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+START TRANSACTION;
+DROP TABLE IF EXISTS `employee_role`;
+DROP TABLE IF EXISTS `department`;
+DROP TABLE IF EXISTS `unit`;
+DROP TABLE IF EXISTS `employee`;
+DROP TABLE IF EXISTS `employee_exit`;
+DROP TABLE IF EXISTS `project`;
+DROP TABLE IF EXISTS `assign`;
+DROP TABLE IF EXISTS `task`;
+DROP TABLE IF EXISTS `task_files`;
+DROP TABLE IF EXISTS `performance`;
+DROP TABLE IF EXISTS `admin`;
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `kpi`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `admin`
---
-
-CREATE TABLE `admin` (
-  `id` int(200) NOT NULL,
-  `surname` varchar(100) DEFAULT NULL,
-  `other_names` varchar(100) DEFAULT NULL,
-  `username` varchar(100) NOT NULL,
-  `password` varchar(200) NOT NULL,
-  `last_login` datetime DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL,
-  `phone` varchar(50) DEFAULT NULL
+-- Role numbers the code relies on (employee_role.role):
+--   0 = General Manager, 1 = Auditor, 2 = Employee (regular staff), 3 = Manager
+CREATE TABLE `employee_role` (
+  `id` int(100) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL,
+  `role` tinyint(3) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `role` (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `admin`
---
-
-INSERT INTO `admin` (`id`, `surname`, `other_names`, `username`, `password`, `last_login`, `email`, `phone`) VALUES
-(1, NULL, NULL, 'eoffei', '$2y$10$WsG.9lZaVbbhg5zb3PhZvOKD5El.QT6KVE0FzPMhYD/CmO8bSwZKK', '2025-08-22 11:43:34', NULL, NULL);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `assign`
---
-
-CREATE TABLE `assign` (
-  `project_id` int(200) NOT NULL,
-  `employee_id` int(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `assign`
---
-
-INSERT INTO `assign` (`project_id`, `employee_id`) VALUES
-(1, 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `department`
---
 
 CREATE TABLE `department` (
-  `id` int(100) NOT NULL,
+  `id` int(100) NOT NULL AUTO_INCREMENT,
   `name` varchar(200) NOT NULL,
-  `hod` varchar(200) NOT NULL
+  `hod` varchar(200) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `department`
---
+CREATE TABLE `unit` (
+  `id` int(200) NOT NULL AUTO_INCREMENT,
+  `department_id` int(200) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `department_id` (`department_id`),
+  CONSTRAINT `unit_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO `department` (`id`, `name`, `hod`) VALUES
-(4, 'Information Systems', 'John Mensah');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `employee`
---
-
+-- Employees are never deleted: leaving is recorded (status + employee_exit) so that tasks
+-- and ratings are kept and the turnover model can learn from exits.
 CREATE TABLE `employee` (
-  `id` int(100) NOT NULL,
+  `id` int(100) NOT NULL AUTO_INCREMENT,
   `surname` varchar(100) NOT NULL,
   `other_names` varchar(200) NOT NULL,
   `username` varchar(100) NOT NULL,
@@ -100,299 +70,23 @@ CREATE TABLE `employee` (
   `employee_role_id` int(100) NOT NULL,
   `department_id` int(100) DEFAULT NULL,
   `unit_id` int(100) DEFAULT NULL,
-  `is_new` tinyint(1) NOT NULL DEFAULT 1
+  `hire_date` date DEFAULT NULL,
+  `status` enum('active','left') NOT NULL DEFAULT 'active',
+  `last_login` datetime DEFAULT NULL,
+  `is_new` tinyint(1) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`),
+  UNIQUE KEY `email` (`email`),
+  KEY `employee_role_id` (`employee_role_id`),
+  KEY `department_id` (`department_id`),
+  KEY `unit_id` (`unit_id`),
+  CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`employee_role_id`) REFERENCES `employee_role` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `employee_ibfk_2` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `employee_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `unit` (`id`) ON DELETE SET NULL ON UPDATE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `employee`
---
-
-INSERT INTO `employee` (`id`, `surname`, `other_names`, `username`, `password`, `phone`, `email`, `location`, `employee_role_id`, `department_id`, `unit_id`, `is_new`) VALUES
-(1, 'Gligah', 'Petra', 'petra', '$2y$10$jERrpRpkaL42VJuqUDEDAOhhjPk4aTf0aOACigPVgTrUHtjqkXWFG', '+23327562526363', 'ebenezeroffei@outlook.com', 'Teshie', 2, 4, 1, 1),
-(15, 'Mensah', 'Steven', 'jmensah', '$2y$10$kdMmva78C/KVIgMTPgRLPOm3zlNBMv7i5qKfvTZqiDahELVjAovAG', '+23327562526363', 'john@gmail.com', 'Kasoa', 1, 4, 1, 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `employee_role`
---
-
-CREATE TABLE `employee_role` (
-  `id` int(100) NOT NULL,
-  `name` varchar(200) NOT NULL,
-  `role` tinyint(3) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `employee_role`
---
-
-INSERT INTO `employee_role` (`id`, `name`, `role`) VALUES
-(1, 'Auditor', 1),
-(2, 'Employee', 2),
-(4, 'General Manager', 0);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `performance`
---
-
-CREATE TABLE `performance` (
-  `id` int(200) NOT NULL,
-  `task_id` int(200) NOT NULL,
-  `assessor_id` int(200) NOT NULL,
-  `rating` tinyint(3) NOT NULL,
-  `date` date NOT NULL,
-  `comments` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `performance`
---
-
-INSERT INTO `performance` (`id`, `task_id`, `assessor_id`, `rating`, `date`, `comments`) VALUES
-(1, 2, 1, 40, '2025-08-22', ''),
-(2, 1, 1, 50, '2025-08-22', '');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `project`
---
-
-CREATE TABLE `project` (
-  `id` int(100) NOT NULL,
-  `name` varchar(200) NOT NULL,
-  `date_created` date NOT NULL,
-  `deadline` date NOT NULL,
-  `is_open` tinyint(1) NOT NULL DEFAULT 0,
-  `assess` tinyint(1) NOT NULL DEFAULT 0,
-  `target` smallint(3) NOT NULL DEFAULT 30
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `project`
---
-
-INSERT INTO `project` (`id`, `name`, `date_created`, `deadline`, `is_open`, `assess`, `target`) VALUES
-(1, 'Order Management System', '2025-08-22', '2025-08-30', 0, 1, 100);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `task`
---
-
-CREATE TABLE `task` (
-  `id` int(200) NOT NULL,
-  `project_id` int(200) NOT NULL,
-  `employee_id` int(200) NOT NULL,
-  `description` text NOT NULL,
-  `date_created` date NOT NULL,
-  `deadline` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `task`
---
-
-INSERT INTO `task` (`id`, `project_id`, `employee_id`, `description`, `date_created`, `deadline`) VALUES
-(1, 1, 1, 'Nice', '2025-08-22', '2025-08-30'),
-(2, 1, 1, 'I have a good God', '2025-08-22', '2025-08-30');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `unit`
---
-
-CREATE TABLE `unit` (
-  `id` int(200) NOT NULL,
-  `department_id` int(200) NOT NULL,
-  `name` varchar(200) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `unit`
---
-
-INSERT INTO `unit` (`id`, `department_id`, `name`) VALUES
-(1, 4, 'Software');
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `admin`
---
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `assign`
---
-ALTER TABLE `assign`
-  ADD UNIQUE KEY `project_id` (`project_id`,`employee_id`),
-  ADD KEY `employee_id` (`employee_id`);
-
---
--- Indexes for table `department`
---
-ALTER TABLE `department`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `employee`
---
-ALTER TABLE `employee`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD KEY `employee_role_id` (`employee_role_id`),
-  ADD KEY `department_id` (`department_id`),
-  ADD KEY `unit_id` (`unit_id`);
-
---
--- Indexes for table `employee_role`
---
-ALTER TABLE `employee_role`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD UNIQUE KEY `role` (`role`);
-
---
--- Indexes for table `performance`
---
-ALTER TABLE `performance`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `task_id` (`task_id`),
-  ADD KEY `assessor_id` (`assessor_id`);
-
---
--- Indexes for table `project`
---
-ALTER TABLE `project`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `task`
---
-ALTER TABLE `task`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `employee_id` (`employee_id`),
-  ADD KEY `project_id` (`project_id`);
-
---
--- Indexes for table `unit`
---
-ALTER TABLE `unit`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `department_id` (`department_id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `admin`
---
-ALTER TABLE `admin`
-  MODIFY `id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `department`
---
-ALTER TABLE `department`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `employee`
---
-ALTER TABLE `employee`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
-
---
--- AUTO_INCREMENT for table `employee_role`
---
-ALTER TABLE `employee_role`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `performance`
---
-ALTER TABLE `performance`
-  MODIFY `id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `project`
---
-ALTER TABLE `project`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `task`
---
-ALTER TABLE `task`
-  MODIFY `id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `unit`
---
-ALTER TABLE `unit`
-  MODIFY `id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `assign`
---
-ALTER TABLE `assign`
-  ADD CONSTRAINT `assign_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `assign_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `employee`
---
-ALTER TABLE `employee`
-  ADD CONSTRAINT `employee_ibfk_1` FOREIGN KEY (`employee_role_id`) REFERENCES `employee_role` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  ADD CONSTRAINT `employee_ibfk_2` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
-  ADD CONSTRAINT `employee_ibfk_3` FOREIGN KEY (`unit_id`) REFERENCES `unit` (`id`) ON DELETE SET NULL ON UPDATE SET NULL;
-
---
--- Constraints for table `performance`
---
-ALTER TABLE `performance`
-  ADD CONSTRAINT `performance_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `performance_ibfk_2` FOREIGN KEY (`assessor_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `task`
---
-ALTER TABLE `task`
-  ADD CONSTRAINT `task_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `task_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `unit`
---
-ALTER TABLE `unit`
-  ADD CONSTRAINT `unit_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
--- --------------------------------------------------------
--- Turnover tracking (phase 1): who joins, who leaves, and when.
--- Idempotent, so it doubles as the migration for existing databases.
--- --------------------------------------------------------
-
-ALTER TABLE `employee`
-  ADD COLUMN IF NOT EXISTS `hire_date` date DEFAULT NULL AFTER `unit_id`,
-  ADD COLUMN IF NOT EXISTS `status` enum('active','left') NOT NULL DEFAULT 'active' AFTER `hire_date`,
-  ADD COLUMN IF NOT EXISTS `last_login` datetime DEFAULT NULL AFTER `status`;
 
 -- One row per departure, so a reinstated employee who leaves again keeps both records
-CREATE TABLE IF NOT EXISTS `employee_exit` (
+CREATE TABLE `employee_exit` (
   `id` int(200) NOT NULL AUTO_INCREMENT,
   `employee_id` int(100) NOT NULL,
   `exit_date` date NOT NULL,
@@ -402,14 +96,43 @@ CREATE TABLE IF NOT EXISTS `employee_exit` (
   PRIMARY KEY (`id`),
   KEY `employee_id` (`employee_id`),
   CONSTRAINT `employee_exit_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Files attached to tasks (used by TaskControl::saveTaskWithFile / getTaskFiles).
--- The code needed this table but neither SQL dump created it, so fresh installs crashed
--- when viewing assessments. Safe to run on a database that already has it.
+CREATE TABLE `project` (
+  `id` int(100) NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL,
+  `date_created` date NOT NULL,
+  `deadline` date NOT NULL,
+  `is_open` tinyint(1) NOT NULL DEFAULT 0,
+  `assess` tinyint(1) NOT NULL DEFAULT 0,
+  `target` smallint(3) NOT NULL DEFAULT 30,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS `task_files` (
+CREATE TABLE `assign` (
+  `project_id` int(200) NOT NULL,
+  `employee_id` int(200) NOT NULL,
+  UNIQUE KEY `project_id` (`project_id`,`employee_id`),
+  KEY `employee_id` (`employee_id`),
+  CONSTRAINT `assign_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `assign_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `task` (
+  `id` int(200) NOT NULL AUTO_INCREMENT,
+  `project_id` int(200) NOT NULL,
+  `employee_id` int(200) NOT NULL,
+  `description` text NOT NULL,
+  `date_created` date NOT NULL,
+  `deadline` date NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `employee_id` (`employee_id`),
+  KEY `project_id` (`project_id`),
+  CONSTRAINT `task_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `task_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `task_files` (
   `id` int(200) NOT NULL AUTO_INCREMENT,
   `task_id` int(200) NOT NULL,
   `file_name` varchar(255) NOT NULL,
@@ -420,19 +143,81 @@ CREATE TABLE IF NOT EXISTS `task_files` (
   PRIMARY KEY (`id`),
   KEY `task_id` (`task_id`),
   CONSTRAINT `task_files_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
--- Role numbers the code relies on (employee_role.role):
---   0 = General Manager, 1 = Auditor, 2 = Employee (regular staff), 3 = Manager
--- The code used to treat role 2 as Manager, which gave every regular employee manager-level
--- assessment access in their department. Managers now have their own role: after running this,
--- switch each manager / head of department to "Manager" on their employee page.
+CREATE TABLE `performance` (
+  `id` int(200) NOT NULL AUTO_INCREMENT,
+  `task_id` int(200) NOT NULL,
+  `assessor_id` int(200) NOT NULL,
+  `rating` tinyint(3) NOT NULL,
+  `date` date NOT NULL,
+  `comments` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `task_id` (`task_id`),
+  KEY `assessor_id` (`assessor_id`),
+  CONSTRAINT `performance_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `performance_ibfk_2` FOREIGN KEY (`assessor_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT IGNORE INTO `employee_role` (`name`, `role`) VALUES ('Manager', 3);
+CREATE TABLE `admin` (
+  `id` int(200) NOT NULL AUTO_INCREMENT,
+  `surname` varchar(100) DEFAULT NULL,
+  `other_names` varchar(100) DEFAULT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(200) NOT NULL,
+  `last_login` datetime DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `phone` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `employee_role` (`id`, `name`, `role`) VALUES
+(1, 'Auditor', 1),
+(2, 'Employee', 2),
+(4, 'General Manager', 0),
+(5, 'Manager', 3);
+
+-- Administrator: username `admin`, password `Admin@123`. Change it after installing.
+INSERT INTO `admin` (`id`, `surname`, `other_names`, `username`, `password`, `last_login`, `email`, `phone`) VALUES
+(1, 'Admin', 'Demo', 'admin', '$2y$12$ZL0mo94r6FRenBGGh0IiRuHy88Mg10ENN8OlvDule5zv7BD4U.q8m', NULL, 'admin@example.com', NULL);
+
+INSERT INTO `department` (`id`, `name`, `hod`) VALUES
+(4, 'Information Systems', 'Ama Owusu');
+
+INSERT INTO `unit` (`id`, `department_id`, `name`) VALUES
+(1, 4, 'Software');
+
+INSERT INTO `employee` (`id`, `surname`, `other_names`, `username`, `password`, `phone`, `email`, `location`, `employee_role_id`, `department_id`, `unit_id`, `hire_date`, `status`, `last_login`, `is_new`) VALUES
+(1, 'Gligah', 'Petra', 'petra', '$2y$12$ELxs/RvF0uH01ApZ.b9EYuOOxfL0NGgTx0V7h5oUtaLRP2hvfJz7q', '+233200000001', 'petra@example.com', 'Teshie', 2, 4, 1, '2022-03-14', 'active', NULL, 1),
+(15, 'Mensah', 'Steven', 'jmensah', '$2y$12$U3/NfcRV1Ps2EMd6yfZ6CO8eLwLtozhXxcqHMtdvoesHZ6PEdCxha', '+233200000002', 'jmensah@example.com', 'Kasoa', 1, 4, 1, '2019-06-03', 'active', NULL, 1),
+(16, 'Owusu', 'Ama', 'aowusu', '$2y$12$Ap4DJ2dixhCjwuX.Rz5Ps.SyChv63Fr59z3bDobONRRbMjS/WpsqC', '+233200000003', 'aowusu@example.com', 'Accra', 5, 4, 1, '2018-09-03', 'active', NULL, 1),
+(17, 'Boateng', 'Kwame', 'kboateng', '$2y$12$7Ae.j./onlHPhUlmUXaywet/9cZt8BvHEkG3KxG/1lPHLMKL4Tz2W', '+233200000004', 'kboateng@example.com', 'Tema', 4, 4, NULL, '2015-01-12', 'active', NULL, 1),
+(18, 'Addo', 'Esi', 'eaddo', '$2y$12$wawE5TPd3lzBwnV5iNQUB.9gNN.50o/UJGDAt2BwBUbr7cJVY8viW', '+233200000005', 'eaddo@example.com', 'Madina', 2, 4, 1, '2024-02-05', 'active', NULL, 1),
+(19, 'Tetteh', 'Yaw', 'ytetteh', '$2y$12$6iXlki.1o855tvl1GhVwgePjdQKqdr8ri56bhjzzYgB2g5xXmN7VG', '+233200000006', 'ytetteh@example.com', 'Kumasi', 2, 4, 1, '2021-05-10', 'left', NULL, 1);
+
+INSERT INTO `employee_exit` (`id`, `employee_id`, `exit_date`, `exit_type`, `reason`, `recorded_at`) VALUES
+(1, 19, '2026-07-31', 'resigned', 'Moved to a private bank', '2026-07-31 16:00:00');
+
+-- Project 1 is under assessment (tasks locked, ratings open); project 2 is open for tasks
+INSERT INTO `project` (`id`, `name`, `date_created`, `deadline`, `is_open`, `assess`, `target`) VALUES
+(1, 'Order Management System', '2025-08-22', '2025-08-30', 0, 1, 100),
+(2, 'Customer Portal Upgrade', '2026-09-01', '2026-12-15', 1, 0, 80);
+
+INSERT INTO `assign` (`project_id`, `employee_id`) VALUES
+(1, 1), (1, 16), (1, 18),
+(2, 1), (2, 16), (2, 18);
+
+INSERT INTO `task` (`id`, `project_id`, `employee_id`, `description`, `date_created`, `deadline`) VALUES
+(1, 1, 1, 'Design the order database schema', '2025-08-22', '2025-08-30'),
+(2, 1, 1, 'Build the order tracking page', '2025-08-22', '2025-08-30'),
+(3, 1, 18, 'Write test cases for checkout', '2025-08-23', '2025-08-30'),
+(4, 1, 16, 'Review the sprint deliverables', '2025-08-24', '2025-08-30'),
+(5, 2, 1, 'Audit the current portal pages', '2026-09-05', '2026-12-15');
+
+-- Petra's self-assessment of her two tasks; the other tasks are left for you to rate
+INSERT INTO `performance` (`id`, `task_id`, `assessor_id`, `rating`, `date`, `comments`) VALUES
+(1, 2, 1, 40, '2025-08-28', 'Page works; filters still missing'),
+(2, 1, 1, 50, '2025-08-28', 'Schema reviewed and approved');
 
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+SET FOREIGN_KEY_CHECKS = 1;

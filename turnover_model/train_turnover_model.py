@@ -164,36 +164,51 @@ def purged_split(dates, first_test_date, horizon):
     return train, test
 
 
-def choose_lambda(df, numeric, horizon, weight_mode, log):
+def rolling_folds(df, horizon, n_folds=3):
     """
-    Rolling-origin validation inside the training period: train on the past, validate on each
-    later quarter. Picks the penalty with the lowest validation log-loss, which rewards both
-    good ranking and honest probabilities (AUC alone would happily shrink every weight to ~0).
+    Rolling-origin validation folds inside a training period: for each of the last n_folds
+    snapshot dates, train on rows at least `horizon` earlier and validate on that date.
+    Yields (train_mask, validation_mask), skipping folds without enough leavers.
     """
     dates = pd.to_datetime(df[DATE])
-    unique = sorted(dates.unique())
-    results = {lam: [] for lam in LAMBDAS}
-    aucs = {lam: [] for lam in LAMBDAS}
-    for val_date in unique[-3:]:
+    y = df[LABEL].to_numpy()
+    for val_date in sorted(dates.unique())[-n_folds:]:
         fold_train = (dates <= val_date - horizon).to_numpy()
         fold_val = (dates == val_date).to_numpy()
-        y_tr, y_val = df[LABEL].to_numpy()[fold_train], df[LABEL].to_numpy()[fold_val]
-        if fold_train.sum() == 0 or y_tr.sum() < 5 or y_val.sum() == 0:
+        if fold_train.sum() == 0 or y[fold_train].sum() < 5 or y[fold_val].sum() == 0:
             continue
+        yield fold_train, fold_val
+
+
+def lambda_validation_scores(df, numeric, horizon, weight_mode):
+    """Mean validation log-loss and AUC for every lambda: {lambda: (log_loss, auc, folds)}."""
+    y = df[LABEL].to_numpy()
+    losses = {lam: [] for lam in LAMBDAS}
+    aucs = {lam: [] for lam in LAMBDAS}
+    for fold_train, fold_val in rolling_folds(df, horizon):
         prep = Preprocessor().fit(df[fold_train], numeric, CATEGORICAL)
         X_tr, X_val = prep.transform(df[fold_train]), prep.transform(df[fold_val])
         for lam in LAMBDAS:
-            b = fit_logistic(X_tr, y_tr, lam, class_weight(y_tr, weight_mode))
+            b = fit_logistic(X_tr, y[fold_train], lam, class_weight(y[fold_train], weight_mode))
             p_val = predict(b, X_val)
-            results[lam].append(log_loss(p_val, y_val))
-            aucs[lam].append(auc(p_val, y_val))
-    scored = {lam: np.mean(v) for lam, v in results.items() if v}
-    if not scored:
+            losses[lam].append(log_loss(p_val, y[fold_val]))
+            aucs[lam].append(auc(p_val, y[fold_val]))
+    return {lam: (float(np.mean(losses[lam])), float(np.nanmean(aucs[lam])), len(losses[lam]))
+            for lam in LAMBDAS if losses[lam]}
+
+
+def choose_lambda(df, numeric, horizon, weight_mode, log):
+    """
+    Picks the penalty with the lowest validation log-loss, which rewards both good ranking and
+    honest probabilities (AUC alone would happily shrink every weight to ~0).
+    """
+    scores = lambda_validation_scores(df, numeric, horizon, weight_mode)
+    if not scores:
         log("  Not enough history for validation folds; using lambda = 0.03")
         return 0.03
-    for lam, loss in scored.items():
-        log(f"  lambda {lam:<6} validation log-loss {loss:.4f}   AUC {np.nanmean(aucs[lam]):.3f}  ({len(results[lam])} folds)")
-    chosen = min(scored, key=scored.get)
+    for lam, (loss, lam_auc, folds) in scores.items():
+        log(f"  lambda {lam:<6} validation log-loss {loss:.4f}   AUC {lam_auc:.3f}  ({folds} folds)")
+    chosen = min(scores, key=lambda lam: scores[lam][0])
     log(f"  -> lambda = {chosen}")
     return chosen
 

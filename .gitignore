@@ -10,3 +10,8 @@ turnover_model/*.csv
 # Files people upload (CVs, evidence) are user data, not code
 uploads/*
 !uploads/.htaccess
+
+# Python virtual environment for the model scripts
+turnover_model/.venv/
+__pycache__/
+.DS_Store

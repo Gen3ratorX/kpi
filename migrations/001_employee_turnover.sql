@@ -1,5 +1,5 @@
 -- Turnover tracking (phase 1): who joins, who leaves, and when.
--- Run once on an existing `kpi` database. Safe to re-run (MariaDB 10.0.2+).
+-- Run once on an existing `kpi` database. Safe to re-run. MariaDB only (uses ADD COLUMN IF NOT EXISTS).
 -- Fresh installs from kpi.sql / kpi_data.sql already include this.
 
 ALTER TABLE `employee`
@@ -18,4 +18,4 @@ CREATE TABLE IF NOT EXISTS `employee_exit` (
   PRIMARY KEY (`id`),
   KEY `employee_id` (`employee_id`),
   CONSTRAINT `employee_exit_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employee` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

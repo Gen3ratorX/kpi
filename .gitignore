@@ -15,3 +15,6 @@ uploads/*
 turnover_model/.venv/
 __pycache__/
 .DS_Store
+
+# Local editor/assistant settings
+.claude/
